@@ -21,6 +21,7 @@ jobs:
           sh tools/ngate_fuzz.sh || exit 1
           sh tools/ngate_nfix.sh || exit 1
           sh tools/mkproof.sh src/tests/key_test.nas || exit 1
+          sh tools/nrun.sh src/tests/a2_boot_test.nas | grep -qx 'A2 PASS' || exit 1
   apk:
     needs: core-tests
     runs-on: ubuntu-latest

@@ -30,11 +30,59 @@ LD r3,r2,#W_KIND
 ST r3,r0,@res_kind0
 LD r3,r2,#W_ALIVE
 ST r3,r0,@res_alive0
-HALT
+JMP @a2_chk
 res_nwin:
 .word 0
 res_kind0:
 .word 0
 res_alive0:
 .word 0
+; ---- self-check: exactly one window, terminal kind, and alive (A2's actual assertions;
+; res_steps is filled by the outer driver AFTER n16i_run, so the guest cannot read it here) ----
+a2_chk:
+MOVI r2,1
+LD r1,r0,@res_nwin
+CMP r1,r2
+JMP[NE] @a2_fail
+LD r1,r0,@res_kind0
+CMP r1,r0
+JMP[NE] @a2_fail
+LD r1,r0,@res_alive0
+CMP r1,r2
+JMP[NE] @a2_fail
+MOVI r1,65
+PUTC r1
+MOVI r1,50
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+a2_fail:
+MOVI r1,65
+PUTC r1
+MOVI r1,50
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
 .include "../exhibits/gui_cart.nas"

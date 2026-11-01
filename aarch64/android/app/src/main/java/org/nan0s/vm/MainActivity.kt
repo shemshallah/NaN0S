@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -27,8 +29,36 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val reqImage = 1
     private val reqDisk = 2
     private val autosave get() = File(filesDir, "autosave.nan1")
+    private val diskFile get() = File(filesDir, "disk.nanfs")
+    private var diskPfd: ParcelFileDescriptor? = null
 
     private fun asset(): ByteArray = assets.open("nan0s.img").use { it.readBytes() }
+
+    /** Asset -> filesDir (once). The guest needs a real, writable file behind the ATA fd. */
+    private fun seedDisk() {
+        try { assets.open("disk.nanfs").use { i -> diskFile.outputStream().use { o -> i.copyTo(o) } } }
+        catch (e: Exception) { Log.w("nan0s", "no bundled disk.nanfs", e) }
+    }
+
+    /**
+     * Attach the bundled NaNFS volume so the guest can use it over ATA PIO (the C core exposes
+     * it as a file descriptor; guest writes land in app storage). SAF "Disk" replaces it with
+     * any volume the user opens from Android storage. We keep the PFD and pass its borrowed fd:
+     * the C core never closes descriptors, so Java owns the lifetime.
+     */
+    private fun attachDisk(pfd: ParcelFileDescriptor, size: Long) {
+        try { diskPfd?.close() } catch (e: Exception) { }
+        diskPfd = pfd
+        vm.attachDiskFd(pfd.fd, size)
+    }
+
+    private fun attachDefaultDisk() {
+        if (!diskFile.exists()) seedDisk()
+        if (!diskFile.exists()) return
+        try {
+            attachDisk(ParcelFileDescriptor.open(diskFile, ParcelFileDescriptor.MODE_READ_WRITE), diskFile.length())
+        } catch (e: Exception) { Log.w("nan0s", "disk attach failed", e) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +67,7 @@ class MainActivity : Activity(), NanLoop.Listener {
         var restored = false
         if (autosave.exists()) restored = try { vm.restoreState(autosave.readBytes()) } catch (e: Exception) { false }
         if (!restored) vm.load(asset())
+        attachDefaultDisk()
         loop = NanLoop(vm, this)
         view = NanView(this, vm) { loop.poke() }
         beeper = Beeper { vm.speakerHz() }
@@ -72,8 +103,12 @@ class MainActivity : Activity(), NanLoop.Listener {
         })
         row.addView(btn("Open") { pick(reqImage) })
         row.addView(btn("Disk") { pick(reqDisk) })
-        row.addView(btn("Reset") { autosave.delete(); vm.detachDisk(); vm.load(asset()); loop.rearm() })
+        row.addView(btn("Reset") {
+            autosave.delete(); vm.detachDisk()
+            diskFile.delete(); seedDisk(); vm.load(asset()); attachDefaultDisk(); loop.rearm()
+        })
         row.addView(btn("Scale") { view.integerScale = !view.integerScale; view.invalidate() })
+        row.addView(btn("Fit") { view.resetZoom() })
         row.addView(btn("Log") { showLog() })
         return HorizontalScrollView(this).apply { addView(row) }
     }
@@ -98,7 +133,7 @@ class MainActivity : Activity(), NanLoop.Listener {
                 } else {
                     val pfd = contentResolver.openFileDescriptor(uri, "rw")!!
                     val size = pfd.statSize
-                    vm.attachDiskFd(pfd.detachFd(), size)
+                    attachDisk(pfd, size)
                     runOnUiThread { Toast.makeText(this, "disk attached ($size bytes)", Toast.LENGTH_SHORT).show() }
                 }
             } catch (e: Exception) {
@@ -138,6 +173,8 @@ class MainActivity : Activity(), NanLoop.Listener {
         super.onDestroy()
         loop.shutdown(); beeper.shutdown()
         try { loop.join(1000) } catch (e: InterruptedException) { }
+        vm.detachDisk()
+        try { diskPfd?.close() } catch (e: Exception) { }
         vm.close()
     }
 }

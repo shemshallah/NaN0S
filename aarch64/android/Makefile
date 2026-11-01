@@ -4,6 +4,11 @@ SRC = core/nan16.c core/nan_dev.c core/nan_load.c core/nan_render.c core/nan_sta
 all: nan_cli
 nan_cli: $(SRC) tools/nan_cli.c core/*.h core/*.inc
 	$(CC) $(CFLAGS) $(SRC) tools/nan_cli.c -o $@ -lm
+# default NaNFS volume shipped in the APK assets; the app copies it to filesDir once and
+# attaches it over a persistent fd (guest reads/writes it over ATA PIO; SAF "Disk" picks
+# any other volume from Android storage). Seed content = the nfix fixpoint source.
+volume:
+	sh ../../tools/nmkfs.sh src/tests/nfix_test.nas aarch64/android/app/src/main/assets/disk.nanfs
 test: tests/test_core
 	./tests/test_core
 tests/test_core: $(SRC) tests/test_core.c core/*.h core/*.inc

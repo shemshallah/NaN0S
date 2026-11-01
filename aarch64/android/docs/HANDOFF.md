@@ -18,7 +18,8 @@ The bundled image app/src/main/assets/nan0s.img is the r28d build, so nothing el
 
 ## Remaining work (priority order)
 - Fix whatever the first Actions run reports.
-- Disk fd leak: MainActivity uses pfd.detachFd() and never closes it. Keep the ParcelFileDescriptor, pass pfd.fd, close after vm.detachDisk() and in onDestroy.
+- DONE (r29j): Disk fd leak - MainActivity keeps the ParcelFileDescriptor, passes pfd.fd, closes it when a new disk is attached and in onDestroy. It also auto-attaches the bundled NaNFS volume: assets/disk.nanfs is seeded to filesDir once and attached RDWR (guest writes persist); the SAF "Disk" button opens any volume from Android storage; Reset re-seeds the pristine asset. tools/build.sh and `make volume` regenerate the asset from src/tests/nfix_test.nas via tools/nmkfs.sh.
+- DONE (r29j): portrait text no longer stretched (aspect-locked 8:16 cells, letterboxed); pinch zoom 1x..8x with pan/double-tap-fit in NanView; "Fit" button added. See TODO.md B2/B3/B4.
 - tools/nan_cli.c is missing --tty, --save/--load, --trace, --ports, --selftest (APIs exist; see TODO.md item 5). --tty matters: it is the no-APK way to test on a phone in Termux.
 - Procedural CP437 box/block glyphs in NanView (0xB0-0xDF).
 - Fuzz widening and qemu gates (TODO.md items 2-4) need gawk + qemu-system-i386, which the sandbox lacked.

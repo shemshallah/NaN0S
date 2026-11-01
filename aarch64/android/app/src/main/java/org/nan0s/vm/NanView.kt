@@ -5,71 +5,158 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.InputType
+import android.view.GestureDetector
 import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
 
-/** Draws the guest display: 80x25 text from the cell buffer (colours through the guest's DAC) or the 8-bit framebuffer as a scaled bitmap. */
+/**
+ * Draws the guest display. Text (80x25) and graphics both render into a content bitmap at
+ * "fit" size, then the bitmap is blitted through a live zoom/pan transform:
+ *  - text cells keep the VGA 8:16 aspect (uniform scale + letterbox; fixes the portrait
+ *    stretching where letters were tall and unreadably narrow),
+ *  - pinch zooms 1x..8x around the focal point, one-finger drag pans when zoomed,
+ *    double-tap or the "Fit" button returns to the whole screen,
+ *  - "resolution" adjust on the fly = the zoom over the current fit; integerScale snaps the
+ *    base stage to whole pixels for a crisp blit (guest VGA mode is untouched).
+ */
 class NanView(context: Context, private val vm: NanVm, private val onInput: () -> Unit) : View(context) {
+    companion object {
+        private const val MAX_ZOOM = 8f
+        private const val CELL_ASPECT = 0.5f   // VGA text cell width/height = 8/16
+    }
     private val cells = IntArray(2000)
     private val pal = IntArray(16)
     private val bg = Paint()
     private val fg = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.MONOSPACE }
-    private val blit = Paint().apply { isFilterBitmap = false }
+    private val blit = Paint().apply { isFilterBitmap = true }
     private var px = IntArray(0)
-    private var bmp: Bitmap? = null
-    private val src = Rect()
-    private val dst = Rect()
-    private var fitW = -1f
+    private var gfxBmp: Bitmap? = null
+    private var txtBmp: Bitmap? = null
+    private val dst = RectF()
+    private var baseW = 0f
+    private var baseH = 0f
     var integerScale = false
+    private var zoom = 1f
+    private var panX = 0f
+    private var panY = 0f
+
+    private val scaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScale(d: ScaleGestureDetector): Boolean {
+            val old = zoom
+            zoom = (zoom * d.scaleFactor).coerceIn(1f, MAX_ZOOM)
+            if (old > 0f && zoom != old) {          // keep the point under the fingers pinned
+                panX = d.focusX - (d.focusX - panX) * (zoom / old)
+                panY = d.focusY - (d.focusY - panY) * (zoom / old)
+                clampPan()
+            }
+            invalidate()
+            return true
+        }
+    }
+    private val scaleDetector = ScaleGestureDetector(context, scaleListener)
+
+    private val gestureListener = object : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent): Boolean = true
+        override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+            if (zoom <= 1.01f) return false
+            panX -= distanceX; panY -= distanceY; clampPan(); invalidate(); return true
+        }
+        override fun onDoubleTap(e: MotionEvent): Boolean { resetZoom(); return true }
+    }
+    private val gestures = GestureDetector(context, gestureListener)
 
     init { isFocusable = true; isFocusableInTouchMode = true }
 
+    /** Back to the whole-screen fit (double-tap / "Fit" button). */
+    fun resetZoom() { zoom = 1f; panX = 0f; panY = 0f; invalidate() }
+
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(Color.BLACK)
-        if (vm.graphics()) drawGfx(canvas) else drawText(canvas)
+        val vw = width; val vh = height
+        if (vw <= 0 || vh <= 0) return
+        val b = (if (vm.graphics()) buildGfx(vw, vh) else buildText(vw, vh)) ?: return
+        val zw = baseW * zoom; val zh = baseH * zoom
+        clampPan()                       // also recenters when the content fits (zoom == 1)
+        dst.set(panX, panY, panX + zw, panY + zh)
+        canvas.drawBitmap(b, null, dst, blit)
     }
 
-    private fun drawText(c: Canvas) {
-        if (!vm.snapshotText(cells, pal)) return
-        val cw = width / 80f
-        val ch = height / 25f
-        fg.textSize = ch * 0.82f
-        if (fitW < 0f || fitW != cw) { fitW = cw; fg.textScaleX = 1f; val m = fg.measureText("M"); if (m > 0f) fg.textScaleX = cw / m }
-        val base = ch * 0.78f
+    private fun clampPan() {
+        val zw = baseW * zoom; val zh = baseH * zoom
+        panX = if (zw <= width) (width - zw) / 2f else panX.coerceIn(width - zw, 0f)
+        panY = if (zh <= height) (height - zh) / 2f else panY.coerceIn(height - zh, 0f)
+    }
+
+    /** Text: uniform cell scale, 8:16 cells, centered/letterboxed - never stretched per axis. */
+    private fun buildText(vw: Int, vh: Int): Bitmap? {
+        if (!vm.snapshotText(cells, pal)) return null
+        var s = min(vw / (80f * CELL_ASPECT), vh / 25f)
+        if (s <= 0f) return null
+        if (integerScale && s >= 1f) s = floor(s)
+        val cw = s * CELL_ASPECT
+        val bw = max(1, (80 * cw).roundToInt())
+        val bh = max(1, (25 * s).roundToInt())
+        var b = txtBmp
+        if (b == null || b.width != bw || b.height != bh) {
+            b = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888); txtBmp = b
+        }
+        val c = Canvas(b)
+        c.drawColor(Color.BLACK)
+        fg.textSize = s * 0.82f
+        val m = fg.measureText("M")
+        fg.textScaleX = if (m > 0f) cw / m else 1f
+        val base = s * 0.78f
         for (y in 0 until 25) {
             for (x in 0 until 80) {
                 val cell = cells[y * 80 + x]
                 val attr = cell shr 8 and 255
                 val bi = attr shr 4 and 7
-                if (bi != 0) { bg.color = pal[bi]; c.drawRect(x * cw, y * ch, (x + 1) * cw + 1f, (y + 1) * ch + 1f, bg) }
+                if (bi != 0) { bg.color = pal[bi]; c.drawRect(x * cw, y * s, (x + 1) * cw, (y + 1) * s, bg) }
                 val code = cell and 255
                 if (code == 0 || code == 32) continue
                 fg.color = pal[attr and 15]
-                c.drawText(Cp437.map[code], x * cw, y * ch + base, fg)
+                c.drawText(Cp437.map[code], x * cw, y * s + base, fg)
             }
         }
+        baseW = bw.toFloat(); baseH = bh.toFloat()
+        return b
     }
 
-    private fun drawGfx(c: Canvas) {
-        val w = vm.width(); val h = vm.height()
-        if (w <= 0 || h <= 0 || w * h > 4_000_000) return
-        if (px.size < w * h) px = IntArray(w * h)
-        var b = bmp
-        if (b == null || b.width != w || b.height != h) { b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888); bmp = b }
-        if (!vm.snapshotGfx(px)) return
-        b!!.setPixels(px, 0, w, 0, 0, w, h)
-        var s = minOf(width.toFloat() / w, height.toFloat() / h)
-        if (integerScale && s >= 1f) s = s.toInt().toFloat()
-        val dw = (w * s).toInt(); val dh = (h * s).toInt()
-        val l = (width - dw) / 2; val t = (height - dh) / 2
-        src.set(0, 0, w, h); dst.set(l, t, l + dw, t + dh)
-        c.drawBitmap(b, src, dst, blit)
+    /** Graphics: fit the guest framebuffer uniformly, integer-snapped on request. */
+    private fun buildGfx(vw: Int, vh: Int): Bitmap? {
+        val gw = vm.width(); val gh = vm.height()
+        if (gw <= 0 || gh <= 0 || gw * gh > 4_000_000) return null
+        if (px.size < gw * gh) px = IntArray(gw * gh)
+        if (!vm.snapshotGfx(px)) return null
+        var b = gfxBmp
+        if (b == null || b.width != gw || b.height != gh) {
+            b = Bitmap.createBitmap(gw, gh, Bitmap.Config.ARGB_8888); gfxBmp = b
+        }
+        b.setPixels(px, 0, gw, 0, 0, gw, gh)
+        var s = min(vw.toFloat() / gw, vh.toFloat() / gh)
+        if (integerScale && s >= 1f) s = floor(s)
+        baseW = gw * s; baseH = gh * s
+        return b
+    }
+
+    // ---- touch: pinch zoom / pan / double-tap fit ----
+    override fun onTouchEvent(e: MotionEvent): Boolean {
+        if (e.actionMasked == MotionEvent.ACTION_DOWN) requestFocus()
+        val a = scaleDetector.onTouchEvent(e)
+        val b = gestures.onTouchEvent(e)
+        return a || b || super.onTouchEvent(e)
     }
 
     // ---- input: hardware and soft keyboards arrive as KeyEvents (soft keyboard with TYPE_NULL) ----
