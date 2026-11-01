@@ -28,6 +28,12 @@
   button:disabled { opacity:.4; cursor:default; }
   .hint { color:var(--dim); font-size:13px; text-align:center; }
   .hint b { color:var(--fg); }
+  .typebar { max-width:640px; margin:8px auto 6px; }
+  .typebar input { width:100%; background:#07070f; color:var(--fg); border:1px solid #2e2e5e;
+    border-radius:5px; padding:11px 12px; font:inherit; }
+  .typebar input:focus { outline:none; border-color:var(--cyan); }
+  .pad { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; max-width:760px; margin:0 auto 8px; }
+  .pad button { min-width:44px; padding:10px 0; font-size:15px; }
   details { margin-top:16px; color:var(--dim); }
   summary { cursor:pointer; }
   #serial { background:#07070f; border:1px solid #1c1c38; border-radius:5px; padding:10px;
@@ -53,7 +59,32 @@
   <div class="controls">
     <button id="restart" disabled>Restart</button>
     <button id="fullscreen" disabled>Full screen</button>
-    <span class="hint">click the screen, then use the menu keys <b>1–9</b> · <b>ESC</b> back</span>
+    <span class="hint">tap a key below · or the text bar to use the phone keyboard · hardware keys work too</span>
+  </div>
+  <div class="typebar">
+    <input id="type" type="text" inputmode="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"
+           placeholder="tap here for the phone keyboard — typing goes to the guest" disabled>
+  </div>
+  <div class="pad" id="pad">
+    <button type="button" data-code="1" disabled>Esc</button>
+    <button type="button" data-code="2" disabled>1</button>
+    <button type="button" data-code="3" disabled>2</button>
+    <button type="button" data-code="4" disabled>3</button>
+    <button type="button" data-code="5" disabled>4</button>
+    <button type="button" data-code="6" disabled>5</button>
+    <button type="button" data-code="7" disabled>6</button>
+    <button type="button" data-code="8" disabled>7</button>
+    <button type="button" data-code="9" disabled>8</button>
+    <button type="button" data-code="10" disabled>9</button>
+    <button type="button" data-code="11" disabled>0</button>
+    <button type="button" data-code="15" disabled>Tab</button>
+    <button type="button" data-code="14" disabled>&#9003;</button>
+    <button type="button" data-code="28" disabled>&#9166;</button>
+    <button type="button" data-code="57" disabled>Space</button>
+    <button type="button" data-code="72" data-ext="1" disabled>&#8593;</button>
+    <button type="button" data-code="75" data-ext="1" disabled>&#8592;</button>
+    <button type="button" data-code="80" data-ext="1" disabled>&#8595;</button>
+    <button type="button" data-code="77" data-ext="1" disabled>&#8594;</button>
   </div>
   <details>
     <summary>COM1 serial</summary>
@@ -82,9 +113,24 @@
   var serialEl = document.getElementById("serial");
   var restartBtn = document.getElementById("restart");
   var fsBtn = document.getElementById("fullscreen");
+  var padEl = document.getElementById("pad");
+  var typeEl = document.getElementById("type");
   var emulator = null;
   var serialBuf = "";
   var serialDirty = false;
+
+  // Set-1 PS/2 scancodes; arrow keys are E0-prefixed. Make then break per tap.
+  function sendKey(code, ext) {
+    if (!emulator) return;
+    if (ext) emulator.keyboard_send_scancodes([0xE0, code, 0xE0, code | 0x80]);
+    else emulator.keyboard_send_scancodes([code, code | 0x80]);
+  }
+
+  function setInputEnabled(on) {
+    typeEl.disabled = !on;
+    var keys = padEl.querySelectorAll("button");
+    for (var i = 0; i < keys.length; i++) keys[i].disabled = !on;
+  }
 
   function status(text, isError) {
     statusEl.textContent = text;
@@ -126,9 +172,10 @@
       screen_container: screenEl
     });
     emulator.add_listener("emulator-ready", function () {
-      status("running — click the screen to type");
+      status("running — tap a key below, or the text bar to use the phone keyboard");
       restartBtn.disabled = false;
       fsBtn.disabled = false;
+      setInputEnabled(true);
     });
     emulator.add_listener("serial0-output-byte", function (b) {
       serialBuf += String.fromCharCode(b);
@@ -144,6 +191,39 @@
   });
   fsBtn.addEventListener("click", function () {
     if (emulator) emulator.screen_go_fullscreen();
+  });
+
+  // On-screen keypad: every button is a make+break PS/2 scancode pair. Works on touch
+  // (numbers/ESC/arrows are tappable) and with a mouse, no keyboard required.
+  padEl.addEventListener("click", function (e) {
+    var b = e.target;
+    if (!b || b.tagName !== "BUTTON" || b.disabled) return;
+    var code = parseInt(b.getAttribute("data-code"), 10);
+    if (isNaN(code)) return;
+    sendKey(code, b.getAttribute("data-ext") === "1");
+  });
+
+  // Text bar: focusing it raises the phone's IME. While it is focused the emulator's own
+  // document-level keyboard capture is disabled, so typed text is forwarded exactly once
+  // (printable chars via keyboard_send_text; Backspace/Enter/Escape/Tab as scancodes).
+  var SPECIAL = { Backspace: 0x0E, Enter: 0x1C, Escape: 0x01, Tab: 0x0F };
+  typeEl.addEventListener("focus", function () {
+    if (emulator) emulator.keyboard_set_enabled(false);
+  });
+  typeEl.addEventListener("blur", function () {
+    if (emulator) emulator.keyboard_set_enabled(true);
+  });
+  typeEl.addEventListener("keydown", function (e) {
+    var code = SPECIAL[e.key];
+    if (code === undefined) return;
+    e.preventDefault();
+    sendKey(code, false);
+    typeEl.value = "";
+  });
+  typeEl.addEventListener("input", function () {
+    var v = typeEl.value;
+    if (v && emulator) emulator.keyboard_send_text(v);
+    typeEl.value = "";
   });
 
   fetchImage().then(function (image) {
