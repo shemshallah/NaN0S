@@ -1,0 +1,8 @@
+# ATA PIO in NaN16 - r21
+# READ: PASS. ata_read28 LBA0 returns 0x414E ("NAN0" little-endian).
+# WRITE: PASS. ata_write28 (OUTL dword path) + flush + ata_read28:
+#   word 0 = 0xA5A5, word 255 = 0xA6A4, source matched.
+# Root cause found: nasm1 emitted 32-bit IN/OUT for 16-bit PIO. The 0x66
+# operand-size prefix was added to h_inw/h_outw/h_outsw. Then OUTL dword
+# writes completed the sector.
+# serial: ATA RW PASS

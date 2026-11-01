@@ -1,0 +1,1 @@
+4c79207c93fc0b3639a0c75d6b318487fad5b219565ce6bbee9f7a8c8214a7a2  build/nan0s.img

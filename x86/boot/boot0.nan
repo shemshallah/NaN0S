@@ -1,0 +1,7 @@
+; NaN/0S boot0 round02: loads NaNVM0 (sectors 2-3 -> 0000:7E00) and guest image (sectors 4-18 -> 1000:0000)
+; bytes derived from tools/scaffold/boot0.s, verified with objdump
+fa 31 c0 8e d8 8e c0 8e d0 bc 00 7c fb 88 16 00   ; +0000
+05 b8 03 00 cd 10 bb 00 7e b8 02 02 b9 02 00 8a   ; +0010
+16 00 05 30 f6 cd 13 72 1c b8 00 10 8e c0 31 db   ; +0020
+b8 0f 02 b9 04 00 8a 16 00 05 30 f6 cd 13 72 05   ; +0030
+ea 00 7e 00 00 b8 44 0e cd 10 fa f4 eb fd   ; +0040

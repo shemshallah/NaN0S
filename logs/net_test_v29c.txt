@@ -1,0 +1,19 @@
+words 1965 steps 71313948 halted True trap !OA0E7D
+hxEN hello OK
+hxEN empty OK
+hxEN cap9 OK
+hxD 012 OK
+hxD odd OK
+hxD cap2 OK
+b64E hello X
+b64D hello X
+b64E empty OK
+b64D $ OK
+b64E a X
+b64D cap4 X
+b32E a OK
+b32D ME OK
+b32D i1 OK
+b32E empty OK
+xor AB K3 X
+RxPLqOn:R1DXFE7.e~;Gbk'F<?,T!/+N-o2js$s9&4PHMf!OA0E7D

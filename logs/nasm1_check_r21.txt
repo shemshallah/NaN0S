@@ -1,0 +1,6 @@
+83/83 passed
+gold: 6312 bytes (boot 512 + kernel 5800)
+boot  : 512 bytes  IDENTICAL
+kernel: 5800 bytes  IDENTICAL
+RESULT: PASS
+image /data/data/com.termux/files/usr/tmp/opencode/opencode/selftest1.img boot 512 kernel 5800 guest 4096 words

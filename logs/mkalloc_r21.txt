@@ -1,0 +1,9 @@
+# r21 sparse allocation prototype
+# command: python3 tools/mkalloc.py --size 64G --work build/nan0s.img --out $TMPDIR/store.nan
+allocation image /data/data/com.termux/files/usr/tmp/opencode/store.nan
+apparent bytes 68719476736
+allocated bytes (sparse) 1478656
+work image bytes 1474560
+total blocks 16777216 used blocks 361
+seal A 141b6733 seal B ac693153
+# apparent 64 GiB, allocated ~1.5 MiB

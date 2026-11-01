@@ -1,0 +1,10 @@
+PASS control loaded
+PASS pay_w0_b0 refused
+PASS pay_w0_b15 refused
+PASS pay_w0_b31 refused
+PASS pay_w1_b0 refused
+PASS pay_w1_b15 refused
+PASS pay_w1_b31 refused
+PASS pay_w100_b0 refused
+PASS pay_w100_b15 refused
+PASS pay_w100_b31 refused

@@ -1,0 +1,7 @@
+# v30 (Oct 30 2026): full TOC + TOC-driven shell menu.
+TOC entry = 16 words at 1024+16k: id(0=end) year hall title_ptr start len badge flags seal meta_ptr +6 reserved. Builder patches start/len/seal per --cart (k-th cart = k-th entry).
+lib_seal_verify ABI now r1=addr r2=len r3=expected seal -> r1 1/0 (no hard-coded TOC address).
+Shell: draws one list item per TOC entry ([id] year title + badge line), key = id digit finds the entry, seal check, BCOPY, CALL SLOT, redraw on return (cls + menu).
+VERIFIED in v86 (build/nan0s_museum_cart.img, 1 cartridge): menu shows '[1] 1948 Manchester Baby (SSEM) - 21 June 1948' and 'RE-CREATION: same behaviour, rewritten'; key 1,2 -> Baby run; ESC -> back to the shell (banner + footer redrawn). Only ONE TOC entry exists so the multi-entry loop/lookup is untested.
+NOT RUN: tools/sweep_seal.sh (mutation sweep over cart words 0..612 x bits 0/15/31 + seal bit flips; control must load) - script written, first launch failed on a shell 'time' call, never executed. Previous single-position refusal test (v29) was done on the OLD TOC layout; the new layout's refusal path (sh_bad) is NOT re-tested.
+Also: hall/flags/meta unused so far; badge strings are in the shell, title strings at word 2048.

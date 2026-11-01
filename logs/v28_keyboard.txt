@@ -1,0 +1,6 @@
+# v28 (Oct 30 2026): item C keyboard verification in v86 0.5.472, new hw kernel (4728 B). Tests: src/tests/key_test.nas, ring_test.nas; harness tools/harness/keyseq.mjs.
+key_test (blocking KEY, prints K+8 hex): 'a' (1e) -> 0x61 | Shift+1 (2a 02 82 aa) -> 0x21 '!' | E0 48 -> 0x80 up | E0 4b -> 0x82 left | E0 50 -> 0x81 down | E0 4d -> 0x83 right | Enter (1c) -> 0x0d.
+ => arrow map: up 0x80, down 0x81, left 0x82, right 0x83. Blocking KEY wakes on each key (IRQ + HLT path works).
+ring_test (guest busy until TICK 8000, 20 digit keys sent meanwhile, then KEYQ drain): got the FIRST 15 keys (1..0,1..5) then empty. => ring capacity 15, policy on overflow = DROP NEWEST (last 5 lost). Documented behaviour, not a bug.
+NOT RUN: UD2 !X0006 test (needs a way to execute x86 UD2 from NaN16; kernel-internal), real hardware PS/2, caps lock.
+DRAFT NOT SHIPPED (untested): real seal_verify = FNV-1a/32 over cartridge payloads in lib (MUL/BOOL.6) compared with TOC word 1026, builder computes the hash, shell prints 'SEAL MISMATCH' and refuses; test by flipping one payload bit (env NAN_FLIP). The mkimg1.py edit used a nonexistent sim method, so it was reverted; redo cleanly next.

@@ -1,0 +1,11 @@
+words 944 steps 630085 halted True trap None
+nalloc test: heap at word 0x30000, 2048 words
+init     ok
+workload ok
+drain    ok
+edges    ok
+badfree  ok
+coalesce ok
+exhaust  ok
+checks=00000C54 allocfail=0000000C PASS
+

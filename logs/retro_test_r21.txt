@@ -1,0 +1,3 @@
+# Retrocausal Lab primitives test (NaN16, toy only)
+# forward/reverse clock, contractive fixed point, capped singularity
+serial: LE=00000000 BE=FFFFFFFF FIX=00000007 SING=000003E8 SEAL=00005B6C RETRO PASS

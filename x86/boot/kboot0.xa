@@ -1,0 +1,93 @@
+; kboot0.xa - NaN/0S boot sector, assembled by nasm1 (the NaN16 x86 emitter).
+; r26f: INT 15h E820 map -> 0x600 (24 B entries), count word at 0x5FC (0 = BIOS has no E820).
+; BIOS floppy -> load 1040 sectors to 0x10000 -> A20 -> protected mode -> jump to kernel.
+.base 0x7C00
+.code16
+_start:
+  CLI
+  XOR %AX,%AX
+  MOV %AX,%DS
+  MOV %AX,%SS
+  MOV $0x7C00,%SP
+  STI
+  MOV %DL,[drive]
+  MOV %AX,%ES
+  XOR %EBX,%EBX
+  MOV $0x600,%DI
+  XOR %SI,%SI
+e8l:
+  MOV $0xE820,%EAX
+  MOV $0x534D4150,%EDX
+  MOV $24,%ECX
+  INT $0x15
+  JC @e8d
+  CMP $0x534D4150,%EAX
+  JNE @e8d
+  INC %SI
+  ADD $24,%DI
+  TEST %EBX,%EBX
+  JZ @e8d
+  CMP $40,%SI
+  JB @e8l
+e8d:
+  MOV %SI,[0x5FC]
+  MOV $0x1000,%AX
+  MOV %AX,%ES
+  XOR %BX,%BX
+  MOV $0x0002,%CX
+  XOR %DH,%DH
+  MOV $1040,%SI
+L1:
+  MOV $0x0201,%AX
+  MOV [drive],%DL
+  INT $0x13
+  JC @fail
+  MOV %ES,%AX
+  ADD $0x20,%AX
+  MOV %AX,%ES
+  INC %CL
+  CMP $19,%CL
+  JB @L2
+  MOV $1,%CL
+  XOR $1,%DH
+  JNZ @L2
+  INC %CH
+L2:
+  DEC %SI
+  JNZ @L1
+  IN $0x92,%AL
+  OR $2,%AL
+  OUT %AL,$0x92
+  CLI
+  LGDT [gdtr]
+  MOV %CR0,%EAX
+  OR $1,%EAX
+  MOV %EAX,%CR0
+  LJMP $8,@pm
+fail:
+  HLT
+  JMP @fail
+.code32
+pm:
+  MOV $0x10,%AX
+  MOV %AX,%DS
+  MOV %AX,%ES
+  MOV %AX,%SS
+  MOV %AX,%FS
+  MOV %AX,%GS
+  MOV $0x90000,%ESP
+  MOV $0x10000,%EAX
+  JMP %EAX
+.code16
+drive:
+  .byte 0
+  .align 4
+gdt:
+  .long 0,0
+  .long 0x0000FFFF,0x00CF9A00
+  .long 0x0000FFFF,0x00CF9200
+gdtr:
+  .word 23
+  .long @gdt
+  .org 510
+  .word 0xAA55

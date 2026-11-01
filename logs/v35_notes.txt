@@ -1,0 +1,6 @@
+# v35 (Oct 30 2026): seal v2 WRITTEN, NOT TESTED (zip requested by directive mid-work)
+Edited, never built/booted: src/lib/libvec.nas lib_seal_verify (dual-face seal: LDN gate per word; A=FNV near payload; B=FNV far-face payload via BSWAPM restored; C=rol4^class nibble; mirror law per word; ABI r1=addr r2=len r10=TOC entry -> r1 1/0/2/3, r2 failing word index), src/museum/shell.nas (sh_run passes r10, prints reason + word index; TOC entry 2 added: id 2, year 1854, INSPIRED, title ptr sh_str2), tools/mkimg1.py (computes A,B,C into TOC words 8,10,11; hooks NAN_HEADFLIP=w, NAN_SEALBIT, NAN_FLIP).
+Only check run: nanchk emit of museum.nas assembles (see below if it printed an error).
+WARNING: TOC entry 2 exists but src/exhibits/boole_cart.nas is NOT written yet. An image built with only the Baby cart would show item [2] with start 0/len 0. Build with both carts once the Boole cart exists, or remove entry 2.
+Layout facts: shell code 512..~800, TOC 1024+16k, strings 2048, store 3072..7679, slot 8192, scratch for runtime-assembled words planned at 12288.
+Boole 16 cartridge design (not written): runtime-assembled BOOL words (STW class n at 12288, RET after), CALL on a=CCCCCCCC b=AAAAAAAA -> n*0x11111111; mirror law BOOL_rot2(n)(a,b)==BOOL_n(~a,b); word view of an XOR word before/after BSWAPM (n 6 -> 9, payload 00310002 -> 02003100).

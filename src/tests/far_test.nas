@@ -1,0 +1,39 @@
+; v32 test: CALLF to word 0x20000 (beyond imm16) + 4M-word memory (0x2C0000 and 0x0C0000 alias under the old 1M mask). Expect serial/out: FKMN
+main:
+MOVI r13,1
+MOVI r2,2
+SHL r2,r2,16
+MOVI r3,15
+MOVI r1,0x0046
+MOVHI r1,0x0140
+STW r1,r2,r3
+ADD r2,r2,r13
+MOVI r1,0
+MOVHI r1,0x1540
+STW r1,r2,r3
+ADD r2,r2,r13
+MOVI r1,0
+MOVHI r1,0x0C00
+STW r1,r2,r3
+CALLF 131072
+MOVI r4,0x4B
+PUTC r4
+MOVI r1,0x2C
+SHL r1,r1,16
+MOVI r2,0x0C
+SHL r2,r2,16
+MOVI r5,0x11
+ST r5,r1,0
+MOVI r6,0x22
+ST r6,r2,0
+LD r7,r1,0
+MOVI r4,0x58
+CMP r7,r5
+MOVI[EQ] r4,0x4D
+PUTC r4
+LD r8,r2,0
+MOVI r4,0x58
+CMP r8,r6
+MOVI[EQ] r4,0x4E
+PUTC r4
+HALT

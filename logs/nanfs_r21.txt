@@ -1,0 +1,3 @@
+# nanfs_test.nas - RAM format/alloc/write/read round-trip
+serial: NANFS PASS
+# 64-word blocks, superblock, bitmap, data from block 2.

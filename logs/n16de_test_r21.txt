@@ -1,0 +1,3 @@
+# n16de carrier test (NaN16)
+# command: python3 tools/mkimg1.py src/boot/kboot0.xa src/native/kan16.xa src/tests/n16de_test.nas ...
+serial: N16DE PASS

@@ -1,0 +1,12 @@
+# NaN/0S shell plan (written round 05, from the owner's direction)
+## Top-level menu = an OS shell, not just a museum list
+1. **MUSEUM** - exhibit halls. Every piece: parity with the original's behaviour, written in NaN16/4NaNLanguage, with a plaque (event, machine, people, alive or died, dates, sources). Planned halls: Dawn (Baby 1948, EDSAC, Whirlwind), Languages (Lisp 1958, ELIZA 1966, BASIC, Forth), Games (Spacewar!, Pong 1972, Life 1970, Adventure, Tetris, Snake), Graphics (Sketchpad, donut, plasma), Engines (Doom 1993, Quake 1996 - gated on NaNVM1, see DISPLAY_PLAN.md).
+2. **TOOLS** - NaN-coded: disassembler showing both faces of a word, memory/word inspector, assembler (replaces nanchk.py), display-mode switcher, self-test, benchmark (Baby steps/s, NaN16 ops/s).
+3. **NaNNet** - networking, completely custom, from scratch: own link layer, own addressing, own transport, written in NaN. Phase 0: loopback + serial (COM1 via boundary port ops). Phase 1: NE2000/RTL8139 NIC driver in NaN over NaNVM1. Phase 2: NaNNet frames/addresses (not Ethernet/IP semantics) with a bridge to the host. Phase 3: chat, file drop, remote exhibits. Needs: port-I/O boundary ops (INB/OUTB), interrupts, NaNVM1.
+4. **HALL OF NaN** - Easter-egg hall of fame, high-score style. Hidden finds (secret keys, hidden words in exhibits, odd NaN payloads, a lattice pattern, a cheat in an exhibit) award a code; entering it lets you put a name on the board. Persistent: scores/names stored as NaN words written back to the floppy image (needs DISKW boundary op; until then board is in-session + seeded). Board entries: name (8 chars), find id, tick/time.
+5. **ABOUT** - NaN/0S v0.0.1. Contact: shemshallah@gmail.com. Started OCT26 (2026). Description of what the system has become: a from-scratch bare-metal OS whose every layer above a ~1.5 KB native boundary is NaN words (64-bit IEEE NaN encodings carrying 16-operand logic); it boots from a floppy, runs a museum of computing history, and is growing a custom network.
+## Shell mechanics
+- Menu keys: M museum, T tools, N NaNNet, H hall, A about, ESC back. Sub-menus use number keys. One image, one namespace; exhibits end with JMP @menu.
+- Version string lives in one data block (about + title bars read it) so releases bump once.
+## Dependencies / order
+NaNVM1 (protected mode, flat memory, port I/O, disk write) unlocks NaNNet, persistent Hall, Doom/Quake. Until then shell + museum + tools + About + seeded Hall run on NaNVM0.

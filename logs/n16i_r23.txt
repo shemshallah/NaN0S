@@ -1,0 +1,15 @@
+suite        native steps    73978 | interp host steps    3343631 | guest steps reported    73973 | out  2640 chars | MATCH
+   tail: '3_F8FF BOOL.15 r1,r2,r3\nN16I GUEST DONE\n'
+   (note: guest step count 73973 vs native total 73978, driver overhead expected)
+gate trap    native steps      201 | interp host steps       9290 | guest steps reported      196 | out    24 chars | MATCH
+   out: '00000000\n00000001\n!G213F'
+bad-op trap  native steps      112 | interp host steps       5129 | guest steps reported      107 | out    15 chars | MATCH
+   out: '00000000\n!O213E'
+nest depth 0: host steps       1148 | halted
+nest depth 1: host steps      52616 | halted
+nest depth 2: host steps    2498537 | halted
+nested outputs identical (native / 1 level / 2 levels): True
+NaN16 in NaN16 in NaN16: sum of squares 1..100 = 0x529AE
+000529AE
+00000152
+RESULT PASS

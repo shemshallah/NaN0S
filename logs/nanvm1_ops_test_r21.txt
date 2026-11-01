@@ -1,0 +1,2 @@
+integer ops: 3566 checks
+nanvm1 test: 5810 checks, 0 FAIL

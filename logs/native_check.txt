@@ -1,0 +1,23 @@
+   1830	    248	8392696	8394774	 801816	/tmp/n.o
+selftest.nas words=248 steps=5577 out=ok vga=ok trap=None
+sierpinski.nas words=129 steps=271352 out=ok vga=ok trap=None
+spanbench.nas words=240 steps=400000 out=ok vga=ok trap=None
+nalloc_test.nas words=944 steps=630085 out=ok vga=ok trap=None
+museum.nas words=778 steps=300000 out=ok vga=ok trap=None
+fuzz: 1000 vectors, 0 FAIL
+empty guest            ok   model=b'!G0001' native=b'!G0001'
+bad op 38              ok   model=b'!O0001' native=b'!O0001'
+bad op 0E              ok   model=b'!O0001' native=b'!O0001'
+bad op 1C              ok   model=b'!O0001' native=b'!O0001'
+bad op 1F              ok   model=b'!O0001' native=b'!O0001'
+bad op 40              ok   model=b'!O0001' native=b'!O0001'
+bad op FE              ok   model=b'!O0001' native=b'!O0001'
+hole op skipped by pred ok   model=b'!O0002' native=b'!O0002'
+gate trap word 1       ok   model=b'!G0002' native=b'!G0002'
+big pc trap hex        ok   model=b'' native=b''
+halt                   ok   model=b'' native=b''
+selftest.nas native 0.01s | native: ['words=000000F8 labels=0000001C err=00000000 mirror=00000000 diff=00000000 PASS'] | logged: ['words=000000F8 labels=0000001C err=00000000 mirror=00000000 diff=00000000 PASS'] | MATCH
+sierpinski.nas native 0.01s | native: ['words=00000081 labels=0000000F err=00000000 mirror=00000000 diff=00000000 PASS'] | logged: ['words=00000081 labels=0000000F err=00000000 mirror=00000000 diff=00000000 PASS'] | MATCH
+nalloc_test.nas native 0.02s | native: ['words=000003B0 labels=00000073 err=00000000 mirror=00000000 diff=00000000 PASS'] | logged: ['words=000003B0 labels=00000073 err=00000000 mirror=00000000 diff=00000000 PASS'] | MATCH
+spanbench.nas native 0.01s | native: ['words=000000F0 labels=0000001B err=00000000 mirror=00000000 diff=00000000 PASS'] | logged: ['words=000000F0 labels=0000001B err=00000000 mirror=00000000 diff=00000000 PASS'] | MATCH
+museum.nas native 0.01s | native: ['words=0000030A labels=00000036 err=00000000 mirror=00000000 diff=00000000 PASS'] | logged: ['words=0000030A labels=00000036 err=00000000 mirror=00000000 diff=00000000 PASS'] | MATCH

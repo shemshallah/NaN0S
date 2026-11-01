@@ -1,0 +1,5 @@
+# r21 Trust test transcript
+# Sat Oct 31 00:28:50 UTC 2026 UTC
+# command: python3 tools/mkproof.py src/prog/nasm0_proof.nas --gen2
+harness+nasm0 = 798 words (limit 6272) | source 2485 words | expected 798 words
+gen0 steps 1402242 | gen1 (guest-built code) steps 1402242 | words=0000031E labels=0000007A err=00000000 mirror=00000000 diff=00000000 PASS | gen1 output == gen0 output: True

@@ -1,0 +1,4 @@
+aeb5c68656afb195f51d2c3ac89354756f46674151f8c1a19b883d9a38e6a2d9  build/nan0s.img
+44bfc099cb919cec022c37e12fd79be292c3c029a2caf1547f962af16f6c529f  build/base.img
+date Sat Oct 31 05:15:55 UTC 2026
+gates: nasm1_check_r21.txt nanvm1_ops_test_r21.txt r21_trust_test.txt mkalloc_r21.txt n16de_test_r21.txt retro_test_r21.txt ata_r21.txt audio_r21.txt translate_r21.txt nbuild_r21.txt selfhost_r21.txt nanfs_r21.txt

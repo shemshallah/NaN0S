@@ -1,0 +1,9 @@
+# v31 (Oct 30 2026): NO SOURCE CHANGES vs v30. Notes only, written when the zip was requested by directive.
+Checked this session (v86 harness, node boot.mjs): control image built from src/boot/kboot0.xa + src/native/kan16.xa + src/museum/museum.nas with --cart 3072:src/exhibits/baby_cart.nas (seal b3199e73, 613 words) boots, key 1 loads the Baby ("MANCHESTER SMALL" seen on screen). Build ~16 s, v86 boot ~12 s per image.
+tools/sweep_seal.sh: launched once in the background, produced only its header line ("control LOADED expected:") in ~100 s, then was stopped on request. It has NOT completed; there is no mutant result. Owner said to drop the sweep for now.
+Refusal path on the new TOC layout (sh_bad): still NOT re-tested. Multiple TOC entries: still untested (one entry).
+Findings while reading the code (not yet acted on):
+ - Cartridge store is words 3072..4095 and the image only carries 4096 guest words; Baby takes 613, so only ~411 words are free for a second cartridge. Slot (4096) and Baby workspace (SB 6144..) overlap the part of the image that could hold more store. Fix idea: move SLOT to 8192, grow store to 3072..7679 (image limit 60 KB = 7680 words).
+ - Seal (FNV-1a/32 over payloads) does not cover heads/class; plan: seal v2 using both faces: LDN gate check per word (reports first bad word), FNV over near-face payload, FNV over far-face payload read after BSWAPM (restored after), rotating xor of class nibbles; check mirror law (far payload == bswap32, far class == rot2(near class)); verify the copy at the slot, not the store.
+ - Candidate 2nd cartridge: Boole's 16 (Hall 0, 1854): runtime-assembled BOOL words via STW with class n, checks BOOL_n(0xCCCCCCCC,0xAAAAAAAA)==n*0x11111111 and the mirror law BOOL_rot2(n)(a,b)==BOOL_n(~a,b) for all 16 n.
+ - NAN16_SPEC says KEY blocks; model and native KEY return 0 when no key (spec drift).

@@ -1,0 +1,16 @@
+# v32 (Oct 30 2026): EDITS MADE, NONE TESTED. Zip requested by directive mid-work.
+Goal: make room for Doom/Quake-scale code (hundreds of thousands to millions of NaN16 words).
+Changes (all untested, not built, not booted):
+ 1. New ops JMPF 0x38 / CALLF 0x39: 24-bit absolute word target = payload bits [23:0] (d:a:imm16), reach 16M words, 1 word per far call (JMP/CALL imm16 only reach 65536). Predicated like other ops. CALLF sets r15=pc.
+    Edited: tools/nan16sim.py (maxop 0x39, two branches), tools/nanchk.py (OPS JMPF=56 CALLF=57, FORM 'j', emit + dis), src/native/kan16.xa (MAXOP 0x39, h_jmpf/h_callf, dispatch table).
+    NOT done: src/native/nan16.s (hosted gas build used by difftest/native_check), nasm0/nasm1 in-guest mnemonic tables (would change the self-host fixed point), spec/NANVM1_SPEC.md text.
+ 2. Guest memory: MASK 0xFFFFF -> 0x3FFFFF (1M -> 4M words = 32 MB), boot zeroing loop 0x200000 -> 0x800000 dwords, v86 harness memory_size 32 -> 64 MB (boot.mjs, keyseq.mjs, tick.mjs; cap.mjs and run.mjs still 16 MB). Needs >= 36 MB of RAM; real hardware size not probed (no E820 yet).
+ 3. Only check run: python imports of nanchk/nan16sim.
+Planned test (not written): guest builds a stub at word 0x20000 with STW, CALLF to it, prints F then K via PUTC; stores 0x11 at 0x2C0000 and 0x22 at 0x0C0000 and reads the first back (old mask would alias them) -> expect serial FKM-style output.
+Scale notes: Doom-class = code roughly 0.3-0.6M words plus data/WAD 1-2M words; transport for big carts cannot be the 60 KB floppy guest (needs host-injected RAM blob or ATA PIO), cartridges should run in place at their final address.
+Still open from v31: seal v2 on both faces, SLOT->8192 / bigger store, Boole 16 cartridge, refusal re-test, multi-entry test, sweep.
+UPDATE (same day, after the zip): the planned test now exists and PASSES. python3 tools/test_far.py -> out 'FKMN' (model, nwords 1<<22). Same program as the guest in v86 (kboot0 + kan16, 64 MB): SERIAL "FKMN" (build 11 s, boot 10 s). So JMPF/CALLF reach word 0x20000 and words 0x2C0000/0x0C0000 no longer alias in the native kernel.
+Still NOT tested: src/native/nan16.s hosted build, nasm0/nasm1 tables, full native_check.sh, the museum image with the new kernel (museum/shell/Baby on the 4M-word kernel not re-booted).
+New: spec/MEMORY_SCALE.md (16 GB RAM / 32 GB VRAM plan, M0-M4, rules for code written now).
+UPDATE 2: museum regression on the new kernel PASSES: image = kboot0 + kan16 (4M words, JMPF/CALLF) + museum.nas + baby_cart (seal b3199e73), v86 64 MB, key 1 -> Baby plaque text on screen (Baby store, rows 3-5 show the plaque).
+This zip (v33) = v32 + that result. The slot move (SLOT 4096 -> 8192, bigger cartridge store), seal v2 and Boole 16 are NOT started in code; only planned.

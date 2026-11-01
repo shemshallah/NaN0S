@@ -1,0 +1,5 @@
+83/83 passed
+gold: 6320 bytes (boot 512 + kernel 5808)
+boot  : 512 bytes  IDENTICAL
+kernel: 5808 bytes  IDENTICAL
+RESULT: PASS

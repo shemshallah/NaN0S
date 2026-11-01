@@ -1,0 +1,7 @@
+words 240 steps 3876607 halted True trap None
+spanbench: 200x320 texture spans, NaNVM1 ops
+plain    kilo-ops=000002C2
+unrolled kilo-ops=00000232
+mismatch plain=00000000 unrolled=00000000
+PASS
+

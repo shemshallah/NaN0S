@@ -1,0 +1,48 @@
+# r26j census log (31 Oct 2026)
+
+Outer-tool census EXECUTED. The tree now contains zero .py, zero .mjs, no C, no
+gas .s x86 sources, and no node/JS harness. Outer dev stack: POSIX sh + gawk +
+xxd + qemu-system-i386. Guest runtime: NaN16 words only on bare metal.
+
+## Deleted this round
+- tools/*.py (22): nanchk.py, mkimg1.py, mkbase.py, mkboot.py, nasm1run.py,
+  nan16sim.py, gen_nbuild_selfhost.py, mkalloc.py, mkproof.py, proofnat.py,
+  nasm1check.py, nasm1_tests.py, test_nanvm1.py, test_far.py, difftest.py,
+  fuzz.py, traptest.py, n16i_check.py, n16i_fuzz.py, babyref.py,
+  sweep_seal.py, mutate_nalloc.py; plus tools/__pycache__.
+- tools/harness/ (v86 + node): node_modules/, bios/, aboot/boot*.mjs,
+  keyseq/bootseq/capfb/shot.mjs, package.json, package-lock.json, qrun.sh.
+- tools/scaffold/ (boot0.bin, boot0.s, nanvm0.bin, nanvm0.s).
+- Legacy shells: tools/build.sh, build_round01.sh, capture_r21.sh, hex2bin.sh,
+  sweep_seal.sh, native_check.sh, nasm1check.sh.
+- Retired x86/gas sources: src/native/nan16.s, src/native/boot.s,
+  src/native/r22_verified/ (gold kept: kan16.xa + nan16_x86.nan).
+- Puzzle-145 + RETROCAUSAL LAB workline: src/puzzle/,
+  spec/PUZZLE_145.md, spec/RETROCAUSAL_LAB.md, src/tests/retro_test.nas,
+  logs/retro_test_r21.txt, TODO sections + plaque wording
+  (paradox_cart.nas header now "DOUBLE-ENDIAN CLOCK + PARADOX ENGINE").
+- src/museum/museum_r16.nas (stale r16 scaffold copy).
+
+## Kept / added (tools/)
+- tools/nmk.awk      - .nas -> .nan emit + decode-check (gawk)
+- tools/mkimg.awk    - image builder: gold boot/kernel, guest words, TOC, seals A/B/C (gawk)
+- tools/mkall.sh     - glue: build/nan0s.img (sh + gawk + truncate)
+- tools/qgate.sh     - bare-metal boot gate on qemu-system-i386 (sh)
+- tools/carts.txt    - cart manifest (unchanged)
+
+## Evidence
+- logs/nmk_parity_r26j.txt - emit parity: awk == retired tool == checked .nan
+  for all 10 sources (museum + 9 carts) PASS.
+- Byte-identity: with the pre-banner gui/cart set, mkimg.awk output is
+  byte-identical to the r26i reference image
+  (sha256 79cc73edf90915c27d619cb9008979edd4a36b164b440975e626785ba6ac5200,
+  1474560 bytes; collision diff count 0).
+- logs/qgate_com1.txt - qemu COM1 capture from build/nan0s.img:
+  "NaN/0S R26J READY MENU=S\r\n" (26 bytes). qgate PASS.
+- shell cold-entry banner added: museum .org 512 -> sh_cold (52 words of
+  MOVI/PUTC pairs) then falls through into shell.nas; word 0 JMP 512.
+
+## Final image
+build/nan0s.img sha256 4c79207c93fc0b3639a0c75d6b318487fad5b219565ce6bbee9f7a8c8214a7a2
+guest 24904 words; boot 512 + kernel 5808 (frozen gold); boot/base.img unchanged
+44bfc099cb919cec022c37e12fd79be292c3c029a2caf1547f962af16f6c529f.

@@ -1,0 +1,4 @@
+r27 (31 Oct 2026, base = uploaded nan0s_1.zip r26k tree)
+- F7 SYSTEM window: new ARCH row (X86, +LM when CPUID 0x80000001 EDX bit29), MEM row (guest word space by address aliasing, words and MB), VRAM row (KB and WxH).
+- src/nan/gui_cart.nan regenerated with tools/nmk.awk (check: 0 mismatches), image rebuilt with tools/mkall.sh.
+- NOT yet booted after this change (zip taken on request). Sierpinski colour = palette 16/17 in fb.nas pal_tab; HTML colour not supplied.

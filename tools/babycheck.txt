@@ -1,0 +1,28 @@
+# scratch verification of Tootill's 19-line listing (HASE table 3), NOT shipped
+M=0xFFFFFFFF
+def enc(f,s): return (f<<13)|s
+LDN,STO,SUB,CMP,STP,JRP,JMP=2,3,4,6,7,1,0
+prog=[(1,LDN,24),(2,STO,26),(3,LDN,26),(4,STO,27),(5,LDN,23),(6,SUB,27),(7,CMP,0),(8,JRP,20),
+(9,SUB,26),(10,STO,25),(11,LDN,25),(12,CMP,0),(13,STP,0),(14,LDN,26),(15,SUB,21),(16,STO,27),
+(17,LDN,27),(18,STO,26),(19,JMP,22)]
+def mk(a):
+    st=[0]*32
+    for l,f,s in prog: st[l]=enc(f,s)
+    st[20]=(-3)&M; st[21]=1; st[22]=4; st[23]=(-a)&M; st[24]=(a-1)&M
+    return st
+def run(st):
+    A=0;CI=0;n=0
+    while True:
+        CI=(CI+1)&M; w=st[CI&31]; S=w&31; F=(w>>13)&7; n+=1
+        if F==0: CI=st[S]
+        elif F==1: CI=(CI+st[S])&M
+        elif F==2: A=(-st[S])&M
+        elif F==3: st[S]=A
+        elif F in(4,5): A=(A-st[S])&M
+        elif F==6:
+            if A>>31: CI=(CI+1)&M
+        else: return st,n
+for a in (12,100,4537,2**12,2**18):
+    st,n=run(mk(a)); print(a,'-> line27 =',st[27],' steps',n)
+print([hex(enc(f,s)) for l,f,s in prog])
+for a in (12,4537,2**18): print(a,hex((-a)&M),hex(a-1))

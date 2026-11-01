@@ -1,0 +1,9 @@
+# v27 (Oct 30 2026): item A first slice - !G1002 FIXED by a real packed cartridge.
+Build: python3 tools/mkimg1.py src/boot/kboot0.xa src/native/kan16.xa src/museum/museum.nas build/nan0s_museum_cart.img --cart 3072:src/exhibits/baby_cart.nas
+ -> cart store 3072, len 613 words (store holds 1024), TOC words 1024/1025 = start,len patched by the builder. boot 512 / kernel 4728 unchanged.
+Run (v86, key plan 8s '1', 12s '2'): shell menu -> key 1 -> shell BCOPY store->SLOT 4096 -> CALL 4096 -> cart plaque -> key 2 (N=2^12)
+ -> screen: STOPPED. highest proper factor = 2048 (correct), CI 0x14, STEPS 53247, wall 5 s. No trap.
+Round trip (keys 8:'1', 12:'2', 14:ESC, 17:'1'): final screen = Baby plaque again, i.e. cart returned to the shell by RET and was loaded a second time.
+ Caveat: the intermediate shell menu screen was not captured separately; the round trip is inferred from the final plaque.
+Changes: src/exhibits/baby_cart.nas (new; vector calls CALL #V_*, r15 saved at entry, exit RET, own plaque + data), shell.nas (r13=1 at entry, TOC read, CALL SLOT, redraw on return, baby_store/len no longer overlap), tools/mkimg1.py (--cart STORE:file).
+NOT DONE: seal_verify is still a stub (always 1), TOC has only start/len (no id/year/hall/badge/seal), nasm1check.sh still builds the OLD museum (needs updating), corrupted-cartridge refusal test, UD2/Shift+1/E0/ring/blocking-KEY tests.

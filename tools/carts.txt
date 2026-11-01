@@ -1,0 +1,10 @@
+# STORE:file  (one cartridge per line, in TOC order; STORE may be 'auto'). Edit this file to add exhibits; build with sh x86/tools/mkall.sh
+6400:src/nan/baby_cart.nan
+auto:src/nan/boole_cart.nan
+auto:src/nan/sierpinski_cart.nan
+auto:src/nan/about_nan0s_cart.nan
+auto:src/nan/about_dev_cart.nan
+auto:src/nan/trust_cart.nan
+auto:src/nan/patriot_cart.nan
+auto:src/nan/paradox_cart.nan
+auto:src/nan/gui_cart.nan

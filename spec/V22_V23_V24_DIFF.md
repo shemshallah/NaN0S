@@ -1,0 +1,6 @@
+# v22 vs v23 vs v24 (compared Oct 30 2026)
+v22 -> v23: ONLY 3 files differ. (1) src/native/kan16.xa 8838 -> 12989 B source: the r22 draft (fck.draft.xa) MERGED: hw_init, IDT + 32 exception stubs, PIT 1000 Hz irq0 clock (h_tick = MS), PIC remap mask 0xFC, irq1 keyboard (shift/caps/E0 arrows, 16-byte ring), blocking KEY (0x12) via HLT, non-blocking KEYQ (0x1A). (2) src/native/nan16_x86.nan gold regenerated from it (kernel 4728 B <= 8192). (3) TODO.md header line. README identical to v22 (stale).
+v23 LOST: tools/harness/node_modules/v86 (the x86 emulator the v86 acceptance tests need). v23 is NOT verified: never booted in v86.
+v22 HAD: node_modules/v86; the v86-verified 4402 B kernel (selftest + museum boot proven, round 16/21 baseline).
+v24 = v23 (new hw kernel, plan items F and C coded) + v22's node_modules/v86 restored + v22 verified kernel kept in src/native/r22_verified/ as the fallback gold + v22/v23 README+TODO archived in spec/ + new README, TODO, MUSEUM_PLAN. No code changed in v24 beyond that: v24 is a merge+plan release.
+Unchanged between v22/v23/v24: all of src/prog, src/museum, src/exhibits, src/lib (libvec.nas jump-vector ABI, shell.nas cartridge-loader draft), tools/*.py, specs, build/*.img (images are STALE: built before the hw kernel).

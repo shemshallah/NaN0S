@@ -1,0 +1,5 @@
+# bare-metal boot checks: v86 (x86 emulator, node harness in /home/claude/harness, npm i v86 + BIOS from github copy/v86)
+# image = boot.s + nan16.s (BARE) + guest words, built by tools/mkboot.py; run with tools/harness/boot.mjs (needs node_modules/v86)
+selftest.nas : model out == v86 bare-metal serial output: True (565 chars, ends 'collatz27 steps=0000006F.fails=00000000')
+museum.nas   : menu drawn on VGA text memory by guest VPOKE; key '1' (set-1 scancode 0x02 -> ASCII '1') opens the Baby plaque (rows 0-19 rendered)
+not tested: real hardware, QEMU, USB/legacy boot

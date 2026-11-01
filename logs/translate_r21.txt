@@ -1,0 +1,2 @@
+# translate_test.nas - common/x86/a64 three-file translator
+serial: TRANSLATE PASS

@@ -1,0 +1,9 @@
+# v37 (Oct 30 2026): seal v2 + TOC fix, TESTED in v86 (64 MB, tools/harness/boot.mjs)
+Build: python3 tools/mkimg1.py src/boot/kboot0.xa src/native/kan16.xa src/museum/museum.nas OUT.img --cart 3072:src/exhibits/baby_cart.nas   (Baby seal A 65aa6e73 B e6023491 C 08b36a3a)
+PASS intact cart: key 1 -> Baby plaque, no SEAL MISMATCH.
+PASS payload bit flip (word 100 bit 5) -> REFUSED, "seal differs: near payload / far-face payload / class-nibble channel".
+PASS head bit flip (word 50) -> REFUSED, "illegal head (gate fails) at cartridge word: 50" (gate path, exact word index).
+PASS TOC seal bit flip -> REFUSED (seal differs).
+PASS TOC entry 2 (no cartridge packed, start 0 len 0) -> REFUSED (seal differs), not run.
+BUG FIXED: TOC entry 1 held only 10 words, so entry 2 sat at word 1034 instead of 1040 (menu showed year 0, no title). Added .org 1040. Menu now lists 2 entries ([1] Baby, [2] Boole with INSPIRED badge) = first multi-entry TOC verified (screencaps/v37_menu_2entries.png).
+NOT tested: mirror-law refusal path (status 3); mutation sweep (many positions); second real cartridge (boole_cart.nas still unwritten); real hardware.

@@ -1,0 +1,26 @@
+r25 WORK IN PROGRESS (31 Oct 2026)
+DONE (assembles, image builds; boot smoke-tested only):
+- kernel kan16.xa: variable framebuffer (FBBASE/FBTOT), DISPSET w<<16|h = Bochs-VBE linear 8bpp mode (PCI BAR scan, fallback 0xE0000000),
+  DISPSET 0xFFFF00nn = raw-scancode keyboard mode (nn!=0) for a NaN16 keyboard driver.
+NOT YET: NaN16 users of the above (see TODO list in chat).
+checkpoint 2:
+- kernel: FBCOPY/FBFILL now copy the byte tail (widths not multiple of 4), new ops CPUID (0x44, d=cpuid(leaf a).reg[b]) and RDTSC (0x45, a=0 low / 1 high).
+- fb.nas: runtime fb_w/fb_h (was constants), fb_init_mode(r1=(w<<16)|h), fb_pal + palette table.
+- tools/gen_font.py -> src/lib/font7.nas: original 7x11 stroke font 'NaNGlyph' (not yet wired into the GUI).
+- gui_cart/wm still the old 320x200 layout; boot of the GUI with the runtime fb_w change is NOT yet verified.
+checkpoint 3:
+- src/lib/fbtext.nas (fb_char7/fb_text7) + generated src/lib/font7.nas; src/tests/vbe_test.nas (1024x768 test cart); tools/harness/capx.mjs (capture).
+- v86 reports svga 1024x768 8bpp after DISPSET; the capture of the pixels is garbled (red/black stripes): not yet known whether the kernel/palette path or capx.mjs is at fault.
+- src/nan/gui_cart.nan regenerated from .nas with runtime fb_w; old 320x200 GUI boots and renders correctly.
+checkpoint 4 (31 Oct 2026):
+- 1024x768 pixel output VERIFIED: raw indices from capx are clean (bg 1, text 15/16); the earlier "red/black stripes" were a bad capture, not the kernel/palette. NaNGlyph (fbtext.nas/font7.nas) VERIFIED on screen at 1024x768 (src/tests/vbe_test.nas).
+- Sierpinski colour from the HTML reference (op 6, hue 145, dark theme): fire #42ef8a, idle #10311e, panel #181536. fb.nas palette 16/17/18 set to 6-bit (16,59,34) (4,12,7) (6,5,13). gui_cart/sierpinski_cart .nan regenerated; image rebuilt, boots.
+- src/lib/kbd.nas: raw PS/2 set-1 driver in NaN16 (kbd_init/kbd_poll/kbd_get/kbd_mods), event = code | mods<<16. Tested in v86 (src/tests/kbd_test.nas): letters, Shift, Caps, Ctrl, Alt, F5, Alt+F4, arrows, Del, Esc, Backspace all correct. Not yet wired into the GUI.
+- Rule from owner: all new code is raw NaN16 .nas only (no Python/C generators). The Python scaffold stays only for assembling/imaging.
+REMAINING: WM+GUI rewrite (enlarge, adaptive Terminal/Monitor/Hex, Sierpinski offscreen cache via VRAM FBCOPY), Settings (modes + revert countdown), NaNNet menu, utilities (ATA identify, memory, CPUID/RDTSC), 5x7 cartridge font, README/TODO, regression gates.
+checkpoint 5: nasm0 (NaN16 assembler in the guest) assembled src/lib/kbd.nas: 565 words, err=0 mirror=0 diff=0 PASS. src/draft/wm_r25_wip.nas written (assembles, untested). TODO.md now starts with the next-Claude handoff.
+checkpoint 6 (31 Oct 2026): src/tests/wm_test.nas = new test cart for src/draft/wm_r25_wip.nas (3 windows + wm_enlarge) at 1024x768. nasm0 proof PASS (2984 words, err=0, diff=0; proof copy must have no .org: `sed '/^\.org/d'`, run with --big, no image arg). v86 capture OK: top bar, NaNGlyph titles, close/enlarge boxes, z-order, focus colour, clipping, enlarge-to-fill all correct (screencaps/main.png). WIP wm is now VERIFIED but still not in wm.nas / gui_cart.nas.
+FOUND: nasm0 label lookup compares only the 32-bit djb2 hash (no name compare). Raw-case djb2 collides for `dw_c` and `f5_c` (JMP resolved to the wrong label, 1 diff word). Renamed WIP label dw_c -> dw_cx. Needs a real fix (store/compare name or second hash) in src/prog/nasm0.nas; until then every nasm0 proof must hit diff=0.
+checkpoint 7: wm.nas replaced by the new WM; gui_cart.nas ported (1024x768, NaNGlyph 8x13, kbd.nas, F2/F3/Tab/Esc, adaptive Terminal/Hex, Monitor fit). Booted standalone in v86 and key-tested (h, Enter, F3). Not yet: Settings/NaNNet/Utilities, row cache, gates, shell-launch check.
+
+checkpoint 8 (r25c): Sierpinski rewritten as exact cyclic rule 90 + VRAM row cache; sim-verified vs reference (src/tests/lat_rule90_test.nas). F5/F6/F7, gates, v86 boot NOT done.

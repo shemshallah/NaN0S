@@ -1,0 +1,6 @@
+# v34 (Oct 30 2026)
+DONE + TESTED: cartridge slot moved 4096 -> 8192 (src/museum/shell.nas SLOT/BCOPY/CALL, src/exhibits/baby_cart.nas SLOT 8192, SB 10240, .org 8192). tools/mkimg1.py: cart words taken from C[8192:], store may grow to 7680 guest words (image limit 60 KB), --cart STORE accepts 'auto' (= next free word after the previous cart), image padded to the highest cart end.
+Evidence: image built with --cart 3072:src/exhibits/baby_cart.nas (613 words, new FNV seal 65aa6e73), v86 64 MB, key 1 -> Baby plaque text on screen, no SEAL MISMATCH.
+Store now has words 3685..7679 free (about 3990 words) for more cartridges.
+Owner confirmed (round 33): explicit raw windows for VRAM/tensors, every block that crosses NaN space <-> raw window is dual-face sealed; see spec/MEMORY_SCALE.md.
+NOT DONE (designed only): seal v2 on both faces (LDN gate per word, FNV over near and far payloads via BSWAPM restored after, rotating xor of class nibbles, mirror-law checks, TOC words 8/10/11, status code + failing word index to the shell), Boole 16 cartridge as the 2nd TOC entry, refusal re-test on the new layout, multi-entry menu test, the mutation sweep.

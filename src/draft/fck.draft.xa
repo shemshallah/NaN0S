@@ -1,0 +1,243 @@
+; fck.draft.xa - F clock + C keyboard + exception stubs, bare-metal leaves for kan16.xa. Standalone-assembles with nasm1 (stub labels at end stand in for kan16).
+.base 0x10000
+.code32
+.equ MS 0x8058
+.equ MSF 0x805C
+.equ SHIFT 0x8060
+.equ E0 0x8061
+.equ CAPS 0x8062
+.equ RHEAD 0x8064
+.equ RTAIL 0x8065
+.equ KRING 0x8070
+.equ IDT 0x9000
+hw_init:
+  MOV $IDT,%EDI
+  XOR %EAX,%EAX
+  MOV $512,%ECX
+  REPSTOSD
+  MOV $IDT,%EDI
+  MOV $xs,%EAX
+  MOV $32,%EBX
+e1:
+  CALL @mkgate
+  ADD $4,%EAX
+  DEC %EBX
+  JNZ @e1
+  MOV $0x9100,%EDI
+  MOV $irq0,%EAX
+  CALL @mkgate
+  MOV $irq1,%EAX
+  CALL @mkgate
+  MOV $irets,%EAX
+  MOV $0x9138,%EDI
+  CALL @mkgate
+  MOV $0x9178,%EDI
+  CALL @mkgate
+  LIDT [idtr]
+  MOV $ptab,%ESI
+p1:
+  MOVZXB [ESI],%EDX
+  TEST %EDX,%EDX
+  JZ @p2
+  MOVZXB [ESI+1],%EAX
+  OUT %AL,%DX
+  OUT %AL,$0x80
+  ADD $2,%ESI
+  JMP @p1
+p2:
+  STI
+  RET
+mkgate:
+  MOV %EAX,%EDX
+  AND $0xFFFF,%EDX
+  OR $0x80000,%EDX
+  MOV %EDX,[EDI]
+  MOV %EAX,%EDX
+  AND $0xFFFF0000,%EDX
+  OR $0x8E00,%EDX
+  MOV %EDX,[EDI+4]
+  ADD $8,%EDI
+  RET
+xs:
+  .byte 0x6A,0,0xEB,124
+  .byte 0x6A,1,0xEB,120
+  .byte 0x6A,2,0xEB,116
+  .byte 0x6A,3,0xEB,112
+  .byte 0x6A,4,0xEB,108
+  .byte 0x6A,5,0xEB,104
+  .byte 0x6A,6,0xEB,100
+  .byte 0x6A,7,0xEB,96
+  .byte 0x6A,8,0xEB,92
+  .byte 0x6A,9,0xEB,88
+  .byte 0x6A,10,0xEB,84
+  .byte 0x6A,11,0xEB,80
+  .byte 0x6A,12,0xEB,76
+  .byte 0x6A,13,0xEB,72
+  .byte 0x6A,14,0xEB,68
+  .byte 0x6A,15,0xEB,64
+  .byte 0x6A,16,0xEB,60
+  .byte 0x6A,17,0xEB,56
+  .byte 0x6A,18,0xEB,52
+  .byte 0x6A,19,0xEB,48
+  .byte 0x6A,20,0xEB,44
+  .byte 0x6A,21,0xEB,40
+  .byte 0x6A,22,0xEB,36
+  .byte 0x6A,23,0xEB,32
+  .byte 0x6A,24,0xEB,28
+  .byte 0x6A,25,0xEB,24
+  .byte 0x6A,26,0xEB,20
+  .byte 0x6A,27,0xEB,16
+  .byte 0x6A,28,0xEB,12
+  .byte 0x6A,29,0xEB,8
+  .byte 0x6A,30,0xEB,4
+  .byte 0x6A,31,0xEB,0
+xc:
+  POP %ESI
+  MOV $0x58,%EAX
+  JMP @trap
+irq0:
+  PUSH %EAX
+  ADDL $65526,[MSF]
+  MOV [MSF],%EAX
+  SHR $16,%EAX
+  ANDL $0xFFFF,[MSF]
+  ADD %EAX,[MS]
+  MOV $0x20,%AL
+  OUT %AL,$0x20
+  POP %EAX
+irets:
+  .byte 0xCF
+irq1:
+  PUSH %EAX
+  PUSH %EBX
+  PUSH %ECX
+  PUSH %EDX
+  XOR %EAX,%EAX
+  IN $0x60,%AL
+  CMP $0xE0,%EAX
+  JNE @k1
+  MOVB $1,[E0]
+  JMP @kx
+k1:
+  MOVZXB [E0],%EBX
+  TEST $0x80,%EAX
+  JNZ @kbrk
+  TEST %EBX,%EBX
+  JNZ @kext
+  CMP $0x2A,%EAX
+  JE @kshd
+  CMP $0x36,%EAX
+  JE @kshd
+  CMP $0x3A,%EAX
+  JE @kcap
+  MOVZXB [SHIFT],%ECX
+  MOVZXB [ktab+EAX],%EBX
+  LEA [EBX-97],%EDX
+  CMP $26,%EDX
+  JAE @k3
+  MOVZXB [CAPS],%EDX
+  XOR %EDX,%ECX
+k3:
+  SHL $7,%ECX
+  MOVZXB [ktab+ECX+EAX],%EBX
+  JMP @kpush
+kext:
+  MOVZXB [ktab+256+EAX],%EBX
+  JMP @kpush
+kshd:
+  MOVB $1,[SHIFT]
+  JMP @kx0
+kcap:
+  XORB $1,[CAPS]
+  JMP @kx0
+kbrk:
+  TEST %EBX,%EBX
+  JNZ @kx0
+  AND $0x7F,%EAX
+  CMP $0x2A,%EAX
+  JE @kshu
+  CMP $0x36,%EAX
+  JNE @kx0
+kshu:
+  MOVB $0,[SHIFT]
+  JMP @kx0
+kpush:
+  TEST %EBX,%EBX
+  JZ @kx0
+  MOVZXB [RTAIL],%EAX
+  LEA [EAX+1],%ECX
+  AND $15,%ECX
+  MOVZXB [RHEAD],%EDX
+  CMP %EDX,%ECX
+  JE @kfull
+  MOV %BL,[KRING+EAX]
+  MOV %CL,[RTAIL]
+kfull:
+kx0:
+  MOVB $0,[E0]
+kx:
+  MOV $0x20,%AL
+  OUT %AL,$0x20
+  POP %EDX
+  POP %ECX
+  POP %EBX
+  POP %EAX
+  .byte 0xCF
+h_key:
+kb1:
+  MOVZXB [RHEAD],%EAX
+  MOVZXB [RTAIL],%EDX
+  CMP %EDX,%EAX
+  JNE @kb2
+  HLT
+  JMP @kb1
+kb2:
+  MOVZXB [KRING+EAX],%EBX
+  INC %EAX
+  AND $15,%EAX
+  MOV %AL,[RHEAD]
+  JMP @st
+h_keyq:
+  XOR %EBX,%EBX
+  MOVZXB [RHEAD],%EAX
+  MOVZXB [RTAIL],%EDX
+  CMP %EDX,%EAX
+  JE @st
+  JMP @kb2
+h_tick:
+  MOV [MS],%EBX
+  JMP @st
+idtr:
+  .word 2047
+  .long 0x9000
+ptab:
+  .byte 0x20,0x11,0xA0,0x11,0x21,0x20,0xA1,0x28,0x21,4,0xA1,2,0x21,1,0xA1,1,0x43,0x36,0x40,0xA9,0x40,4,0x21,0xFC,0xA1,0xFF,0,0
+ktab:
+  .byte 0,27,49,50,51,52,53,54,55,56,57,48,45,61,8,9
+  .byte 113,119,101,114,116,121,117,105,111,112,91,93,13,0,97,115
+  .byte 100,102,103,104,106,107,108,59,39,96,0,92,122,120,99,118
+  .byte 98,110,109,44,46,47,0,42,0,32,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,27,33,64,35,36,37,94,38,42,40,41,95,43,8,9
+  .byte 81,87,69,82,84,89,85,73,79,80,123,125,13,0,65,83
+  .byte 68,70,71,72,74,75,76,58,34,126,0,124,90,88,67,86
+  .byte 66,78,77,60,62,63,0,42,0,32,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,132,128,134,0,130,0,131,0,133
+  .byte 129,135,136,137,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+trap:
+  NOP
+st:
+  NOP

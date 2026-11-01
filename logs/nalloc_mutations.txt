@@ -1,0 +1,11 @@
+clean: ('checks=00000C54 allocfail=0000000C PASS', 630085, 944)
+no-next-coalesce             CAUGHT  workload FAIL tag=00000211 00000004 00000000
+no-prev-coalesce             CAUGHT  workload FAIL tag=00000211 00000004 00000000
+split-threshold              CAUGHT  edges    FAIL tag=0000030C 00000000 00000000 00000800 000000
+rover-not-reset-in-free      CAUGHT  workload FAIL tag=00000210 00000001 00000000
+rover-not-advanced-on-split  CAUGHT  coalesce FAIL tag=00000525 00030001 00030025
+no-wrap-in-next              CAUGHT  workload
+foot-off-by-one              CAUGHT  workload FAIL tag=00000211 00000001 00000000
+double-free-undetected       CAUGHT  badfree  FAIL tag=00000403 00000000 00000001
+min-size-2                   CAUGHT  badfree  FAIL tag=0000040A 00000002 00000000 00000000 000000
+missed 0

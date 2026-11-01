@@ -1,0 +1,5 @@
+harness+nasm0 = 889 words (limit 6272) | source 5619 words | expected 1965 words
+steps 3543313 halted True trap None
+nasm0 proof
+words=000007AD labels=000000E0 err=00000000 mirror=00000000 diff=00000000 PASS
+

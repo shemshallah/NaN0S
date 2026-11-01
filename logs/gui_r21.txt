@@ -1,0 +1,5 @@
+# gui_cart.nas - windowed museum desktop
+TOC entry 9, 320x200, four windows (Terminal, Sierpinski, Monitor, Hex).
+TAB focus, ` move mode, arrows move focused window, ESC close.
+Sierpinski is stateless in its window; it continued animating while moved.
+Screenshot: screencaps/gui.png, gui_move.png

@@ -1,0 +1,2 @@
+# audio_test.nas - NaN16 PC speaker driver
+serial: AUDIO PASS

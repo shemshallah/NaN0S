@@ -1,0 +1,5 @@
+# nbuild.nas - self-hosted builder first slice
+# assemble + dual-face seal + RAM store + TOC + store verify + seal verify
+serial: STORE PASS
+serial: SEAL PASS
+serial: NBUILD words=00000005 err=00000000 mirr=00000000 out0=01100048 sealA=CD1B31B4 sealB=E0C7CD3A sealC=000FFFFF BUILD PASS

@@ -1,0 +1,15 @@
+# v26 findings (Oct 30 2026) - v25 sources unchanged; this release adds evidence + diagnosis only
+## F2 CLOCK (PASS in v86 0.5.472): src/tests/tick_test.nas on the new hw kernel (kan16.xa, 4728 B), 22 lines over 12 s.
+ every 500 ms of guest TICK = 499..519 ms wall (typ 500-501). Overall RATIO tick/wall = 0.9967 (includes first-line boot offset).
+ v86 PIT is emulated; real-hardware accuracy still untested (F5: reload 1193, 1.193182 MHz/1000 = 1000.15 Hz, +0.015% fast).
+## A. ROOT CAUSE of !G1002 (src/museum/museum.nas + shell.nas): pc in the trap is HEX: 0x1002 = SLOT(4096)+2.
+ shell key '1' does BCOPY dst=4096 src=baby_store len=341, then JMP 4096. But baby_store (word 3072) holds a single '.word 0'
+ and the image ends at word 3072 (3073 words); the rest is never-loaded zero memory = illegal heads = gate trap on first fetch.
+ => The cartridge was never packed: the 'TOC filled by build script' step does not exist. It is NOT a kernel bug and NOT a bad opcode.
+ Other draft defects found: baby_store and baby_len share word 3072; lib_bcopy comment says r1=src,r2=dst but the instruction is
+ BCOPY d=dst,a=src,b=count (shell passes it correctly, the comment is wrong); src/museum/baby.nas (monolith) uses @vcls/@vputs labels and
+ 'JMP @menu' as exit, so it cannot run as a cartridge until retargeted to vector calls (CALL #V_PUTS) and 'RET' (r15 saved at entry,
+ because every lib call clobbers r15).
+## FIX PLAN (next release): cartridge assembled at .org SLOT standalone, placed into the store by the image builder, TOC words
+ (start,len,year,...) patched there; baby cart owns its plaque; shell reads TOC; exit by RET.
+## STILL NOT RUN: UD2 !X0006 trap, Shift+1, E0 arrows, 15-key ring, blocking-KEY HLT wake.

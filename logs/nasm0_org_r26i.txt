@@ -1,0 +1,6 @@
+# nasm0 .org directive - r26i
+# Added .org expr to src/prog/nasm0.nas and dirs table hash 193501741 (hash of "org").
+# Test: .org 100 + MOVI r1,5 + HALT
+# nasm0 proof: words=00000066 err=00000000 mirror=00000000 diff=00000000 PASS
+# nasm0 code size after .org: 752 words (was 661).
+# nbuild_selfhost regenerated with dynamic BASE0=752, BASE1=753 source words 2300.

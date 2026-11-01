@@ -1,0 +1,4 @@
+# v29 (Oct 30 2026): real cartridge seal. lib_seal_verify = FNV-1a/32 over the cartridge PAYLOAD words (h=(h^w)*0x01000193), compared to TOC word 1026 (builder computes it).
+good image (build/nan0s_museum_cart.img): key '1' -> seal OK -> Baby plaque loads (v86).
+corrupt image (build/nan0s_museum_cart_CORRUPT_test.img, NAN_FLIP=300 = payload bit0 of cart word 300): key '1' -> shell stays on menu and prints 'SEAL MISMATCH - cartridge REFUSED' (row 20).
+Limits (honest): hash covers payload words only, not heads/class (a corrupted head already gate-traps on fetch, but BCOPY would copy it first); FNV is an integrity check, NOT tamper-proof - anyone who edits the cart can recompute the TOC hash. A cryptographic seal is Hall 5 material. Only one flipped bit / one position tested, not a mutation suite.

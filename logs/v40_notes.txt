@@ -1,0 +1,47 @@
+# v40 / r21 (31 Oct 2026)
+
+## What changed
+
+- 256 KB guest image: boot loads 528 sectors (16 kernel + 512 guest), kernel
+  copies 256 KB. Guest slot is now 32,768 words.
+- Real VGA framebuffer: mode 13h 320x200x8, linear A0000. Kernel ops:
+  FBINFO, VSYNC, FBCOPY, FBFILL, OUTB, INB; VPOKE/VPEEK are mode-aware.
+- VGA mode-set register sequence is NaN16 code in src/lib/fb.nas. The native
+  kernel only exposes port I/O and framebuffer mapping.
+- Homebrew 3x5 font, 64 glyphs, 2x scale, 1px gaps. fb_char3 / fb_text3.
+- Sierpinski cartridge: 320x128 pixel rule-90 lattice, white on black, live
+  scroll; lower 72px is a scrollable 3x5-font label. Exact dev note included.
+- Boole cartridge: 98-line scrollable plaque, live 16 functions, mirror law,
+  word lab. V_SCROLL is a general shell vector.
+- About NaN/0S and About Shemshallah cartridges, scrollable.
+- Trust exhibit: preface + full paper (376 lines), scrollable. Paper:
+  spec/TRUST_PAPER.md.
+- Curator Console: `~` opens a read-only raw guest word view.
+- Seven TOC entries. Image is 13,767 guest words. Patriot Missile Failure
+  (1991) added as a scrollable, fact-checked plaque.
+- Sparse allocation prototype: tools/mkalloc.py creates a 64 GiB apparent
+  NANFS image with ~1.5 MiB allocated.
+
+## Evidence
+
+- logs/nasm1_check_r21.txt: 83/83, boot/kernel gold identical, v86 selftest
+  565 chars match, Baby, Boole, Trust, Curator, Sierpinski 8,906 white pixels.
+- logs/nanvm1_ops_test_r21.txt: 5,810 checks, 0 FAIL.
+- logs/r21_trust_test.txt: gen0 == gen1 fixed point, PASS.
+- logs/mkalloc_r21.txt: 64 GiB apparent, 1,478,656 bytes allocated.
+- screencaps/: main, Boole plaque/scrolled/live, Sierpinski pixels/details,
+  About x2, Trust preface/paper, Curator, Patriot.
+
+## Not run
+
+- Seal mutation sweep on the six-entry layout.
+- Mirror-law refusal test.
+- Patriot, Ariane 5, Apollo AGC, Orrery, Paradox Engine, Halting Oracle,
+  EPR, dual-endian timer. Specs and TODO entries are in place.
+
+## r21 self-hosting additions
+- nbuild: assemble + dual-face seal + RAM store + TOC + verify. STORE PASS.
+- nbuild_selfhost: in-guest nasm0 assembles its own 661-word code, SELFHOST PASS.
+- nanfs: RAM format/alloc/write/read, NANFS PASS.
+- ATA read PASS; ATA write still blocked at one 16-bit word in v86.
+- 5x7 ASCII font + UTF-8 subset, NaN/0S headers, 6x9 cells.

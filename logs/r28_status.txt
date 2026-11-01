@@ -1,0 +1,1 @@
+r28: A64 core + assembler + self-test; QEMU: core PASS; museum prints READY line then !O006C (needs KEY/VPOKE ops). See TODO.md header.

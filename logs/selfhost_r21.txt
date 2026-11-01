@@ -1,0 +1,4 @@
+# nbuild_selfhost.nas - in-guest self-replication fixed point
+serial: SELFHOST PASS
+# nasm0 assembled its own 661-word code from its flattened source and
+# matched payload + class for every word. Runtime is NaN16 only.

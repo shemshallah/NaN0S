@@ -1,0 +1,4 @@
+# r22 nasm0 (in-guest) assembles disasm_test.nas: words=0000027F err=0 mirror=0 diff=0 PASS
+# r22 nasm0 assembles mktables.nas: words=0000032E err=0 mirror=0 diff=0 PASS
+# r22 nasm0 fixed point (nasm0 added operand kind 5, 24-bit target for JMPF/CALLF):
+harness+nasm0 = 848 words | gen0 steps 1472009 | gen1 steps 1472009 | words=00000350 labels=0000007B err=0 mirror=0 diff=0 PASS | gen1 output == gen0 output: True

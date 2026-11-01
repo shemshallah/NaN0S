@@ -1,0 +1,5 @@
+# v39 (Oct 30 2026): Boole 16 cartridge written in NaN16 only (src/exhibits/boole_cart.nas), packed as TOC entry 2 (store 3685, 684 words), tested in v86.
+PASS: menu key 2 -> plaque; key 1 -> live table: all 16 BOOL.n words assembled at run time (STW class n into a code slot), BOOL.n(CCCCCCCC,AAAAAAAA)==n*0x11111111 for n=0..15 (lane ok x16), mirror law BOOL.rot2(n)(a,b)==BOOL.n(~a,b) ok x16, XOR word n=6 payload 00310002 -> after BSWAPM n=9 payload 02003100.
+Seal v2 packs it (A 386fcaac-class values are printed by mkall.sh). NOT re-run this round: seal mutation sweep, mirror-law refusal (status 3), nasm1check.sh via mkall.sh.
+Gotcha: ';' inside .str is treated as a comment by the assembler; plaque text must fit 25 rows.
+Screencap rule (owner): ONE main image only: screencaps/main.png (overwritten each round). build/ holds nan0s.img + base.img only.

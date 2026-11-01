@@ -1,0 +1,6 @@
+r24 GUI on the native kernel (v86), image build/nan0s.img, 17267 guest words, GUI cart 2751 words at store 14516.
+boot -> menu shows 9 entries -> key 9 (scancode 0A at t=8 s) -> desktop with Terminal, Sierpinski, Monitor, Hex.
+t=22 s: screencaps/gui.png  MONITOR FWD 0000524D REV FFFFADB2 (sum FFFFFFFF), WIN 4, lattice regrows (t mod 128).
+key ESC (scancode 01 at t=20 s) closes the focused Terminal: screencaps/gui_esc_close.png WIN 3, focus moves to Hex (cyan border).
+Model run with typed commands + move mode: screencaps/gui_model_overlap.png (opened a 2nd Sierpinski, moved it over the Terminal).
+Self-test (NaN16, model): logs/gui_test_r24.txt  20 checks, GUI PASS. Not yet run on v86.

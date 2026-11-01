@@ -1,0 +1,10 @@
+83/83 passed
+gold: 4914 bytes (boot 512 + kernel 4402)
+boot  : 512 bytes  IDENTICAL
+kernel: 4402 bytes  IDENTICAL
+RESULT: PASS
+image /data/data/com.termux/files/usr/tmp/opencode/selftest1.img boot 512 kernel 4402 guest 248 words
+image /data/data/com.termux/files/usr/tmp/opencode/museum1.img boot 512 kernel 4402 guest 778 words
+selftest: v86 serial 565 chars, model 546, match True
+museum: menu + Baby plaque rendered (key 1)
+nasm1 check done

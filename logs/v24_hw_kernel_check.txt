@@ -1,0 +1,8 @@
+# v24 hardware-kernel check (Oct 30 2026, v86 0.5.472 in tools/harness)
+nasm1check: gold 5240 B (boot 512 + kernel 4728) IDENTICAL; 83/83 encodings; RESULT PASS.
+selftest in v86 with the NEW kernel (PIT+IDT+kbd IRQ): serial 565 chars, model 546 (+CRLF), match True. => hw_init does not break the interpreter.
+museum isolation (key plan 11:02 = '1'):
+ A old r22 kernel + v22/v23/v24 src/museum/museum.nas (cartridge-shell DRAFT): serial !G1002 (gate trap)  -> the DRAFT GUEST is broken, not the kernel
+ B NEW kernel + r16 working museum (778 words): menu, key '1' -> Baby plaque rendered  -> keyboard IRQ path works
+ C old kernel + r16 working museum: Baby plaque rendered (same)
+NOT yet done: TICK delta vs wall clock (2000 +-100 / 2 s), UD2 '!X0006' test, Shift+1 '!', E0 arrows, 15-key ring, blocking-KEY HLT wake.

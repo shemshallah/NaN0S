@@ -1,0 +1,35 @@
+// extra-form test
+.equ K, 0x20
+ cmp x0, x1
+ tst x0, x1
+ mvn x0, x1
+ ret
+ br x16
+ blr x1
+ csinc x0, x1, x2, eq
+ cset w0, eq
+ sbfx x0, x1, #4, #8
+ madd x0, x1, x2, x3
+ msub x0, x1, x2, x3
+ rev16 w0, w1
+ rev x0, x1
+ rev w0, w1
+ strh w1, [x2, #2]
+ ldrb w0, [x1, x2]
+ ldr x0, [x1], #-8
+ mrs x0, cntfrq_el0
+ lsl x0, x1, #3
+ asr w0, w1, #3
+ add x0, x1, #K
+ sub w2, w3, w4, lsl #2
+ neg x5, x6
+ cbnz x0, here
+ mov w1, w2
+ mov x3, #7
+ movk x3, #1, lsl #16
+here:
+ b.lt here
+ adr x1, here
+.align 4
+.ascii "hi\n"
+.quad 0x123456789
