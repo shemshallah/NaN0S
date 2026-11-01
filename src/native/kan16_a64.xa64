@@ -1,0 +1,695 @@
+// kan16_a64.xa64 - NaN16 native core + boot shim for AArch64 (QEMU -M virt -kernel; raw blob entered at 0x40080000, EL1/EL2, MMU off).
+// Hand-written A64, assembled by tools/a64.awk (outer tool). Blob layout: core code padded to 0x2200, then the guest word image
+// (same bytes the x86 image carries from byte 8704). r25-r27 bring-up: ops listed in the table at optab; the rest trap !O<pc>.
+// Registers: x27 console shadow (80x25 u16 at 0x43E00000), x28/x29 link regs for emit_cell/pdec, x19 guest mem base, w20 pc, x21 guest r0..r15 (u32 array), w22 flags k=2Z+L, w23 mem mask, x24 PL011, w25 pc mask,
+//            x26 op table, w8 op, w9 d, w10 a, w11 imm16, w12 b-index, w15 class nibble n, w6 payload.
+_start:
+ movz x0, #0x47F0, lsl #16
+ add sp, x0, #0
+ movz x24, #0x0900, lsl #16
+ movz w0, #0
+ str w0, [x24, #0x30]
+ movz w0, #0x7FF
+ str w0, [x24, #0x44]
+ movz w0, #0x301
+ str w0, [x24, #0x30]
+ adr x1, _start
+ add x1, x1, #2, lsl #12
+ add x1, x1, #0x200
+ movz x19, #0x4400, lsl #16
+ mov x2, x19
+ movz w3, #1, lsl #16
+cp:
+ ldr x4, [x1], #8
+ str x4, [x2], #8
+ subs w3, w3, #1
+ b.ne cp
+ movz x21, #0x43F0, lsl #16
+ movz w23, #0x3F, lsl #16
+ movk w23, #0xFFFF
+ movz w25, #0xFF, lsl #16
+ movk w25, #0xFFFF
+ adr x26, optab
+ movz w20, #0
+ movz w22, #0
+ movz x27, #0x43E0, lsl #16
+loop:
+ and w0, w20, w23
+ ldr x1, [x19, x0, lsl #3]
+ lsr x2, x1, #48
+ bl cls
+ cmp w2, #3
+ b.hi trap_g
+ lsl w15, w2, #2
+ ubfx w2, w1, #0, #16
+ rev16 w2, w2
+ bl cls
+ cmp w2, #3
+ b.hi trap_g
+ orr w15, w15, w2
+ ubfx x6, x1, #16, #32
+ lsr w8, w6, #24
+ ubfx w9, w6, #20, #4
+ ubfx w10, w6, #16, #4
+ ubfx w11, w6, #0, #16
+ ubfx w12, w6, #0, #4
+ add w20, w20, #1
+ and w20, w20, w25
+ cmp w8, #255
+ b.eq halt
+ cmp w8, #0x46
+ b.hs trap_o
+ cbz w8, dispatch
+ lsr w13, w15, w22
+ ubfx w13, w13, #0, #1
+ cbz w13, loop
+dispatch:
+ add x13, x26, x8, lsl #2
+ br x13
+// cls: w2 = 16-bit head -> w2 = class 0..3 (c = 2*Q + S) or 0xFFFFFFFF when the head is not one of 7FF1 FFF1 7FF8 FFF8
+cls:
+ ubfx w4, w2, #3, #1
+ lsr w5, w2, #15
+ movz w6, #0x7FF1
+ movz w7, #7
+ madd w6, w4, w7, w6
+ add w6, w6, w5, lsl #15
+ cmp w6, w2
+ b.ne cls_bad
+ add w2, w5, w4, lsl #1
+ ret
+cls_bad:
+ mvn w2, wzr
+ ret
+// mkhead: w2 = class 0..3 -> w2 = head
+mkhead:
+ ubfx w4, w2, #1, #1
+ ubfx w5, w2, #0, #1
+ movz w6, #0x7FF1
+ movz w7, #7
+ madd w6, w4, w7, w6
+ add w2, w6, w5, lsl #15
+ ret
+// fin_z: store w2 to r[d]; Z = (w2 == 0), L = 0
+fin_z:
+ str w2, [x21, x9, lsl #2]
+ cmp w2, #0
+ cset w22, eq
+ lsl w22, w22, #1
+ b loop
+h_bool:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ mvn w16, w13
+ mvn w17, w14
+ ubfx w0, w15, #0, #1
+ neg w0, w0
+ and w3, w16, w17
+ and w2, w3, w0
+ ubfx w0, w15, #1, #1
+ neg w0, w0
+ and w3, w16, w14
+ and w3, w3, w0
+ orr w2, w2, w3
+ ubfx w0, w15, #2, #1
+ neg w0, w0
+ and w3, w13, w17
+ and w3, w3, w0
+ orr w2, w2, w3
+ ubfx w0, w15, #3, #1
+ neg w0, w0
+ and w3, w13, w14
+ and w3, w3, w0
+ orr w2, w2, w3
+ b fin_z
+h_movi:
+ str w11, [x21, x9, lsl #2]
+ b loop
+h_movhi:
+ ldr w13, [x21, x9, lsl #2]
+ ubfx w13, w13, #0, #16
+ orr w13, w13, w11, lsl #16
+ str w13, [x21, x9, lsl #2]
+ b loop
+h_add:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ adds w2, w13, w14
+ cset w3, cs
+ b fin_zl
+h_sub:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ subs w2, w13, w14
+ cset w3, cc
+ b fin_zl
+// fin_zl: store w2; Z = (w2 == 0), L = w3
+fin_zl:
+ str w2, [x21, x9, lsl #2]
+ cmp w2, #0
+ cset w4, eq
+ lsl w4, w4, #1
+ orr w22, w4, w3
+ b loop
+h_shl:
+ ubfx w14, w11, #0, #5
+ ldr w13, [x21, x10, lsl #2]
+ lsl w2, w13, w14
+ b fin_z
+h_shr:
+ ubfx w14, w11, #0, #5
+ ldr w13, [x21, x10, lsl #2]
+ lsr w2, w13, w14
+ b fin_z
+h_sar:
+ ubfx w14, w11, #0, #5
+ ldr w13, [x21, x10, lsl #2]
+ asr w2, w13, w14
+ b fin_z
+h_cmp:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ cmp w13, w14
+ cset w3, eq
+ lsl w3, w3, #1
+ cset w4, lo
+ orr w22, w3, w4
+ b loop
+h_cmps:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ cmp w13, w14
+ cset w3, eq
+ lsl w3, w3, #1
+ cset w4, lt
+ orr w22, w3, w4
+ b loop
+h_ld:
+ ldr w13, [x21, x10, lsl #2]
+ add w13, w13, w11
+ and w13, w13, w23
+ ldr x1, [x19, x13, lsl #3]
+ ubfx x1, x1, #16, #32
+ str w1, [x21, x9, lsl #2]
+ b loop
+h_st:
+ ldr w13, [x21, x10, lsl #2]
+ add w13, w13, w11
+ and w13, w13, w23
+ ldr w2, [x21, x9, lsl #2]
+ movz x1, #0x7FF8, lsl #48
+ movk x1, #0xF87F
+ orr x1, x1, x2, lsl #16
+ str x1, [x19, x13, lsl #3]
+ b loop
+h_jmp:
+ mov w20, w11
+ b loop
+h_call:
+ str w20, [x21, #60]
+ mov w20, w11
+ b loop
+h_ret:
+ ldr w20, [x21, #60]
+ and w20, w20, w25
+ b loop
+h_jmpr:
+ ldr w20, [x21, x10, lsl #2]
+ and w20, w20, w25
+ b loop
+h_callr:
+ str w20, [x21, #60]
+ ldr w20, [x21, x10, lsl #2]
+ and w20, w20, w25
+ b loop
+h_jmpf:
+ ubfx w2, w6, #0, #24
+ and w20, w2, w25
+ b loop
+h_nop:
+ b loop
+h_bswapm:
+ ldr w13, [x21, x10, lsl #2]
+ add w13, w13, w11
+ and w13, w13, w23
+ ldr x1, [x19, x13, lsl #3]
+ rev x1, x1
+ str x1, [x19, x13, lsl #3]
+ b loop
+h_putc:
+ ldr w13, [x21, x9, lsl #2]
+pw:
+ ldr w14, [x24, #0x18]
+ ubfx w14, w14, #5, #1
+ cbnz w14, pw
+ strb w13, [x24]
+ b loop
+h_tick:
+ mrs x13, cntvct_el0
+ mrs x14, cntfrq_el0
+ movz x16, #1000
+ mul x13, x13, x16
+ udiv x13, x13, x14
+ str w13, [x21, x9, lsl #2]
+ b loop
+h_stw:
+ ldr w13, [x21, x10, lsl #2]
+ and w13, w13, w23
+ ldr w14, [x21, x12, lsl #2]
+ ubfx w14, w14, #0, #4
+ ldr w16, [x21, x9, lsl #2]
+ ubfx w2, w14, #2, #2
+ bl mkhead
+ lsl x17, x2, #48
+ ubfx w2, w14, #0, #2
+ bl mkhead
+ rev16 w2, w2
+ orr x17, x17, x2
+ orr x17, x17, x16, lsl #16
+ str x17, [x19, x13, lsl #3]
+ b loop
+h_ldn:
+ ldr w13, [x21, x10, lsl #2]
+ add w13, w13, w11
+ and w13, w13, w23
+ ldr x1, [x19, x13, lsl #3]
+ lsr x2, x1, #48
+ bl cls
+ mov w16, w2
+ ubfx w2, w1, #0, #16
+ rev16 w2, w2
+ bl cls
+ cmp w16, #3
+ b.hi ldn_bad
+ cmp w2, #3
+ b.hi ldn_bad
+ lsl w16, w16, #2
+ orr w2, w2, w16
+ str w2, [x21, x9, lsl #2]
+ b loop
+ldn_bad:
+ mvn w2, wzr
+ str w2, [x21, x9, lsl #2]
+ b loop
+h_mul:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ mul w2, w13, w14
+ b fin_z
+h_mulhu:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ mul x2, x13, x14
+ lsr x2, x2, #32
+ b fin_z
+h_mulh:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ sbfx x13, x13, #0, #32
+ sbfx x14, x14, #0, #32
+ mul x2, x13, x14
+ asr x2, x2, #32
+ b fin_z
+h_divu:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ cbz w14, dz_q
+ udiv w2, w13, w14
+ b fin_z
+dz_q:
+ str wzr, [x21, x9, lsl #2]
+ movz w22, #3
+ b loop
+h_modu:
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ cbz w14, dz_r
+ udiv w3, w13, w14
+ msub w2, w3, w14, w13
+ b fin_z
+dz_r:
+ str w13, [x21, x9, lsl #2]
+ movz w22, #3
+ b loop
+h_addi:
+ ldr w13, [x21, x10, lsl #2]
+ sbfx w14, w11, #0, #16
+ adds w2, w13, w14
+ cset w3, cs
+ b fin_zl
+h_ldb:
+ ldr w13, [x21, x10, lsl #2]
+ add w2, w13, w11
+ lsr w3, w2, #2
+ and w3, w3, w23
+ ldr x1, [x19, x3, lsl #3]
+ ubfx x1, x1, #16, #32
+ ubfx w4, w2, #0, #2
+ lsl w4, w4, #3
+ lsr w1, w1, w4
+ ubfx w1, w1, #0, #8
+ str w1, [x21, x9, lsl #2]
+ b loop
+h_stb:
+ ldr w13, [x21, x10, lsl #2]
+ add w2, w13, w11
+ lsr w3, w2, #2
+ and w3, w3, w23
+ ldr x1, [x19, x3, lsl #3]
+ ubfx x1, x1, #16, #32
+ ubfx w4, w2, #0, #2
+ lsl w4, w4, #3
+ movz w5, #255
+ lsl w5, w5, w4
+ bic w1, w1, w5
+ ldr w6, [x21, x9, lsl #2]
+ ubfx w6, w6, #0, #8
+ lsl w6, w6, w4
+ orr w1, w1, w6
+ movz x7, #0x7FF8, lsl #48
+ movk x7, #0xF87F
+ orr x7, x7, x1, lsl #16
+ str x7, [x19, x3, lsl #3]
+ b loop
+h_bcopy:
+ ldr w16, [x21, x9, lsl #2]
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ cbz w14, loop
+ cmp w16, w13
+ b.hi bc_back
+ movz w2, #0
+bc_f1:
+ add w3, w13, w2
+ and w3, w3, w23
+ ldr x1, [x19, x3, lsl #3]
+ add w3, w16, w2
+ and w3, w3, w23
+ str x1, [x19, x3, lsl #3]
+ add w2, w2, #1
+ cmp w2, w14
+ b.lo bc_f1
+ b loop
+bc_back:
+ mov w2, w14
+bc_b1:
+ sub w2, w2, #1
+ add w3, w13, w2
+ and w3, w3, w23
+ ldr x1, [x19, x3, lsl #3]
+ add w3, w16, w2
+ and w3, w3, w23
+ str x1, [x19, x3, lsl #3]
+ cbnz w2, bc_b1
+ b loop
+h_bfill:
+ ldr w16, [x21, x9, lsl #2]
+ ldr w13, [x21, x10, lsl #2]
+ ldr w14, [x21, x12, lsl #2]
+ cbz w14, loop
+ movz x7, #0x7FF8, lsl #48
+ movk x7, #0xF87F
+ orr x7, x7, x13, lsl #16
+ movz w2, #0
+bf1:
+ add w3, w16, w2
+ and w3, w3, w23
+ str x7, [x19, x3, lsl #3]
+ add w2, w2, #1
+ cmp w2, w14
+ b.lo bf1
+ b loop
+// ---- console ops (r28d): text console = 80x25 u16 cells shadowed at x27 (0x43E00000), mirrored to the PL011 as ANSI. KEY/KEYQ read PL011 RX.
+h_vpoke:
+ ldr w13, [x21, x10, lsl #2]
+ cmp w13, #2000
+ b.hs loop
+ ldr w14, [x21, x9, lsl #2]
+ ubfx w14, w14, #0, #16
+ ldrh w2, [x27, x13, lsl #1]
+ cmp w14, w2
+ b.eq loop
+ strh w14, [x27, x13, lsl #1]
+ bl emit_cell
+ b loop
+h_vpeek:
+ ldr w13, [x21, x10, lsl #2]
+ cmp w13, #2000
+ b.hs loop
+ ldrh w2, [x27, x13, lsl #1]
+ str w2, [x21, x9, lsl #2]
+ b loop
+h_dispq:
+ movz w2, #3, lsl #16
+ movz w3, #0x1950
+ orr w2, w2, w3
+ str w2, [x21, x9, lsl #2]
+ b loop
+h_dispset:
+ ldr w13, [x21, x9, lsl #2]
+ lsr w2, w13, #16
+ cbnz w2, loop
+ ubfx w13, w13, #0, #8
+ cmp w13, #0x13
+ b.eq loop
+ movz x3, #0
+ movz w2, #0
+ds1:
+ str x3, [x27, x2, lsl #3]
+ add w2, w2, #1
+ cmp w2, #500
+ b.lo ds1
+ bl esc_br
+ movz w0, #0x30
+ bl uart_c
+ movz w0, #0x6D
+ bl uart_c
+ bl esc_br
+ movz w0, #0x32
+ bl uart_c
+ movz w0, #0x4A
+ bl uart_c
+ bl esc_br
+ movz w0, #0x48
+ bl uart_c
+ b loop
+h_key:
+ ldr w14, [x24, #0x18]
+ ubfx w14, w14, #4, #1
+ cbnz w14, h_key
+ b k_rd
+h_keyq:
+ ldr w14, [x24, #0x18]
+ ubfx w14, w14, #4, #1
+ cbz w14, k_rd
+ str wzr, [x21, x9, lsl #2]
+ b loop
+k_rd:
+ ldr w2, [x24]
+ ubfx w2, w2, #0, #8
+ cmp w2, #0x7F
+ b.ne k_st
+ movz w2, #8
+k_st:
+ str w2, [x21, x9, lsl #2]
+ b loop
+// esc_br: print ESC [ (link in x29)
+esc_br:
+ mov x29, x30
+ movz w0, #0x1B
+ bl uart_c
+ movz w0, #0x5B
+ bl uart_c
+ br x29
+// pdec: print w0 (0..99) in decimal (link in x29)
+pdec:
+ mov x29, x30
+ mov w6, w0
+ movz w7, #10
+ udiv w5, w6, w7
+ cbz w5, pd1
+ add w0, w5, #0x30
+ bl uart_c
+pd1:
+ msub w5, w5, w7, w6
+ add w0, w5, #0x30
+ bl uart_c
+ br x29
+// vga2ansi: w2 = VGA colour 0..7 -> ANSI colour (swap bits 0 and 2); clobbers w4 w5
+vga2ansi:
+ ubfx w4, w2, #1, #1
+ lsl w4, w4, #1
+ ubfx w5, w2, #0, #1
+ lsl w5, w5, #2
+ orr w4, w4, w5
+ ubfx w5, w2, #2, #1
+ orr w2, w4, w5
+ ret
+// emit_cell: w13 = cell index, w14 = u16 cell (char | attr<<8) -> ESC[r;cH ESC[0[;1];3f;4bm char   (link in x28; clobbers w0 w2-w7 w14 w16 w17)
+emit_cell:
+ mov x28, x30
+ mov w16, w13
+ mov w17, w14
+ bl esc_br
+ movz w2, #80
+ udiv w3, w16, w2
+ msub w4, w3, w2, w16
+ add w0, w3, #1
+ bl pdec
+ movz w0, #0x3B
+ bl uart_c
+ add w0, w4, #1
+ bl pdec
+ movz w0, #0x48
+ bl uart_c
+ bl esc_br
+ movz w0, #0x30
+ bl uart_c
+ ubfx w3, w17, #8, #8
+ ubfx w2, w3, #3, #1
+ cbz w2, ec_nb
+ movz w0, #0x3B
+ bl uart_c
+ movz w0, #0x31
+ bl uart_c
+ec_nb:
+ movz w0, #0x3B
+ bl uart_c
+ movz w0, #0x33
+ bl uart_c
+ ubfx w2, w3, #0, #3
+ bl vga2ansi
+ add w0, w2, #0x30
+ bl uart_c
+ movz w0, #0x3B
+ bl uart_c
+ movz w0, #0x34
+ bl uart_c
+ ubfx w2, w3, #4, #3
+ bl vga2ansi
+ add w0, w2, #0x30
+ bl uart_c
+ movz w0, #0x6D
+ bl uart_c
+ ubfx w0, w17, #0, #8
+ cmp w0, #0x20
+ b.lo ec_sp
+ cmp w0, #0x7F
+ b.lo ec_out
+ movz w0, #0x23
+ b ec_out
+ec_sp:
+ movz w0, #0x20
+ec_out:
+ bl uart_c
+ br x28
+halt:
+ wfi
+ b halt
+uart_c:
+ ldr w14, [x24, #0x18]
+ ubfx w14, w14, #5, #1
+ cbnz w14, uart_c
+ strb w0, [x24]
+ ret
+trap_g:
+ add w20, w20, #1
+ and w20, w20, w25
+ movz w0, #0x21
+ bl uart_c
+ movz w0, #0x47
+ bl uart_c
+ b trap_pc
+trap_o:
+ movz w0, #0x21
+ bl uart_c
+ movz w0, #0x4F
+ bl uart_c
+trap_pc:
+ movz w5, #12
+th:
+ lsr w3, w20, w5
+ ubfx w3, w3, #0, #4
+ cmp w3, #10
+ b.lo th_d
+ add w0, w3, #55
+ b th_o
+th_d:
+ add w0, w3, #48
+th_o:
+ bl uart_c
+ subs w5, w5, #4
+ b.ge th
+ b halt
+ .align 2
+optab:
+ b h_bool
+ b h_movi
+ b h_movhi
+ b h_add
+ b h_sub
+ b h_shl
+ b h_shr
+ b h_cmp
+ b h_ld
+ b h_st
+ b h_jmp
+ b h_call
+ b h_ret
+ b h_jmpr
+ b trap_o
+ b h_nop
+ b h_vpoke
+ b h_vpeek
+ b h_key
+ b h_tick
+ b h_bswapm
+ b h_putc
+ b h_stw
+ b h_ldn
+ b h_dispq
+ b h_dispset
+ b h_keyq
+ b h_nop
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b h_mul
+ b h_mulh
+ b h_mulhu
+ b trap_o
+ b trap_o
+ b h_divu
+ b h_modu
+ b h_sar
+ b h_cmps
+ b h_addi
+ b h_ldb
+ b h_stb
+ b h_callr
+ b h_bcopy
+ b h_bfill
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b h_jmpf
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o
+ b trap_o

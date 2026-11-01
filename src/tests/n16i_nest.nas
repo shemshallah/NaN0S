@@ -1,5 +1,5 @@
 ;  n16i_nest.nas - n16i running a second copy of n16i (labels renamed ni_ -> nj_) running a small guest.
-; mode (patched by tools/n16i_check.py): 0 = inner guest natively, 1 = under one n16i (outer copy native), 2 = under two n16i.
+; mode (patched by tools/ngate_n16i.sh): 0 = inner guest natively, 1 = under one n16i (outer copy native), 2 = under two n16i.
 JMP @drv
 .include "../tools/n16i.nas"
 drv:

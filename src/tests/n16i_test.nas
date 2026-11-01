@@ -1,5 +1,5 @@
 ; n16i_test.nas - Stage 3 differential test. Host driver below word 8192, guest program at word 8192 (.org).
-; mode word (patched by tools/n16i_check.py): 0 = run guest natively, 1 = run it under n16i.
+; mode word (patched by tools/ngate_n16i.sh): 0 = run guest natively, 1 = run it under n16i.
 ; gsel word: 0 = full guest suite, 1 = gate trap, 2 = bad-op trap.  Guest addresses are 8192+x; the guest
 ; window wraps (mask 8191) so they alias x, which is exactly what the interpreter must reproduce.
 JMP @drv

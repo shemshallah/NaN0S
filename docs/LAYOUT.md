@@ -30,8 +30,8 @@ TODO.md, spec/ and logs/ are history and still use the old names. Translate with
 | `src/native/kan16.xa`, `nan16_x86.nan`, `nan16.s`, `boot.s`, `r22_verified/` | `x86/native/...` |
 | `src/native/kan16_a64.xa64` | `aarch64/native/kan16_a64.xa64` |
 | `build/nan0s.img`, `build/base.img` | `x86/build/...` |
-| `tools/mkall.sh`, `qgate.sh`, `build.sh`, `native_check.sh`, `capture_r21.sh` | `x86/tools/...` |
-| `tools/harness/` (v86 test harness) | `x86/harness/` |
+| `tools/mkall.sh`, `qgate.sh`, `build.sh`, `mkbase.sh` | `x86/tools/...` (native_check.sh / capture_r21.sh retired r29i) |
+| `tools/harness/` (v86 test harness; retired r29i, qgate.sh is the boot gate) | `x86/harness/` |
 | `tools/scaffold/` | `x86/scaffold/` |
 | `tools/a64.awk`, `tools/a64_run.sh` | `aarch64/tools/...` |
 | `src/draft/a64_smoke.hex` | `aarch64/draft/a64_smoke.hex` |

@@ -1,0 +1,599 @@
+; kan16.xa - NaN16/NaNVM1 native core, BARE flat 32-bit x86, assembled by nasm1.
+; The ONE host file; everything else is NaN16 guest code. Transcribed from src/native/nan16.s.
+.base 0x10000
+.code32
+.equ MASK 0xFFFFF
+.equ MAXOP 0x37
+.equ G 0x200000
+.equ R 0x8000
+.equ VGA 0xB8000
+.equ FLAGM 0x8040
+.equ STEPS 0x8044
+.equ MAXS 0x8048
+.equ T0 0x804C
+.equ KB 0x8050
+.equ OB 0x8054
+_start:
+  CLD
+  MOVL $0x7FFFFFFF,[MAXS]
+  MOVL $1,[FLAGM]
+  MOVL $0,[STEPS]
+  MOV $G,%EDI
+  XOR %EAX,%EAX
+  MOV $0x200000,%ECX
+  REPSTOSD
+  MOV $0x12000,%ESI
+  MOV $G,%EDI
+  MOV $0x3C00,%ECX
+  REPMOVSD
+  XOR %ESI,%ESI
+loop:
+  MOV [STEPS],%EAX
+  CMP [MAXS],%EAX
+  JAE @done
+  INC %EAX
+  MOV %EAX,[STEPS]
+  MOV %ESI,%ECX
+  AND $MASK,%ECX
+  CALL @nib
+  JC @gate
+  INC %ESI
+  SHRD $16,%EDX,%EAX
+  MOV %EAX,%EBX
+  SHR $24,%EBX
+  CMP $0xFF,%EBX
+  JE @done
+  CMP $MAXOP,%EBX
+  JA @badop
+  MOV %EAX,%EBP
+  SHR $18,%EBP
+  AND $0x3C,%EBP
+  MOV %EAX,%ECX
+  SHR $14,%ECX
+  AND $0x3C,%ECX
+  MOV [R+ECX],%ECX
+  MOV %EAX,%EDX
+  AND $15,%EDX
+  MOV [R+EDX*4],%EDX
+  TEST %EBX,%EBX
+  JZ @L5
+  TEST %EDI,[FLAGM]
+  JZ @loop
+L5:
+  JMP [tbl+EBX*4]
+head:
+  MOV %EBX,%ECX
+  AND $0x7FF0,%ECX
+  CMP $0x7FF0,%ECX
+  JNE @L8
+  MOV $0x01020000,%ECX
+  BT %EBX,%ECX
+  JNC @L8
+  MOV %EBX,%ECX
+  SHR $2,%ECX
+  AND $2,%ECX
+  SHR $15,%EBX
+  OR %EBX,%ECX
+  CLC
+  RET
+L8:
+  STC
+  RET
+nib:
+  MOV [G+ECX*8],%EAX
+  MOV [G+4+ECX*8],%EDX
+  MOV %EDX,%EBX
+  SHR $16,%EBX
+  CALL @head
+  JC @L9
+  LEA [ECX*4],%EDI
+  MOV %EAX,%EBX
+  BSWAP %EBX
+  SHR $16,%EBX
+  CALL @head
+  JC @L9
+  OR %ECX,%EDI
+L9:
+  RET
+putw:
+  MOV %ECX,%EDX
+  AND $3,%ECX
+  MOVZWL [heads+ECX*2],%ECX
+  ROL $8,%CX
+  PUSH %EBX
+  SHL $16,%EBX
+  OR %ECX,%EBX
+  MOV %EBX,[G+EAX*8]
+  POP %EBX
+  SHR $16,%EBX
+  SHR $2,%EDX
+  MOVZWL [heads+EDX*2],%EDX
+  SHL $16,%EDX
+  OR %EDX,%EBX
+  MOV %EBX,[G+4+EAX*8]
+  RET
+wrz:
+  MOV %EBX,[R+EBP]
+  TEST %EBX,%EBX
+wf:
+  MOV %EBX,[R+EBP]
+fl:
+  SETC %CL
+  SETZ %AL
+fl2:
+  MOVZX %CL,%ECX
+  MOVZX %AL,%EAX
+  LEA [ECX+EAX*2],%ECX
+  MOV $1,%EAX
+  SHL %CL,%EAX
+  MOV %EAX,[FLAGM]
+  JMP @loop
+st:
+  MOV %EBX,[R+EBP]
+  JMP @loop
+stf:
+  MOV %EBX,[R+EBP]
+  MOVL $1,[FLAGM]
+  JMP @loop
+h_bool:
+  XOR %EBX,%EBX
+  MOV %ECX,%EAX
+  OR %EDX,%EAX
+  NOT %EAX
+  TEST $1,%EDI
+  JZ @hb1
+  OR %EAX,%EBX
+hb1:
+  MOV %ECX,%EAX
+  NOT %EAX
+  AND %EDX,%EAX
+  TEST $2,%EDI
+  JZ @hb2
+  OR %EAX,%EBX
+hb2:
+  MOV %EDX,%EAX
+  NOT %EAX
+  AND %ECX,%EAX
+  TEST $4,%EDI
+  JZ @hb3
+  OR %EAX,%EBX
+hb3:
+  MOV %ECX,%EAX
+  AND %EDX,%EAX
+  TEST $8,%EDI
+  JZ @hb4
+  OR %EAX,%EBX
+hb4:
+  JMP @wrz
+h_movi:
+  MOVZWL %AX,%EBX
+  JMP @st
+h_movhi:
+  MOVZWL [R+EBP],%EBX
+  SHL $16,%EAX
+  OR %EAX,%EBX
+  JMP @st
+h_add:
+  MOV %ECX,%EBX
+  ADD %EDX,%EBX
+  JMP @wf
+h_sub:
+  MOV %ECX,%EBX
+  SUB %EDX,%EBX
+  JMP @wf
+h_shl:
+  MOV %ECX,%EBX
+  MOV %EAX,%ECX
+  SHL %CL,%EBX
+  JMP @wrz
+h_shr:
+  MOV %ECX,%EBX
+  MOV %EAX,%ECX
+  SHR %CL,%EBX
+  JMP @wrz
+h_sar:
+  MOV %ECX,%EBX
+  MOV %EAX,%ECX
+  SAR %CL,%EBX
+  JMP @wrz
+h_cmp:
+  CMP %EDX,%ECX
+  JMP @fl
+h_cmps:
+  CMP %EDX,%ECX
+  SETZ %AL
+  SETL %CL
+  JMP @fl2
+h_ld:
+  MOVZWL %AX,%EAX
+  ADD %ECX,%EAX
+  AND $MASK,%EAX
+  MOV [G+2+EAX*8],%EBX
+  JMP @st
+h_st:
+  MOVZWL %AX,%EAX
+  ADD %ECX,%EAX
+  AND $MASK,%EAX
+  MOV [R+EBP],%EBX
+  MOV $10,%ECX
+  CALL @putw
+  JMP @loop
+h_stw:
+  MOV %ECX,%EAX
+  AND $MASK,%EAX
+  MOV [R+EBP],%EBX
+  MOV %EDX,%ECX
+  AND $15,%ECX
+  CALL @putw
+  JMP @loop
+h_ldn:
+  MOVZWL %AX,%EAX
+  ADD %ECX,%EAX
+  AND $MASK,%EAX
+  MOV %EAX,%ECX
+  CALL @nib
+  MOV %EDI,%EBX
+  JNC @st
+  OR $-1,%EBX
+  JMP @st
+h_jmp:
+  MOVZWL %AX,%ESI
+  JMP @loop
+h_call:
+  MOV %ESI,[R+60]
+  MOVZWL %AX,%ESI
+  JMP @loop
+h_ret:
+  MOV [R+60],%ESI
+  JMP @loop
+h_jmpr:
+  MOV %ECX,%ESI
+  JMP @loop
+h_callr:
+  MOV %ESI,[R+60]
+  MOV %ECX,%ESI
+  JMP @loop
+h_nop:
+  JMP @loop
+h_vpoke:
+  CMP $2000,%ECX
+  JAE @loop
+  MOV [R+EBP],%EBX
+  MOV %BX,[VGA+ECX*2]
+  JMP @loop
+h_vpeek:
+  CMP $2000,%ECX
+  JAE @loop
+  MOVZWL [VGA+ECX*2],%EBX
+  JMP @st
+h_key:
+  XOR %EBX,%EBX
+  IN $0x64,%AL
+  TEST $1,%AL
+  JZ @st
+  IN $0x60,%AL
+  TEST $0x80,%AL
+  JNZ @st
+  MOVZX %AL,%EAX
+  CMP $0x3A,%EAX
+  JAE @st
+  MOVZXB [ktab+EAX],%EBX
+  JMP @st
+h_tick:
+  MOV [STEPS],%EAX
+  XOR %EDX,%EDX
+  MOV $1000,%ECX
+  DIV %ECX
+  MOV %EAX,%EBX
+  JMP @st
+h_bswapm:
+  MOVZWL %AX,%EAX
+  ADD %ECX,%EAX
+  AND $MASK,%EAX
+  MOV [G+EAX*8],%ECX
+  MOV [G+4+EAX*8],%EDX
+  BSWAP %ECX
+  BSWAP %EDX
+  MOV %EDX,[G+EAX*8]
+  MOV %ECX,[G+4+EAX*8]
+  JMP @loop
+h_putc:
+  MOV [R+EBP],%EBX
+  MOV %BL,[OB]
+  CALL @out1
+  JMP @loop
+out1:
+  MOV $0x3FD,%EDX
+oL1:
+  IN %DX,%AL
+  TEST $0x20,%AL
+  JZ @oL1
+  MOV $0x3F8,%EDX
+  MOVZXB [OB],%EAX
+  OUT %AL,%DX
+  RET
+h_dispq:
+  MOV $0x31950,%EBX
+  JMP @st
+h_dispset:
+  XOR %EAX,%EAX
+  MOV $1000,%ECX
+  MOV $VGA,%EDI
+  CLD
+  REPSTOSD
+  JMP @loop
+h_mul:
+  MOV %ECX,%EBX
+  IMUL %EDX,%EBX
+  JMP @wrz
+h_mulh:
+  MOV %ECX,%EAX
+  IMUL %EDX
+  MOV %EDX,%EBX
+  JMP @wrz
+h_mulhu:
+  MOV %ECX,%EAX
+  MUL %EDX
+  MOV %EDX,%EBX
+  JMP @wrz
+h_div:
+  TEST %EDX,%EDX
+  JZ @z0
+  CMP $-1,%EDX
+  JNE @dv1
+  MOV %ECX,%EBX
+  NEG %EBX
+  JMP @wrz
+dv1:
+  MOV %EDX,%EBX
+  MOV %ECX,%EAX
+  CLTD
+  IDIV %EBX
+  MOV %EAX,%EBX
+  JMP @wrz
+h_mod:
+  TEST %EDX,%EDX
+  JZ @zx
+  CMP $-1,%EDX
+  JNE @md1
+  XOR %EBX,%EBX
+  JMP @wrz
+md1:
+  MOV %EDX,%EBX
+  MOV %ECX,%EAX
+  CLTD
+  IDIV %EBX
+  MOV %EDX,%EBX
+  JMP @wrz
+h_divu:
+  TEST %EDX,%EDX
+  JZ @z0
+  MOV %EDX,%EBX
+  MOV %ECX,%EAX
+  XOR %EDX,%EDX
+  DIV %EBX
+  MOV %EAX,%EBX
+  JMP @wrz
+h_modu:
+  TEST %EDX,%EDX
+  JZ @zx
+  MOV %EDX,%EBX
+  MOV %ECX,%EAX
+  XOR %EDX,%EDX
+  DIV %EBX
+  MOV %EDX,%EBX
+  JMP @wrz
+z0:
+  XOR %EBX,%EBX
+  JMP @zf
+zx:
+  MOV %ECX,%EBX
+zf:
+  MOV %EBX,[R+EBP]
+  MOVL $8,[FLAGM]
+  JMP @loop
+h_addi:
+  MOVSXW %AX,%EBX
+  ADD %ECX,%EBX
+  JMP @wf
+h_ldb:
+  MOVZWL %AX,%EAX
+  ADD %ECX,%EAX
+  MOV %EAX,%ECX
+  SHR $2,%EAX
+  AND $MASK,%EAX
+  MOV [G+2+EAX*8],%EBX
+  SHL $3,%ECX
+  SHR %CL,%EBX
+  MOVZX %BL,%EBX
+  JMP @st
+h_stb:
+  MOVZWL %AX,%EAX
+  ADD %ECX,%EAX
+  MOV %EAX,%ECX
+  SHL $3,%ECX
+  SHR $2,%EAX
+  AND $MASK,%EAX
+  MOV [G+2+EAX*8],%EBX
+  MOV $255,%EDX
+  SHL %CL,%EDX
+  NOT %EDX
+  AND %EDX,%EBX
+  MOVZXB [R+EBP],%EDX
+  SHL %CL,%EDX
+  OR %EDX,%EBX
+  MOV $10,%ECX
+  CALL @putw
+  JMP @loop
+h_bcopy:
+  MOV %ECX,%EAX
+  AND $MASK,%EAX
+  MOV [R+EBP],%EBX
+  AND $MASK,%EBX
+  MOV %EDX,%ECX
+  JECXZ @bc3
+  MOV %EBX,%EDI
+  SUB %EAX,%EDI
+  AND $MASK,%EDI
+  CMP %ECX,%EDI
+  JB @bc2
+bc1:
+  MOVQ [G+EAX*8],%XMM0
+  MOVQ %XMM0,[G+EBX*8]
+  INC %EAX
+  AND $MASK,%EAX
+  INC %EBX
+  AND $MASK,%EBX
+  LOOP @bc1
+bc3:
+  JMP @loop
+bc2:
+  LEA [-1+EAX+ECX],%EAX
+  AND $MASK,%EAX
+  LEA [-1+EBX+ECX],%EBX
+  AND $MASK,%EBX
+bc4:
+  MOVQ [G+EAX*8],%XMM0
+  MOVQ %XMM0,[G+EBX*8]
+  DEC %EAX
+  AND $MASK,%EAX
+  DEC %EBX
+  AND $MASK,%EBX
+  LOOP @bc4
+  JMP @loop
+h_bfill:
+  MOV %ECX,[T0]
+  MOV %EDX,%EDI
+  MOV [R+EBP],%EAX
+bf1:
+  TEST %EDI,%EDI
+  JZ @loop
+  AND $MASK,%EAX
+  MOV [T0],%EBX
+  MOV $10,%ECX
+  CALL @putw
+  INC %EAX
+  DEC %EDI
+  JMP @bf1
+h_fadd:
+  MOVD %ECX,%XMM0
+  MOVD %EDX,%XMM1
+  ADDSS %XMM1,%XMM0
+  JMP @fres
+h_fsub:
+  MOVD %ECX,%XMM0
+  MOVD %EDX,%XMM1
+  SUBSS %XMM1,%XMM0
+  JMP @fres
+h_fmul:
+  MOVD %ECX,%XMM0
+  MOVD %EDX,%XMM1
+  MULSS %XMM1,%XMM0
+  JMP @fres
+h_fdiv:
+  TEST $0x7FFFFFFF,%EDX
+  JNZ @fd1
+  MOV %ECX,%EBX
+  AND $0x7FFFFFFF,%EBX
+  JZ @fnan
+  CMP $0x7F800000,%EBX
+  JA @fnan
+fd1:
+  MOVD %ECX,%XMM0
+  MOVD %EDX,%XMM1
+  DIVSS %XMM1,%XMM0
+fres:
+  MOVD %XMM0,%EBX
+  JMP @stf
+fnan:
+  MOV $0x7FC00000,%EBX
+  JMP @stf
+h_fsqrt:
+  MOVD %ECX,%XMM0
+  XORPS %XMM1,%XMM1
+  UCOMISS %XMM1,%XMM0
+  JP @fnan
+  JB @fnan
+  SQRTSS %XMM0,%XMM0
+  JMP @fres
+h_fcmp:
+  MOVD %ECX,%XMM0
+  MOVD %EDX,%XMM1
+  UCOMISS %XMM1,%XMM0
+  JP @fc1
+  JMP @fl
+fc1:
+  MOVL $8,[FLAGM]
+  JMP @loop
+h_cvtif:
+  CVTSI2SS %ECX,%XMM0
+  JMP @fres
+h_cvtfi:
+  MOVD %ECX,%XMM0
+  XOR %EBX,%EBX
+  UCOMISS %XMM0,%XMM0
+  JP @wrz
+  CVTTSS2SI %XMM0,%EBX
+  CMP $0x80000000,%EBX
+  JNE @wrz
+  TEST %ECX,%ECX
+  JS @wrz
+  MOV $0x7FFFFFFF,%EBX
+  JMP @wrz
+gate:
+  INC %ESI
+  MOV $0x47,%EAX
+  JMP @trap
+badop:
+  MOV $0x4F,%EAX
+trap:
+  PUSH %EAX
+  MOVB $0x21,[OB]
+  CALL @out1
+  POP %EAX
+  MOV %AL,[OB]
+  CALL @out1
+  MOV $12,%ECX
+tr1:
+  MOV %ESI,%EDX
+  SHR %CL,%EDX
+  SHR $4,%EDX
+  JZ @tr2
+  ADD $4,%ECX
+  JMP @tr1
+tr2:
+  MOV %ESI,%EDX
+  SHR %CL,%EDX
+  AND $15,%EDX
+  MOVZXB [hexd+EDX],%EAX
+  MOV %AL,[OB]
+  PUSH %ECX
+  CALL @out1
+  POP %ECX
+  SUB $4,%ECX
+  JNS @tr2
+done:
+  CLI
+dn1:
+  HLT
+  JMP @dn1
+.org 0x1000
+heads:
+  .word 0x7FF1,0xFFF1,0x7FF8,0xFFF8
+hexd:
+  .str "0123456789ABCDEF"
+ktab:
+  .byte 0,27
+  .str "1234567890-="
+  .byte 8,9
+  .str "qwertyuiop[]"
+  .byte 13,0
+  .str "asdfghjkl;'`"
+  .byte 0
+  .str "\\zxcvbnm,./"
+  .byte 0,42,0,32
+tbl:
+  .long @h_bool,@h_movi,@h_movhi,@h_add,@h_sub,@h_shl,@h_shr,@h_cmp,@h_ld,@h_st,@h_jmp,@h_call,@h_ret,@h_jmpr,@badop,@h_nop
+  .long @h_vpoke,@h_vpeek,@h_key,@h_tick,@h_bswapm,@h_putc,@h_stw,@h_ldn,@h_dispq,@h_dispset,@h_key,@h_nop,@badop,@badop,@badop,@badop
+  .long @h_mul,@h_mulh,@h_mulhu,@h_div,@h_mod,@h_divu,@h_modu,@h_sar,@h_cmps,@h_addi,@h_ldb,@h_stb,@h_callr,@h_bcopy,@h_bfill,@h_nop
+  .long @h_fadd,@h_fsub,@h_fmul,@h_fdiv,@h_fsqrt,@h_fcmp,@h_cvtif,@h_cvtfi

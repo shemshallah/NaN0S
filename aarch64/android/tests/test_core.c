@@ -286,8 +286,9 @@ static void t_ata(void) {
   nan_port_out(V, 0x1F7, 0xE7, 1); EQ(nan_port_in(V, 0x1F7, 1), 0x50);
   nan_port_out(V, 0x1F7, 0x99, 1); EQ(nan_port_in(V, 0x1F7, 1), 0x51); EQ(nan_port_in(V, 0x1F1, 1), 4);   /* unknown command: ERR + ABRT */
   nan_detach_disk(V); EQ(nan_port_in(V, 0x1F7, 1), 0xFF);
-  /* fd backend */
-  char path[] = "/tmp/nan_ata_XXXXXX"; int fd = mkstemp(path); CHECK(fd >= 0);
+  /* fd backend (TMPDIR honored: /tmp is read-only on Android) */
+  const char *atad = getenv("TMPDIR"); if (!atad || !*atad) atad = "/tmp";
+  char path[512]; snprintf(path, sizeof path, "%s/nan_ata_XXXXXX", atad); int fd = mkstemp(path); CHECK(fd >= 0);
   if (fd >= 0) {
     CHECK(write(fd, disk, sizeof disk) == (ssize_t)sizeof disk); nan_attach_disk_fd(V, fd, sizeof disk);
     nan_port_out(V, 0x1F2, 1, 1); nan_port_out(V, 0x1F3, 1, 1); nan_port_out(V, 0x1F4, 0, 1); nan_port_out(V, 0x1F5, 0, 1); nan_port_out(V, 0x1F7, 0x20, 1);

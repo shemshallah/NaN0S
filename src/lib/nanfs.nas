@@ -1,9 +1,9 @@
 ; nanfs.nas - NaNFS RAM slice. 64-word blocks (512 bytes), block 0 superblock,
-; block 1 bitmap (one word per block), data from block 2.
+; block 1.. bitmap (one word per block, ceil(blocks/64) blocks), sb[3] = first data block (2 when blocks<=64).
 .equ NF_BLOCK 64
 .equ NF_MAGIC 0x4E465331
 
-; format: r1=base, r2=blocks (>=3)
+; format: r1=base, r2=blocks (>=3). Bitmap = ceil(blocks/64) blocks from block 1; sb[3] = first data block (2 when blocks<=64).
 nanfs_format:
   ST r15,r0,@nf_f_ret
   ST r1,r0,@nf_base
@@ -11,7 +11,10 @@ nanfs_format:
   LA r3,#NF_MAGIC
   ST r3,r1,0
   ST r2,r1,1
-  MOVI r4,2
+  MOVI r4,63
+  ADD r4,r2,r4
+  SHR r4,r4,6
+  ADD r4,r4,r13
   SUB r5,r2,r4
   ST r5,r1,2
   ST r4,r1,3
@@ -32,7 +35,7 @@ nf_f_ret:
 ; alloc: r1=base, r2=blocks -> r1=block index (>=2) or 0
 nanfs_alloc:
   ST r15,r0,@nf_a_ret
-  MOVI r3,2
+  LD r3,r1,3
 nfa_l:
   CMP r3,r2
   JMP[GE] @nfa_fail

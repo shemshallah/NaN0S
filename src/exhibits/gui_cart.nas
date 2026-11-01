@@ -29,23 +29,11 @@ CALL @wm_init
 ST r0,r0,@g_quit
 ST r0,r0,@g_move
 ST r0,r0,@g_cnt
-; initial windows (the last opened is on top)
-MOVI r1,2
-MOVI r2,640
-MOVI r3,420
-CALL @gui_open_at
-MOVI r1,1
-MOVI r2,600
-MOVI r3,40
-CALL @gui_open_at
-MOVI r1,3
-MOVI r2,20
-MOVI r3,400
-CALL @gui_open_at
+; boot to the desktop with ONE terminal window (A2). Everything else (lattice,
+; hex, monitor, settings, net, utilities) is launched from the terminal via
+; `run <n>` / the named commands, which call gui_single/gui_open_new themselves.
 MOVI r1,0
-MOVI r2,20
-MOVI r3,40
-CALL @gui_open_at
+CALL @gui_open_new
 MOVI r1,1
 ST r1,r0,@wm_redraw
 TICK r1

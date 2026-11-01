@@ -1,4 +1,27 @@
-# Python census (r24) - EXECUTED r26j: zero Python left in the tree
+# Python census (r24) - EXECUTED r26j: zero Python left in the tree; RE-EXECUTED r29i after the
+# regression (uncommitted working tree had restored 16 tools/*.py plus the legacy shells and the
+# tools/harness/*.mjs node boxes).
+
+r29i re-execution (1 Nov 2026): the r26j zero-Python state had regressed in the uncommitted
+tree. This round re-deleted everything for good and closed the last two functional gaps:
+
+- `tools/ngate_fuzz.sh` + `src/tests/n16fuzz.nas` - the in-guest fuzz cart that replaced
+  `n16i_fuzz.py` (engine vs engine on 60 seeds; mode 1 one-image under n16i, mode 0 one
+  nan_cli per seed; PASS 60/60). One real semantics fact came out of debugging it: BOOL's
+  nibble truth table is 0b0110 = XOR and 0b1110 = OR (`BOOL.14` used as "=A^B" was OR and
+  degenerated the stream; all 6 sites fixed to `BOOL.6`).
+- `tools/build.sh` / `x86/tools/build.sh` call `sh tools/mkbase.sh` now (base.img
+  byte-identical python-vs-sh; only the emitted nanvm0.nan header comment names the proper
+  tools/scaffold path).
+- Deleted: `mkproof.py proofnat.py nanchk.py nan16sim.py mkbase.py mkimg1.py mkboot.py
+  nasm1run.py nasm1check.py nasm1_tests.py test_nanvm1.py difftest.py fuzz.py traptest.py
+  sweep_seal.py`, shells `nasm1check.sh native_check.sh x86/tools/native_check.sh
+  build_round01.sh capture_r21.sh x86/tools/capture_r21.sh`, and `tools/harness/`
+  `x86/harness/` (node_modules + .mjs; boot/capture gates are `qgate.sh`, sh + qemu only).
+- Re-proven post-delete (no Python anywhere): `build.sh` end-to-end, `ngate_n16i.sh`
+  RESULT PASS, `ngate_fuzz.sh` PASS 60/60, `ngate_nfix.sh` PASS, `mkproof.sh` on
+  src/tests/key_test.nas PROOF PASS, `qgate.sh` PASS. Outer stack: POSIX sh + gawk/awk +
+  xxd/od + qemu-system-i386 only; guest remains raw NaN16 (adapters: nan_cli C core, qemu).
 
 r26j resolution: the whole census below is DONE. Every `tools/*.py` file (22),
 `tools/harness/` (node_modules, bios, *.mjs, package.json, package-lock.json,

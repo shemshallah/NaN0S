@@ -24,7 +24,7 @@ BEGIN {
   LMAX = loadguest(GUEST)
   if (LMAX == 0) die("no guest words in " GUEST)
   # ---- cartridges ----
-  k = 0; top = 6400
+  k = 0; top = 40000
   while ((getline cl < CARTS) > 0){
     ci = index(cl, ";"); if (ci > 0) cl = substr(cl, 1, ci-1)
     ci = index(cl, "#"); if (ci > 0) cl = substr(cl, 1, ci-1)
