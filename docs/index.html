@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NaN/0S — live in the browser (v86)</title>
+<style>
+  :root { --bg:#0b0b1a; --fg:#cfd2e6; --dim:#6d7194; --blue:#8f9bff; --cyan:#00f0ff; --pink:#ff2bd6; --green:#39ff14; }
+  * { box-sizing: border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--fg);
+    font:15px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; }
+  header { padding:28px 20px 10px; text-align:center; }
+  h1 { margin:0; font-size:30px; letter-spacing:2px; color:var(--blue); font-weight:700; }
+  h1 span { color:var(--pink); }
+  .tag { margin:8px 0 0; color:var(--dim); }
+  .tag a { color:var(--cyan); text-decoration:none; }
+  main { max-width:980px; margin:14px auto 40px; padding:0 14px; }
+  #status { text-align:center; color:var(--dim); margin:10px 0; min-height:1.5em; }
+  #status.err { color:#ff6b6b; }
+  #screen_container { position:relative; margin:0 auto; width:fit-content; max-width:100%;
+    background:#000; border:1px solid #23234a; border-radius:6px; padding:10px; overflow:auto; }
+  #screen_container > div { white-space:pre; font:14px/14px ui-monospace,monospace; color:#d8d8e8; }
+  #screen_container canvas { display:none; image-rendering:pixelated; max-width:100%; height:auto; }
+  .controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; margin:12px 0 4px; }
+  button { background:#151534; color:var(--fg); border:1px solid #2e2e5e; border-radius:5px;
+    padding:7px 14px; font:inherit; cursor:pointer; }
+  button:hover:not(:disabled) { border-color:var(--cyan); color:var(--cyan); }
+  button:disabled { opacity:.4; cursor:default; }
+  .hint { color:var(--dim); font-size:13px; text-align:center; }
+  .hint b { color:var(--fg); }
+  details { margin-top:16px; color:var(--dim); }
+  summary { cursor:pointer; }
+  #serial { background:#07070f; border:1px solid #1c1c38; border-radius:5px; padding:10px;
+    max-height:220px; overflow:auto; color:#9fe8b3; font-size:12px; white-space:pre-wrap; }
+  footer { text-align:center; color:var(--dim); font-size:12px; padding:0 16px 32px; }
+  footer a { color:var(--dim); }
+  a { color:var(--cyan); }
+</style>
+</head>
+<body>
+<header>
+  <h1>NaN<span>/</span>0S</h1>
+  <p class="tag">the real guest floppy, executed in your browser by
+    <a href="https://github.com/copy/v86" target="_blank" rel="noopener">v86</a> (x86&nbsp;→&nbsp;WebAssembly).
+    no host OS underneath.</p>
+</header>
+<main>
+  <div id="status">loading v86…</div>
+  <div id="screen_container" tabindex="0">
+    <div style="white-space:pre;font:14px/14px monospace;color:#d8d8e8"></div>
+    <canvas style="display:none"></canvas>
+  </div>
+  <div class="controls">
+    <button id="restart" disabled>Restart</button>
+    <button id="fullscreen" disabled>Full screen</button>
+    <span class="hint">click the screen, then use the menu keys <b>1–9</b> · <b>ESC</b> back</span>
+  </div>
+  <details>
+    <summary>COM1 serial</summary>
+    <pre id="serial"></pre>
+  </details>
+</main>
+<footer>
+  v86 © copy.sh, BSD-2 · this page boots <code>nan0s.img</code> from the repository
+  (<a href="https://github.com/shemshallah/nan0s">shemshallah/nan0s</a>) · v86 is fetched from jsDelivr at run time ·
+  site: <code>docs/</code> (GitHub Pages, branch <code>main</code> / <code>docs</code>)
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/v86@0.5.473/build/libv86.js"></script>
+<script>
+(function () {
+  "use strict";
+  // Pinned v86 build. BIOS images are not in the npm package; they come from the v86 repo via jsDelivr.
+  var V86 = "https://cdn.jsdelivr.net/npm/v86@0.5.473/build/";
+  var BIOS = "https://cdn.jsdelivr.net/gh/copy/v86@master/bios/";
+  // docs/index.html is the GitHub Pages site: Settings -> Pages -> Deploy from a branch,
+  // branch main + folder /docs. nan0s.img sits next to this page; ../build/nan0s.img is
+  // the fallback when serving the repository root locally or on an older deployment.
+  var CANDIDATES = ["nan0s.img", "../build/nan0s.img"];
+
+  var statusEl = document.getElementById("status");
+  var screenEl = document.getElementById("screen_container");
+  var serialEl = document.getElementById("serial");
+  var restartBtn = document.getElementById("restart");
+  var fsBtn = document.getElementById("fullscreen");
+  var emulator = null;
+  var serialBuf = "";
+  var serialDirty = false;
+
+  function status(text, isError) {
+    statusEl.textContent = text;
+    statusEl.className = isError ? "err" : "";
+  }
+
+  setInterval(function () {
+    if (!serialDirty) return;
+    serialDirty = false;
+    serialEl.textContent = serialBuf.length > 32768 ? serialBuf.slice(-32768) : serialBuf;
+  }, 150);
+
+  function fetchImage() {
+    var i = 0;
+    function attempt() {
+      if (i >= CANDIDATES.length) {
+        return Promise.reject(new Error("floppy image not found (tried " + CANDIDATES.join(", ") + ")"));
+      }
+      var url = CANDIDATES[i++];
+      status("fetching " + url + " …");
+      return fetch(url, { cache: "force-cache" }).then(function (r) {
+        if (!r.ok) throw new Error(url + ": HTTP " + r.status);
+        return r.arrayBuffer();
+      }).catch(attempt);
+    }
+    return attempt();
+  }
+
+  function boot(image) {
+    status("starting v86 …");
+    emulator = new V86({
+      wasm_path: V86 + "v86.wasm",
+      bios: { url: BIOS + "seabios.bin" },
+      vga_bios: { url: BIOS + "vgabios.bin" },
+      fda: { buffer: image },
+      memory_size: 32 * 1024 * 1024,
+      vga_memory_size: 2 * 1024 * 1024,
+      autostart: true,
+      screen_container: screenEl
+    });
+    emulator.add_listener("emulator-ready", function () {
+      status("running — click the screen to type");
+      restartBtn.disabled = false;
+      fsBtn.disabled = false;
+    });
+    emulator.add_listener("serial0-output-byte", function (b) {
+      serialBuf += String.fromCharCode(b);
+      serialDirty = true;
+    });
+    emulator.add_listener("download-error", function (e) {
+      status("download failed: " + (e && e.file_name ? e.file_name : "component"), true);
+    });
+  }
+
+  restartBtn.addEventListener("click", function () {
+    if (emulator) { emulator.restart(); screenEl.focus(); }
+  });
+  fsBtn.addEventListener("click", function () {
+    if (emulator) emulator.screen_go_fullscreen();
+  });
+
+  try {
+    fetchImage().then(boot).catch(function (e) {
+      status(e.message + " — serve the repo root (or docs/) with any static web server, then open /docs/ (file:// will not work)", true);
+    });
+  } catch (e) {
+    status("cannot start v86: " + e.message, true);
+  }
+})();
+</script>
+</body>
+</html>

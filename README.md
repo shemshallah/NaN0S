@@ -22,9 +22,15 @@
 ## `> sighting`
 
 <div align="center">
-<img src="assets/nan0s-desktop.png" alt="NaN/0S desktop: terminal, rule-90 Sierpinski, live hex, double-endian monitor" width="100%"/>
-<br/>
-<sub>the desktop, running. terminal · rule-90 sierpinski · live hex · double-endian monitor. no host OS underneath.</sub>
+
+<a href="https://shemshallah.github.io/nan0s/"><img src="https://img.shields.io/badge/BOOT%20IT%20%E2%96%B6-LIVE%20IN%20YOUR%20BROWSER-ff2bd6?style=for-the-badge&labelColor=0b0b1a" alt="boot NaN/0S in your browser (v86)"></a>
+
+<br/><br/>
+
+<sub>the real guest floppy, executed in <a href="https://github.com/copy/v86">v86</a> (x86 → WebAssembly).</sub>
+<sub>click the screen, then <b>1–9</b> for the exhibits · <b>ESC</b> back. no install, no host OS underneath.</sub>
+<sub>source <code>docs/</code> · image <code>docs/nan0s.img</code> (= <code>build/nan0s.img</code>) · host a fork: Settings → Pages → branch <code>main</code> / <code>docs</code></sub>
+
 </div>
 
 <details>
