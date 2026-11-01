@@ -70,8 +70,8 @@
 (function () {
   "use strict";
   // Pinned v86 build. BIOS images are not in the npm package; they come from the v86 repo via jsDelivr.
-  var V86 = "https://cdn.jsdelivr.net/npm/v86@0.5.473/build/";
-  var BIOS = "https://cdn.jsdelivr.net/gh/copy/v86@master/bios/";
+  var V86_CDN = "https://cdn.jsdelivr.net/npm/v86@0.5.473/build/";
+  var BIOS_CDN = "https://cdn.jsdelivr.net/gh/copy/v86@master/bios/";
   // docs/index.html is the GitHub Pages site: Settings -> Pages -> Deploy from a branch,
   // branch main + folder /docs. nan0s.img sits next to this page; ../build/nan0s.img is
   // the fallback when serving the repository root locally or on an older deployment.
@@ -116,9 +116,9 @@
   function boot(image) {
     status("starting v86 …");
     emulator = new V86({
-      wasm_path: V86 + "v86.wasm",
-      bios: { url: BIOS + "seabios.bin" },
-      vga_bios: { url: BIOS + "vgabios.bin" },
+      wasm_path: V86_CDN + "v86.wasm",
+      bios: { url: BIOS_CDN + "seabios.bin" },
+      vga_bios: { url: BIOS_CDN + "vgabios.bin" },
       fda: { buffer: image },
       memory_size: 32 * 1024 * 1024,
       vga_memory_size: 2 * 1024 * 1024,
@@ -146,13 +146,15 @@
     if (emulator) emulator.screen_go_fullscreen();
   });
 
-  try {
-    fetchImage().then(boot).catch(function (e) {
-      status(e.message + " — serve the repo root (or docs/) with any static web server, then open /docs/ (file:// will not work)", true);
-    });
-  } catch (e) {
-    status("cannot start v86: " + e.message, true);
-  }
+  fetchImage().then(function (image) {
+    try {
+      boot(image);
+    } catch (e) {
+      status("cannot start v86: " + e.message, true);
+    }
+  }, function (e) {
+    status(e.message + " — serve the repo root (or docs/) with any static web server (file:// will not work)", true);
+  });
 })();
 </script>
 </body>

@@ -23,7 +23,7 @@
 
 <div align="center">
 
-<a href="https://shemshallah.github.io/nan0s/"><img src="https://img.shields.io/badge/BOOT%20IT%20%E2%96%B6-LIVE%20IN%20YOUR%20BROWSER-ff2bd6?style=for-the-badge&labelColor=0b0b1a" alt="boot NaN/0S in your browser (v86)"></a>
+<a href="https://shemshallah.github.io/NaN0S/"><img src="https://img.shields.io/badge/BOOT%20IT%20%E2%96%B6-LIVE%20IN%20YOUR%20BROWSER-ff2bd6?style=for-the-badge&labelColor=0b0b1a" alt="boot NaN/0S in your browser (v86)"></a>
 
 <br/><br/>
 
