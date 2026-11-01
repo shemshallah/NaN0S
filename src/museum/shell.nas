@@ -118,11 +118,13 @@ MOVI r2,@v_scroll
 MOVI r3,15
 STW r1,r2,r3
 
-; ---- cold boot: the GUI is the system (hidden TOC entry, index 8, never listed).
-; Its own entry opens a single CLI window (A2); ESC there returns to this menu.
-MOVI r10,#TOC_BASE
-MOVI r4,128
-ADD r10,r10,r4
+; ---- cold boot: run the system cart (GUI desktop) when the builder declared one;
+; its entry opens a single CLI window (A2). ESC/q there returns to this menu.
+; boot_rec is separate from the exhibit TOC, so slots stay free for exhibits.
+LA r10,@boot_rec
+LD r1,r10,0
+CMP r1,r0
+JMP[EQ] @sh_redraw
 JMP @sh_run
 
 ; ---- 2. Clear screen and display menu ----
@@ -523,133 +525,22 @@ ss_ret:
 ss_body:
 .word 0
 
-; TOC. Entry = 16 words: 0 id (0 = end) | 1 year | 2 hall | 3 title_ptr | 4 start (store addr, builder) | 5 len words (builder) | 6 badge (0 EXACT 1 RE-CREATION 2 INSPIRED) | 7 flags | 8 seal FNV-1a/32 (builder) | 9 meta_ptr | 10-15 reserved
+; TOC. 16 words per entry, fully BUILT by tools/mkimg.awk from tools/carts.txt:
+; [0] slot (menu key 1-9; 0 = end of list) | [1] year | [2] hall | [3] title_ptr |
+; [4] store addr | [5] len words | [6] badge (0 EXACT 1 RE-CREATION 2 INSPIRED) |
+; [7] flags | [8] seal A | [9] meta_ptr | [10] seal B | [11] seal C | [12-15] reserved
+; Titles are builder-written at TITLE_BASE (4 chars/word LE, NUL padded): slot number,
+; order and wording are edited in carts.txt only - no changes here for renumbering.
+.equ TOC_BASE 4608
+.equ BOOT_BASE 4768
 .org 4608
 toc:
-.word 1
-.word 1948
-.word 0
-.word @sh_strings
-.word 0
-.word 0
-.word 1
-.word 0
-.word 0
-.word 0
-.org 4624
-.word 2
-.word 1854
-.word 0
-.word @sh_str2
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-.org 4640
-.word 3
-.word 1915
-.word 4
-.word @sh_str3
-.word 0
-.word 0
-.word 1
-.word 0
-.word 0
-.word 0
-.org 4656
-.word 4
-.word 1984
-.word 7
-.word @sh_str6
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-.org 4672
-.word 5
-.word 1991
-.word 7
-.word @sh_str7
-.word 0
-.word 0
-.word 1
-.word 0
-.word 0
-.word 0
-.org 4688
-.word 6
-.word 2026
-.word 9
-.word @sh_str8
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-.org 4704
-.word 7
-.word 2026
-.word 7
-.word @sh_str4
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-.org 4720
-.word 8
-.word 2026
-.word 7
-.word @sh_str5
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-; idx8 = HIDDEN GUI entry: id 0 stops the menu list, so it is never displayed.
-; the cold-boot path jumps straight to TOC_BASE + 8*16 and runs it (one CLI window).
-.org 4736
-.word 0
-.word 2026
-.word 9
-.word @sh_str9
-.word 0
-.word 0
-.word 1
-.word 0
-.word 0
-.word 0
-.org 4752
-.word 0
-
-; String table
+; (up to 10 builder-written entries; a bare museum.nan shows an empty menu)
+.org 4768
+boot_rec:
+; system cart record (the GUI desktop), same 16-word shape. [0]=0 -> boot to menu.
+; NOT an exhibit slot: slot 9 stays free for a future exhibit (TempleOS).
 .org 4864
-sh_strings:
-.str "Manchester Baby (SSEM) - 21 June 1948\0"
-sh_str2:
-.str "Boole - The Laws of Thought (16 functions, live) - 1854"
-sh_str3:
-.str "Sierpinski - Rule 90 (1915) - live fractal"
-sh_str4:
-.str "About NaN/0S - the machine, the trust, the plan"
-sh_str5:
-.str "About Shemshallah - the developer"
-sh_str6:
-.str "Trust - Reflections on Trusting Trust (1984) - paper"
-sh_str7:
-.str "Patriot Missile Failure - Dhahran 1991"
-sh_str8:
-.str "Paradox Engine - sNaN/qNaN contradiction oscillator"
-sh_str9:
-.str "NaN/0S Desktop - windows, terminal, pixels (GUI)"
-
 .org 5376
 sm_title:
 .str " NaN/0S  SYSTEM"
