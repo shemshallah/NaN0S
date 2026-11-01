@@ -11,3 +11,5 @@ sh tools/nmkfs.sh src/tests/nfix_test.nas build/disk.nanfs
 [ -d x86/build ] && cp build/disk.nanfs x86/build/disk.nanfs
 # published live demo (docs/ is the GitHub Pages site): keep nan0s.img beside index.html
 [ -d docs ] && cp build/nan0s.img docs/nan0s.img
+# the APK ships the same image (assets/ held a stale copy until r29m)
+[ -d aarch64/android/app/src/main/assets ] && cp build/nan0s.img aarch64/android/app/src/main/assets/nan0s.img

@@ -1,11 +1,13 @@
 # STORE:file  (one cartridge per line, in TOC order; STORE may be 'auto'). Edit this file to add exhibits; build with sh x86/tools/mkall.sh
 # STORE MUST BE ABOVE THE RUN SLOT: the shell copies a cartridge to SLOT (word 8192) and runs it there, growing up to the longest cart (gui 7083 words). Any store under SLOT+7100 gets overwritten by the first exhibit run -> SEAL MISMATCH on the next load. First store = 40000, the rest auto-follow.
+# Order = menu order (entry k gets TOC slot k). The last line runs at COLD BOOT only:
+# the shell's hidden TOC entry (id 0) is the GUI, and nothing after it is listed.
 40000:src/nan/baby_cart.nan
 auto:src/nan/boole_cart.nan
 auto:src/nan/sierpinski_cart.nan
-auto:src/nan/about_nan0s_cart.nan
-auto:src/nan/about_dev_cart.nan
 auto:src/nan/trust_cart.nan
 auto:src/nan/patriot_cart.nan
 auto:src/nan/paradox_cart.nan
+auto:src/nan/about_nan0s_cart.nan
+auto:src/nan/about_dev_cart.nan
 auto:src/nan/gui_cart.nan

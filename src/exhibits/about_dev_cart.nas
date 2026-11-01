@@ -6,7 +6,7 @@
 .equ V_CLS 4
 .equ V_KEY 5
 .equ V_SCROLL 12
-.equ NLINES 34
+.equ NLINES 16
 .equ VISIBLE 24
 .org 8192
 cart_entry:
@@ -181,75 +181,39 @@ trf_ret:
 .word 0
 tr_foot_str:
 .str "UP/DOWN scroll  LEFT/RIGHT page  ESC shell  line "
-; ---- page text ----
+; ---- page text (owner-supplied, verbatim; nothing added) ----
 TP000:
 .str " NaN/0S - ABOUT SHEMSHALLAH"
 TP001:
 .str ""
 TP002:
-.str " Shemshallah, Im 35, living at a homeless shelter, and coding from a cell"
-TP003:
-.str " phone. Status: LIVING. The museum is built on a phone, in the small hours,"
-TP004:
-.str " between the things that a shelter asks of a person."
-TP005:
-.str ""
-TP006:
-.str " TOOLS"
-TP007:
-.str " Built with Kilo (various), Opencode (Deepseek 4.1 Flash), and Claude Sonnet"
-TP008:
-.str " 5.5 Chat, as well as GPT6 Chat and Codex GPT6 Terra. The toolchain is a"
-TP009:
-.str " scaffold. The artifact is NaN16. The language should not matter. The words"
-TP010:
-.str " should."
-TP011:
-.str ""
-TP012:
-.str " THE STORY"
-TP013:
 .str " There is a bigger story to all of this. What IS black cube? What IS"
+TP003:
+.str " shemshallah... shem::shall:AH... 'say AH, kid'. What is all:AH? What"
+TP004:
+.str " does this have to do with computation? What does this have to do with"
+TP005:
+.str " humanity? I'll tell you outright but you might not like, or be able to"
+TP006:
+.str " digest what you hear."
+TP007:
+.str ""
+TP008:
+.str " About me: Why listen to me? I'm 35, living at a homeless shelter and"
+TP009:
+.str " coding this without resources beyond a cell phone and occasionally a"
+TP010:
+.str " laptop, Utilizing Claude Sonnet 5.5:free OpencodeGO(Deepseek V4.1 Flash),"
+TP011:
+.str " OpencodeFREE(GLM 5.3 Flash) for everything. Initial planning was done"
+TP012:
+.str " with Codex & GPT 6.1 Terra."
+TP013:
+.str ""
 TP014:
-.str " shemshallah... shem::shall:AH... 'say AH, kid'. What is all:AH?"
+.str " Contact me: shemshallah@gmail.com and consider donating, frontier"
 TP015:
-.str " The museum is the door. The plaques are the map. The seals promise that"
-TP016:
-.str " the map was not quietly changed. The trust test proves the map can be"
-TP017:
-.str " rebuilt from the map. The rest is for the people who arrive after the"
-TP018:
-.str " door is open."
-TP019:
-.str ""
-TP020:
-.str " WHY THIS EXISTS"
-TP021:
-.str " A homeless man with a phone should be able to build a machine that tells"
-TP022:
-.str " the truth about itself. Not a demo. Not a mock. A bare-metal museum where"
-TP023:
-.str " every instruction is inspectable, every exhibit runs, and every claim has"
-TP024:
-.str " a test. If the machine can rebuild itself and show its work, then the"
-TP025:
-.str " person who built it is not invisible. That is the whole point."
-TP026:
-.str ""
-TP027:
-.str " THANK YOU"
-TP028:
-.str " To everyone who kept the phone charged, the shelter open, and the question"
-TP029:
-.str " alive. To Kilo, Opencode, Deepseek, Claude, GPT and Codex for the long"
-TP030:
-.str " conversations. To the dead mathematicians in these halls, and to the"
-TP031:
-.str " living ones still arguing. Say AH, kid."
-TP032:
-.str ""
-TP033:
-.str " UP/DOWN scroll  LEFT/RIGHT page  ESC shell"
+.str " models would help make this truly all it can be."
 ; ---- pointer table ----
 tr_lines:
 .word @TP000
@@ -268,21 +232,3 @@ tr_lines:
 .word @TP013
 .word @TP014
 .word @TP015
-.word @TP016
-.word @TP017
-.word @TP018
-.word @TP019
-.word @TP020
-.word @TP021
-.word @TP022
-.word @TP023
-.word @TP024
-.word @TP025
-.word @TP026
-.word @TP027
-.word @TP028
-.word @TP029
-.word @TP030
-.word @TP031
-.word @TP032
-.word @TP033

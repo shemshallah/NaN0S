@@ -118,6 +118,13 @@ MOVI r2,@v_scroll
 MOVI r3,15
 STW r1,r2,r3
 
+; ---- cold boot: the GUI is the system (hidden TOC entry, index 8, never listed).
+; Its own entry opens a single CLI window (A2); ESC there returns to this menu.
+MOVI r10,#TOC_BASE
+MOVI r4,128
+ADD r10,r10,r4
+JMP @sh_run
+
 ; ---- 2. Clear screen and display menu ----
 sh_redraw:
 CALL @v_cls
@@ -384,7 +391,7 @@ cu_foot:
 sh_banner:
 .str " NaN/0S  MUSEUM OF COMPUTING  (exhibit cartridges)  v40          "
 sh_more:
-.str "9 exhibits installed. Hall 1 Apollo AGC is next. See TODO.md"
+.str "8 exhibits installed. Hall 1 Apollo AGC is next. See TODO.md"
 sh_btab:
 .word @sh_b0
 .word @sh_b1
@@ -553,28 +560,6 @@ toc:
 .word 0
 .org 4656
 .word 4
-.word 2026
-.word 7
-.word @sh_str4
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-.org 4672
-.word 5
-.word 2026
-.word 7
-.word @sh_str5
-.word 0
-.word 0
-.word 2
-.word 0
-.word 0
-.word 0
-.org 4688
-.word 6
 .word 1984
 .word 7
 .word @sh_str6
@@ -584,8 +569,8 @@ toc:
 .word 0
 .word 0
 .word 0
-.org 4704
-.word 7
+.org 4672
+.word 5
 .word 1991
 .word 7
 .word @sh_str7
@@ -595,8 +580,8 @@ toc:
 .word 0
 .word 0
 .word 0
-.org 4720
-.word 8
+.org 4688
+.word 6
 .word 2026
 .word 9
 .word @sh_str8
@@ -606,8 +591,32 @@ toc:
 .word 0
 .word 0
 .word 0
+.org 4704
+.word 7
+.word 2026
+.word 7
+.word @sh_str4
+.word 0
+.word 0
+.word 2
+.word 0
+.word 0
+.word 0
+.org 4720
+.word 8
+.word 2026
+.word 7
+.word @sh_str5
+.word 0
+.word 0
+.word 2
+.word 0
+.word 0
+.word 0
+; idx8 = HIDDEN GUI entry: id 0 stops the menu list, so it is never displayed.
+; the cold-boot path jumps straight to TOC_BASE + 8*16 and runs it (one CLI window).
 .org 4736
-.word 9
+.word 0
 .word 2026
 .word 9
 .word @sh_str9

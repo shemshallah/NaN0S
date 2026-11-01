@@ -19,8 +19,9 @@ asan: $(SRC) tests/test_core.c core/*.h core/*.inc
 	$(CC) -std=gnu99 -O1 -g -Wno-misleading-indentation -fsanitize=address,undefined -fno-sanitize-recover=undefined -ffp-contract=off $(SRC) tests/test_core.c -o tests/test_core_asan -lm
 	./tests/test_core_asan
 # Gate: every cartridge must still load after any other one has run (catches store/SLOT overlap -> SEAL MISMATCH).
+# Boot now lands in the GUI (one CLI window): the first ESCs close it and reach the museum menu.
 seals: nan_cli
 	@bad=0; for a in 1 2 3 4 5 6 7 8; do for b in 1 2 3 4 5 6 7 8; do \
-	  o=$$(./nan_cli --img app/src/main/assets/nan0s.img --dump-text --keys "$$a,@1500000,ESC,@1500000,$$b" --steps 4000000 2>&1); \
+	  o=$$(./nan_cli --img app/src/main/assets/nan0s.img --dump-text --keys "ESC,ESC,ESC,ESC,ESC,$$a,ESC,$$b" --steps 6000000 2>&1); \
 	  case "$$o" in *"SEAL MISMATCH"*) echo "FAIL $$a then $$b"; bad=1;; esac; done; done; \
 	  [ $$bad = 0 ] && echo "seals: 64 pairs OK"

@@ -1,4 +1,6 @@
-; EXHIBIT CARTRIDGE: Sierpinski / rule 90, real VGA pixels, white on black.
+; EXHIBIT CARTRIDGE: Sierpinski / rule 90, real VGA pixels. Palette matches the HTML
+; reference in Download (NaN Lattice): bright #42F08B (16) on dark green #10311C (17),
+; same rule-90 pattern with cyclic edges and the same "time flows up" history.
 ; Badge: RE-CREATION. Runtime code and glyphs are NaN16 only.
 ; Top 320x128 pixels: live rule-90 lattice, one pixel per cell.
 ; Bottom 72 pixels: a scrollable museum label drawn with the homebrew 3x5 font.
@@ -11,10 +13,9 @@
 .equ V_KEYQ 6
 .equ V_TICK 7
 .equ V_SCROLL 12
-.equ SBUF 2304
-.equ NBUF 2624
-.equ ANIMH 128
-.equ PANEL 128
+.equ SBUF 200000
+.equ NBUF 210000
+.equ PANELH 72
 .equ PANELROWS 6
 .equ NLINES 35
 .equ FRAME 33
@@ -25,23 +26,38 @@ cart_entry:
 ST r15,r0,@s_ret
 MOVI r13,1
 CALL @fb_init
+; HTML palette: dark-green field (17), bright cells (16). Panel repaints black.
+MOVI r1,17
+CALL @fb_clear
+; ---- geometry from the CURRENT framebuffer: stage = full width, up to the panel ----
+LD r1,r0,@fb_w
+ST r1,r0,@s_w
+LD r2,r0,@fb_h
+MOVI r3,#PANELH
+SUB r2,r2,r3
+ST r2,r0,@s_stage
+SUB r1,r2,r13
+LD r3,r0,@s_w
+MUL r1,r1,r3
+ST r1,r0,@s_last
 ; ---- seed the lattice: all zero, one cell in the centre ----
 MOVI r1,0
-MOVI r3,320
+LD r3,r0,@s_w
 sseed:
-MOVI r6,#SBUF
+LA r6,#SBUF
 ADD r6,r6,r1
 MOVI r5,2
 MOVI r4,6
 STW r5,r6,r4
-MOVI r6,#NBUF
+LA r6,#NBUF
 ADD r6,r6,r1
 STW r5,r6,r4
 ADD r1,r1,r13
 CMP r1,r3
 JMP[LT] @sseed
-MOVI r2,160
-MOVI r6,#SBUF
+LD r2,r0,@s_w
+SHR r2,r2,1
+LA r6,#SBUF
 ADD r6,r6,r2
 MOVI r5,3
 MOVI r4,6
@@ -141,21 +157,28 @@ s_scroll:
 .word 0
 s_i:
 .word 0
+s_w:
+.word 320
+s_stage:
+.word 128
+s_last:
+.word 40640
 ; ---- one generation: XOR left/right, copy, hardware-blit scroll, draw ----
 s_frame:
 ST r15,r0,@sf_ret
-MOVI r3,320
+LD r3,r0,@s_w
 MOVI r1,0
 sf_x:
 ADD r5,r1,r0
 CMP r5,r0
 JMP[NE] @sf_left
-MOVI r5,319
+LD r5,r0,@s_w
+SUB r5,r5,r13
 JMP @sf_left_ok
 sf_left:
 SUB r5,r5,r13
 sf_left_ok:
-MOVI r6,#SBUF
+LA r6,#SBUF
 ADD r5,r5,r6
 LD r7,r5,0
 BOOL.8 r7,r7,r13
@@ -165,12 +188,12 @@ CMP r5,r3
 JMP[LT] @sf_right_ok
 MOVI r5,0
 sf_right_ok:
-MOVI r6,#SBUF
+LA r6,#SBUF
 ADD r5,r5,r6
 LD r8,r5,0
 BOOL.8 r8,r8,r13
 BOOL.6 r9,r7,r8
-MOVI r6,#NBUF
+LA r6,#NBUF
 ADD r6,r6,r1
 MOVI r5,2
 BOOL.14 r5,r5,r9
@@ -181,55 +204,59 @@ CMP r1,r3
 JMP[LT] @sf_x
 MOVI r1,0
 sf_copy:
-MOVI r6,#NBUF
+LA r6,#NBUF
 ADD r6,r6,r1
 LD r7,r6,0
-MOVI r6,#SBUF
+LA r6,#SBUF
 ADD r6,r6,r1
 MOVI r4,6
 STW r7,r6,r4
 ADD r1,r1,r13
 CMP r1,r3
 JMP[LT] @sf_copy
-; scroll only rows 0..127: copy 127 rows up, blank row 127
-MOVI r1,40640
+; scroll only the stage: copy stageH-1 rows up (src=width), fill the new last row dark green
+LD r1,r0,@s_last
 MOVI r2,0
-MOVI r3,320
+LD r3,r0,@s_w
 FBCOPY r1,r2,r3
-MOVI r1,320
-MOVI r2,40640
-MOVI r3,0
+LD r1,r0,@s_w
+LD r2,r0,@s_last
+MOVI r3,17
 FBFILL r1,r2,r3
 CALL @s_drawrow
 LD r15,r0,@sf_ret
 RET
 sf_ret:
 .word 0
-; ---- draw state at y=127: only set pixels, background is already black ----
+; ---- draw state at the stage bottom row: only set bright pixels (HTML 16), field is 17 ----
 s_drawrow:
-MOVI r3,320
-MOVI r4,40640
+LD r3,r0,@s_w
+LD r4,r0,@s_last
 MOVI r1,0
 sdr:
-MOVI r6,#SBUF
+LA r6,#SBUF
 ADD r6,r6,r1
 LD r7,r6,0
 BOOL.8 r7,r7,r13
 CMP r7,r0
 JMP[EQ] @sdr_next
 ADD r6,r4,r1
-MOVI r5,15
+MOVI r5,16
 VPOKE r5,r6
 sdr_next:
 ADD r1,r1,r13
 CMP r1,r3
 JMP[LT] @sdr
 RET
-; ---- panel: 7 lines, 3x5 font at 2x, 6x10 cell, x=4 y=128+i*10 ----
+; ---- panel: 6 lines, 3x5 font at 2x, 6x10 cell, x=4 y=stageH+i*11 ----
 s_draw_panel:
 ST r15,r0,@sdp_ret
-MOVI r1,23040
-MOVI r2,40960
+LD r1,r0,@s_w
+MOVI r3,#PANELH
+MUL r1,r1,r3
+LD r2,r0,@s_stage
+LD r3,r0,@s_w
+MUL r2,r2,r3
 MOVI r3,0
 FBFILL r1,r2,r3
 MOVI r1,0
@@ -245,7 +272,7 @@ MOVI r3,#NLINES
 CMP r2,r3
 JMP[GE] @sdp_done
 LD r1,r0,@s_i
-MOVI r2,128
+LD r2,r0,@s_stage
 MOVI r6,11
 MUL r6,r1,r6
 ADD r2,r2,r6
@@ -281,9 +308,9 @@ SP004:
 SP005:
 .str "OF ITS TWO NEIGHBOURS ABOVE."
 SP006:
-.str "FRACTAL DIMENSION ≈ 1.585"
+.str "FRACTAL DIMENSION ~ 1.585"
 SP007:
-.str "PASCAL MOD 2: 0 ⊕ 1 = 1"
+.str "PASCAL MOD 2: 0 XOR 1 = 1"
 SP008:
 .str "ROW N OF PASCAL'S TRIANGLE HAS"
 SP009:
@@ -311,9 +338,9 @@ SP019:
 SP020:
 .str "BENOIT MANDELBROT 1924-2010 DEAD"
 SP021:
-.str "NAN/0S DEV NOTE: I LOVE TRIANGLES,"
+.str "NAN/0S DEV NOTE:"
 SP022:
-.str "AND THIS IS MY FAVORITE EXHIBIT."
+.str "I LOVE TRIANGLES!"
 SP023:
 .str "EACH CELL IS A REAL NAN16 WORD:"
 SP024:
@@ -337,9 +364,9 @@ SP032:
 SP033:
 .str ""
 SP034:
-.str "THE FRACTAL IS 320X128 PIXELS,"
+.str "THE FRACTAL IS 320X128 PIXELS"
 SP035:
-.str "WHITE ON BLACK, MODE 13H."
+.str "HTML COLORS #42F08B ON #10311C"
 ; ---- pointer table ----
 s_lines:
 .word @SP000

@@ -24,7 +24,7 @@ static void drain(nan_vm *v, int echo) {
   char b[512]; size_t n; while ((n = nan_serial_read(v, b, sizeof b))) if (echo) fwrite(b, 1, n, stdout);
 }
 int main(int argc, char **argv) {
-  const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
+  const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL, *peek = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
   int dump_text = 0, serial = 0, trim = 1;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--img") && i + 1 < argc) img = argv[++i];
@@ -33,11 +33,12 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--dump-ppm") && i + 1 < argc) ppm = argv[++i];
     else if (!strcmp(argv[i], "--dump-vga") && i + 1 < argc) vga = argv[++i];
     else if (!strcmp(argv[i], "--disk") && i + 1 < argc) disk = argv[++i];
+    else if (!strcmp(argv[i], "--peek") && i + 1 < argc) peek = argv[++i];
     else if (!strcmp(argv[i], "--clock") && i + 1 < argc) { const char *c = argv[++i]; if (!strncmp(c, "steps:", 6)) per_ms = strtoull(c + 6, 0, 0); }
     else if (!strcmp(argv[i], "--dump-text")) dump_text = 1;
     else if (!strcmp(argv[i], "--no-trim")) trim = 0;
     else if (!strcmp(argv[i], "--serial")) serial = 1;
-    else { fprintf(stderr, "usage: nan_cli --img f [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--disk f] [--clock steps:N]\n"); return 2; }
+    else { fprintf(stderr, "usage: nan_cli --img f [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--peek ADDR[:LEN]] [--disk f] [--clock steps:N]\n"); return 2; }
   }
   if (!img) { fprintf(stderr, "need --img\n"); return 2; }
   size_t len; uint8_t *data = slurp(img, &len); if (!data) { perror(img); return 1; }
@@ -62,6 +63,15 @@ int main(int argc, char **argv) {
   drain(v, serial);
   if (serial && isatty(1)) fputc('\n', stdout);
   if (dump_text) { static char b[16384]; nan_text_utf8(v, b, sizeof b, trim); fputs(b, stdout); }
+  if (peek) { /* --peek ADDR[:LEN][,ADDR[:LEN]...]: hex-dump guest words (gate/debug) */
+    char *spec = strdup(peek), *sv = NULL;
+    for (char *tok = strtok_r(spec, ",", &sv); tok; tok = strtok_r(NULL, ",", &sv)) {
+      unsigned long a0 = strtoul(tok, NULL, 0), nw = 1; const char *c = strchr(tok, ':');
+      if (c) nw = strtoul(c + 1, NULL, 0);
+      for (unsigned long i = 0; i < nw; i++) printf("%08X\n", (uint32_t)(nan_word(v, (uint32_t)(a0 + i)) >> 16));
+    }
+    free(spec);
+  }
   if (vga) { FILE *f = fopen(vga, "wb"); if (f) { for (int i = 0; i < 2000; i++) { uint16_t c = nan_text_cell(v, i); fputc(c & 255, f); fputc(c >> 8, f); } fclose(f); } }
   if (ppm) {
     int w, h; nan_display_size(v, &w, &h);

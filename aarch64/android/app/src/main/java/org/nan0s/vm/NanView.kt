@@ -51,6 +51,16 @@ class NanView(context: Context, private val vm: NanVm, private val onInput: () -
     private var zoom = 1f
     private var panX = 0f
     private var panY = 0f
+    // content cache: rebuild only when the guest drew, the view/mode changed, or the
+    // integer-scale toggle flipped. During a pinch we KEEP the last bitmap and only
+    // transform it, so the gesture never pays for text rasterisation or a VM snapshot.
+    private var contentBmp: Bitmap? = null
+    private var cacheVW = -1
+    private var cacheVH = -1
+    private var cacheGfx = false
+    private var cacheDims = -1
+    private var cacheInt = false
+    private var cacheDirty = -1
 
     private val scaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(d: ScaleGestureDetector): Boolean {
@@ -86,11 +96,23 @@ class NanView(context: Context, private val vm: NanVm, private val onInput: () -
         canvas.drawColor(Color.BLACK)
         val vw = width; val vh = height
         if (vw <= 0 || vh <= 0) return
-        val b = (if (vm.graphics()) buildGfx(vw, vh) else buildText(vw, vh)) ?: return
+        val gfx = vm.graphics()
+        val dims = if (gfx) (vm.width() shl 16) or (vm.height() and 0xFFFF) else 0
+        val dirty = vm.dirty()
+        val geometry = vw != cacheVW || vh != cacheVH || gfx != cacheGfx || dims != cacheDims || integerScale != cacheInt
+        val pinching = scaleDetector.isInProgress
+        var b = contentBmp
+        if (b == null || geometry || (dirty != cacheDirty && !pinching)) {
+            b = (if (gfx) buildGfx(vw, vh) else buildText(vw, vh)) ?: return
+            contentBmp = b
+            cacheVW = vw; cacheVH = vh; cacheGfx = gfx; cacheDims = dims; cacheInt = integerScale
+            cacheDirty = dirty
+        }
+        val content = b ?: return
         val zw = baseW * zoom; val zh = baseH * zoom
         clampPan()                       // also recenters when the content fits (zoom == 1)
         dst.set(panX, panY, panX + zw, panY + zh)
-        canvas.drawBitmap(b, null, dst, blit)
+        canvas.drawBitmap(content, null, dst, blit)
     }
 
     private fun clampPan() {
