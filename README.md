@@ -23,12 +23,16 @@
 
 <div align="center">
 
-<a href="https://shemshallah.github.io/NaN0S/"><img src="https://img.shields.io/badge/BOOT%20IT%20%E2%96%B6-LIVE%20IN%20YOUR%20BROWSER-ff2bd6?style=for-the-badge&labelColor=0b0b1a" alt="boot NaN/0S in your browser (v86)"></a>
+<iframe src="https://shemshallah.github.io/NaN0S/?live=1" title="NaN/0S live (v86)" width="960" height="600"
+        style="border:1px solid #23234a;border-radius:6px;max-width:100%" loading="lazy"></iframe>
 
-<br/><br/>
+<a href="https://shemshallah.github.io/NaN0S/?live=1"><img src="assets/nan0s-desktop.png" alt="NaN/0S desktop — click the screenshot to boot LIVE in your browser" width="100%"/></a>
 
-<sub>the real guest floppy, executed in <a href="https://github.com/copy/v86">v86</a> (x86 → WebAssembly).</sub>
-<sub>click the screen, then <b>1–9</b> for the exhibits · <b>ESC</b> back. no install, no host OS underneath.</sub>
+**Click the screenshot to boot LIVE in your browser!**
+
+<sub>the real guest floppy, executed in <a href="https://github.com/copy/v86">v86</a> (x86 → WebAssembly) — no install, no host OS underneath.</sub>
+<sub>[open full screen ↗](https://shemshallah.github.io/NaN0S/?live=1) · click the screen, then <b>1–9</b> for the exhibits · <b>ESC</b> back.</sub>
+<sub>GitHub's README sanitizer strips &lt;iframe&gt;, so on github.com you see the still above; in renderers that allow frames the live machine runs inline.</sub>
 <sub>source <code>docs/</code> · image <code>docs/nan0s.img</code> (= <code>build/nan0s.img</code>) · host a fork: Settings → Pages → branch <code>main</code> / <code>docs</code></sub>
 
 </div>
