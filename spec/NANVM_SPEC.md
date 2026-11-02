@@ -448,6 +448,10 @@ Android product boundary), then riscv64/wasm32. S1 is per-host and small; it
 contains no ATA logic, no filesystem, no allocator, no shell, no builder, no
 font, no VGA mode table.
 
+Status: the AArch64 S1 has its boot and NaN16 decode/execute layers gated by
+`tools/qgate_a64.sh` (MOVI/MOVHI/ADD/SUB/CMP/JMP/CALL/RET/NOP/PUTC/HALT on
+qemu virt); the remaining op table and devices land on the same frame.
+
 ### 12.3 Android: bare-minimum C
 
 The Android build keeps only the JNI glue, display surface, input forwarding
