@@ -88,6 +88,7 @@ disp:
         ubfx    x26, x10, #36, #4   // d
         ubfx    x27, x10, #32, #4   // a
         ubfx    w28, w10, #16, #16  // imm
+        cbz     w25, op_bool
         cmp     w25, #0x01
         b.eq    op_movi
         cmp     w25, #0x02
@@ -123,6 +124,28 @@ disp:
         cmp     w25, #0x2C
         b.eq    op_callr
         b       trapO
+op_bool:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        orr     w11, w9, w10
+        mvn     w11, w11            // ~(A|B)      bit 0
+        bic     w12, w10, w9        // B & ~A       bit 1
+        bic     w13, w9, w10        // A & ~B       bit 2
+        and     w14, w9, w10        // A & B        bit 3
+        mov     w15, #0
+        tbz     w24, #0, 1f
+        orr     w15, w15, w11
+1:      tbz     w24, #1, 2f
+        orr     w15, w15, w12
+2:      tbz     w24, #2, 3f
+        orr     w15, w15, w13
+3:      tbz     w24, #3, 4f
+        orr     w15, w15, w14
+4:      str     w15, [x21, x26, lsl #2]
+        cset    w12, eq
+        lsl     w23, w12, #1        // Z only (L=0)
+        b       loop
 op_movi:
         str     w28, [x21, x26, lsl #2]
         b       loop
@@ -234,23 +257,54 @@ op_putc:
         str     w9, [x20]
         b       loop
 trapG:
-        ldr     x0, =msgG
-        b       puts_halt
+        add     w0, w22, #1         // shown = fetch pc + 1
+        mov     w1, #71             // 'G'
+        b       trap_common
 trapO:
-        ldr     x0, =msgO
-        b       puts_halt
-puts_halt:
-        ldrb    w2, [x0], #1
-        cbz     w2, halt
+        mov     w0, w22             // shown = pc (after increment)
+        mov     w1, #79             // 'O'
+trap_common:
+        mov     w2, #33             // '!'
         str     w2, [x20]
-        b       puts_halt
+        str     w1, [x20]
+        bl      puthex32
+        mov     w2, #10
+        str     w2, [x20]
+        b       halt
+puthex32:
+        mov     w5, #28
+        mov     w3, #8
+ph_top: cmp     w3, #4
+        b.le    ph_emit
+        lsr     w2, w0, w5
+        and     w2, w2, #15
+        cbnz    w2, ph_emit
+        sub     w5, w5, #4
+        sub     w3, w3, #1
+        b       ph_top
+ph_emit:
+        lsr     w2, w0, w5
+        and     w2, w2, #15
+        cmp     w2, #9
+        add     w2, w2, #48
+        b.ls    1f
+        add     w2, w2, #7
+1:      str     w2, [x20]
+        subs    w5, w5, #4
+        b.lo    ph_done
+        b       ph_emit
+ph_done:
+        ret
 halt:
+        mov     w0, #0x18           // semihosting SYS_EXIT
+        movz    x1, #0x2, lsl #16
+        movz    x2, #0x26
+        orr     x1, x1, x2          // ADP_Stopped_ApplicationExit
+        hlt     #0xF000
         wfe
         b       halt
 
         .section .rodata
-msgG:   .asciz "!G\n"
-msgO:   .asciz "!O\n"
 
         .balign 8
 guest_img:
