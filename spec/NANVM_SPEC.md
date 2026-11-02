@@ -449,11 +449,13 @@ contains no ATA logic, no filesystem, no allocator, no shell, no builder, no
 font, no VGA mode table.
 
 Status: the AArch64 S1 has its boot and NaN16 decode/execute layers gated by
-`tools/qgate_a64.sh`: the gate assembles a real `.nas` test with nmk, runs
-the reference harness for the serial golden, converts the emitted image to
-the S1 guest and requires byte-identical output on qemu virt
-(MOVI/MOVHI/ADD/SUB/CMP/JMP/CALL/RET/NOP/PUTC/HALT with predication). The
-remaining op table and devices land on the same frame.
+`tools/qgate_a64.sh`: the gate assembles real `.nas` tests with nmk, runs the
+reference harness for the serial golden, converts the emitted image to the S1
+guest and requires byte-identical output on qemu virt. Covered ops: MOVI
+MOVHI ADD SUB CMP ADDI SHL SHR JMP JMPR CALL CALLR RET NOP PUTC LD ST HALT
+with predication, over a 4M-word writable guest RAM (image copied at boot);
+the gate runs both a purpose-built test and the existing `carry_probe.nas`.
+The remaining op table and devices land on the same frame.
 
 ### 12.3 Android: bare-minimum C
 
