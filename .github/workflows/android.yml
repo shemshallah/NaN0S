@@ -31,6 +31,7 @@ jobs:
           sh tools/lanegate7.sh || exit 1
           sh tools/lanegate8.sh || exit 1
           sh tools/lanegate9.sh || exit 1
+          sh tools/lanegate12.sh || exit 1
           sh tools/nlink.sh ls >/dev/null || exit 1
           sh tools/mkproof.sh src/tests/key_test.nas || exit 1
           sh tools/nrun.sh src/tests/a2_boot_test.nas | grep -qx 'A2 PASS' || exit 1
