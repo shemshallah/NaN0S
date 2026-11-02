@@ -50241,6 +50241,299 @@ dk2062:
   PUTC r1
   CALL @nl
 dn2063:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,0
+  ST r1,r14,600
+  ST r1,r14,601
+  ST r1,r14,602
+  ST r1,r14,603
+  ST r1,r14,608
+  MOVI r5,170
+  CALL @lw
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,604
+  MOVI r2,65533
+  MOVHI r2,65535
+  CMP r1,r2
+  JMP[EQ] @d0k
+  MOVI r1,0
+  ST r1,r14,70
+d0k:
+  CALL @lo
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  MOVI r5,43521
+  CALL @lw
+  MOVI r5,43522
+  CALL @lw
+  MOVI r5,43523
+  CALL @lw
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  CALL @lr
+  ST r1,r14,605
+  CALL @lr
+  ST r1,r14,606
+  CALL @lr
+  ST r1,r14,607
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,605
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,606
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,607
+  CALL @puthex8
+  CALL @nl
+  MOVI r5,43524
+  CALL @lw
+  MOVI r5,43525
+  CALL @lw
+  MOVI r5,43526
+  CALL @lw
+  MOVI r5,43527
+  CALL @lw
+  MOVI r5,43528
+  CALL @lw
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  CALL @lr
+  CALL @lr
+  CALL @lr
+  CALL @lr
+  CALL @lr
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  CALL @lc
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  MOVI r5,43526
+  CALL @lw
+  ST r1,r14,604
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,604
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,605
+  MOVI r2,43521
+  CMP r1,r2
+  JMP[NE] @dvb2
+  LD r1,r14,606
+  MOVI r2,43522
+  CMP r1,r2
+  JMP[NE] @dvb2
+  LD r1,r14,607
+  MOVI r2,43523
+  CMP r1,r2
+  JMP[NE] @dvb2
+  JMP @dvd2
+dvb2:
+  MOVI r1,0
+  ST r1,r14,70
+dvd2:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk2064
+  MOVI r1,76
+  PUTC r1
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn2065
+dk2064:
+  MOVI r1,76
+  PUTC r1
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn2065:
+  JMP @lskip
+lw:
+  ST r15,r0,@lw_ret
+  LD r1,r14,600
+  CMP r1,r0
+  JMP[NE] @lw_o
+  LD r1,r14,608
+  CMP r1,r0
+  JMP[EQ] @lw_iv
+  MOVI r1,65530
+  MOVHI r1,65535
+  LD r15,r0,@lw_ret
+  RET
+lw_iv:
+  MOVI r1,65533
+  MOVHI r1,65535
+  LD r15,r0,@lw_ret
+  RET
+lw_o:
+  LD r1,r14,603
+  MOVI r2,4
+  CMP r1,r2
+  JMP[NE] @lw_r
+  MOVI r1,65535
+  MOVHI r1,65535
+  LD r15,r0,@lw_ret
+  RET
+lw_r:
+  LD r1,r14,601
+  MOVI r2,610
+  ADD r2,r14,r2
+  ADD r2,r2,r1
+  ST r5,r2,0
+  ADDI r1,r1,1
+  MOVI r2,3
+  BOOL.8 r1,r1,r2
+  ST r1,r14,601
+  LD r1,r14,603
+  ADDI r1,r1,1
+  ST r1,r14,603
+  MOVI r1,0
+  LD r15,r0,@lw_ret
+  RET
+lr:
+  ST r15,r0,@lr_ret
+  LD r1,r14,600
+  CMP r1,r0
+  JMP[NE] @lr_o
+  LD r1,r14,608
+  CMP r1,r0
+  JMP[EQ] @lr_iv
+  MOVI r1,65530
+  MOVHI r1,65535
+  LD r15,r0,@lr_ret
+  RET
+lr_iv:
+  MOVI r1,65533
+  MOVHI r1,65535
+  LD r15,r0,@lr_ret
+  RET
+lr_o:
+  LD r1,r14,603
+  CMP r1,r0
+  JMP[NE] @lr_h
+  MOVI r1,65535
+  MOVHI r1,65535
+  LD r15,r0,@lr_ret
+  RET
+lr_h:
+  LD r1,r14,602
+  MOVI r2,610
+  ADD r2,r14,r2
+  ADD r2,r2,r1
+  LD r3,r2,0
+  ADDI r1,r1,1
+  MOVI r2,3
+  BOOL.8 r1,r1,r2
+  ST r1,r14,602
+  LD r1,r14,603
+  SUB r1,r1,r13
+  ST r1,r14,603
+  ADDI r1,r3,0
+  LD r15,r0,@lr_ret
+  RET
+lo:
+  ST r15,r0,@lo_ret
+  MOVI r1,1
+  ST r1,r14,600
+  MOVI r1,1
+  ST r1,r14,608
+  MOVI r1,0
+  ST r1,r14,601
+  ST r1,r14,602
+  ST r1,r14,603
+  MOVI r1,0
+  LD r15,r0,@lo_ret
+  RET
+lc:
+  ST r15,r0,@lc_ret
+  MOVI r1,0
+  ST r1,r14,600
+  LD r15,r0,@lc_ret
+  RET
+lw_ret:
+  .word 0
+lr_ret:
+  .word 0
+lo_ret:
+  .word 0
+lc_ret:
+  .word 0
+lskip:
   MOVI r1,42405
   MOVHI r1,42405
   ST r1,r14,200
