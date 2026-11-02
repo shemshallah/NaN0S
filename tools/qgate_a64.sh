@@ -28,4 +28,10 @@ run_one cprobe src/tests/carry_probe.nas
 grep -q "PASS" "$T/cprobe.ref" || { echo "s1 a64 gate: FAIL (carry_probe reference)"; exit 1; }
 run_one nalloc src/prog/nalloc_test.nas
 grep -q "PASS" "$T/nalloc.ref" || { echo "s1 a64 gate: FAIL (nalloc reference)"; exit 1; }
-echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test)"
+run_one a64test src/tests/a64_test.nas
+grep -q "PASS" "$T/a64test.ref" || { echo "s1 a64 gate: FAIL (a64_test reference)"; exit 1; }
+for t in n16de_test a2_boot_test nan16dump_test; do
+  run_one "$t" "src/tests/$t.nas"
+  grep -q "PASS" "$T/$t.ref" || { echo "s1 a64 gate: FAIL ($t reference)"; exit 1; }
+done
+echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + n16de + a2_boot + nan16dump)"

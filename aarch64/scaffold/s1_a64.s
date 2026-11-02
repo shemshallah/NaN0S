@@ -117,12 +117,52 @@ disp:
         b.eq    op_jmpr
         cmp     w25, #0x0F
         b.eq    loop
+        cmp     w25, #0x1B
+        b.eq    loop
         cmp     w25, #0x15
         b.eq    op_putc
         cmp     w25, #0x29
         b.eq    op_addi
         cmp     w25, #0x2C
         b.eq    op_callr
+        cmp     w25, #0x14
+        b.eq    op_bswapm
+        cmp     w25, #0x16
+        b.eq    op_stw
+        cmp     w25, #0x17
+        b.eq    op_ldn
+        cmp     w25, #0x20
+        b.eq    op_mul
+        cmp     w25, #0x21
+        b.eq    op_mulh
+        cmp     w25, #0x22
+        b.eq    op_mulhu
+        cmp     w25, #0x23
+        b.eq    op_div
+        cmp     w25, #0x24
+        b.eq    op_mod
+        cmp     w25, #0x25
+        b.eq    op_divu
+        cmp     w25, #0x26
+        b.eq    op_modu
+        cmp     w25, #0x27
+        b.eq    op_sar
+        cmp     w25, #0x28
+        b.eq    op_cmps
+        cmp     w25, #0x2A
+        b.eq    op_ldb
+        cmp     w25, #0x2B
+        b.eq    op_stb
+        cmp     w25, #0x2D
+        b.eq    op_bcopy
+        cmp     w25, #0x2E
+        b.eq    op_bfill
+        cmp     w25, #0x2F
+        b.eq    loop
+        cmp     w25, #0x38
+        b.eq    op_jmpf
+        cmp     w25, #0x39
+        b.eq    op_callf
         b       trapO
 op_bool:
         ldr     w9, [x21, x27, lsl #2]
@@ -256,6 +296,295 @@ op_putc:
         and     w9, w9, #0xFF
         str     w9, [x20]
         b       loop
+
+// ---- extension ops -------------------------------------------------------
+op_bswapm:
+        ldr     w9, [x21, x27, lsl #2]
+        add     w9, w9, w28
+        and     w9, w9, #0x3FFFFF
+        ldr     x10, [x19, x9, lsl #3]
+        rev     x10, x10
+        str     x10, [x19, x9, lsl #3]
+        b       loop
+op_stw:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w9, w9, #0x3FFFFF
+        ldr     w0, [x21, x26, lsl #2]
+        and     w1, w28, #15
+        ldr     w1, [x21, x1, lsl #2]
+        and     w1, w1, #15
+        bl      mkword
+        str     x0, [x19, x9, lsl #3]
+        b       loop
+op_ldn:
+        ldr     w9, [x21, x27, lsl #2]
+        add     w9, w9, w28
+        and     w9, w9, #0x3FFFFF
+        ldr     x10, [x19, x9, lsl #3]
+        lsr     x11, x10, #48
+        and     x12, x10, #0xFFFF
+        rev16   w12, w12
+        and     w12, w12, #0xFFFF
+        ubfx    w9, w11, #4, #11
+        cmp     w9, #0x7FF
+        b.ne    ldn_bad
+        and     w9, w11, #15
+        cmp     w9, #1
+        b.eq    1f
+        cmp     w9, #8
+        b.ne    ldn_bad
+1:      ubfx    w9, w12, #4, #11
+        cmp     w9, #0x7FF
+        b.ne    ldn_bad
+        and     w9, w12, #15
+        cmp     w9, #1
+        b.eq    2f
+        cmp     w9, #8
+        b.ne    ldn_bad
+2:      lsr     w13, w11, #2
+        and     w13, w13, #2
+        lsr     w9, w11, #15
+        orr     w13, w13, w9
+        lsr     w14, w12, #2
+        and     w14, w14, #2
+        lsr     w9, w12, #15
+        orr     w14, w14, w9
+        lsl     w13, w13, #2
+        orr     w13, w13, w14
+        str     w13, [x21, x26, lsl #2]
+        b       loop
+ldn_bad:
+        mvn     w9, wzr
+        str     w9, [x21, x26, lsl #2]
+        b       loop
+op_mul:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        mul     w11, w9, w10
+        str     w11, [x21, x26, lsl #2]
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_mulh:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        smull   x11, w9, w10
+        lsr     x11, x11, #32
+        str     w11, [x21, x26, lsl #2]
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_mulhu:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        umull   x11, w9, w10
+        lsr     x11, x11, #32
+        str     w11, [x21, x26, lsl #2]
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_div:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        cbnz    w10, 1f
+        mov     w11, #0
+        mov     w23, #3
+        b       3f
+1:      cmn     w10, #1
+        b.ne    2f
+        neg     w11, w9
+        b       3f
+2:      sdiv    w11, w9, w10
+3:      str     w11, [x21, x26, lsl #2]
+        cbz     w10, loop
+        cmp     w11, #0
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_mod:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        cbnz    w10, 1f
+        mov     w11, w9
+        mov     w23, #3
+        b       3f
+1:      cmn     w10, #1
+        b.ne    2f
+        mov     w11, #0
+        b       3f
+2:      sdiv    w12, w9, w10
+        msub    w11, w12, w10, w9
+3:      str     w11, [x21, x26, lsl #2]
+        cbz     w10, loop
+        cmp     w11, #0
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_divu:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        cbnz    w10, 1f
+        mov     w11, #0
+        mov     w23, #3
+        b       3f
+1:      udiv    w11, w9, w10
+3:      str     w11, [x21, x26, lsl #2]
+        cbz     w10, loop
+        cmp     w11, #0
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_modu:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        cbnz    w10, 1f
+        mov     w11, w9
+        mov     w23, #3
+        b       3f
+1:      udiv    w12, w9, w10
+        msub    w11, w12, w10, w9
+3:      str     w11, [x21, x26, lsl #2]
+        cbz     w10, loop
+        cmp     w11, #0
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_sar:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #31
+        asr     w11, w9, w10
+        str     w11, [x21, x26, lsl #2]
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+op_cmps:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        cmp     w9, w10
+        cset    w12, eq
+        cset    w13, lt
+        lsl     w12, w12, #1
+        add     w23, w12, w13
+        b       loop
+op_ldb:
+        ldr     w9, [x21, x27, lsl #2]
+        add     w9, w9, w28
+        lsr     w10, w9, #2
+        and     w10, w10, #0x3FFFFF
+        ldr     x11, [x19, x10, lsl #3]
+        lsr     x11, x11, #16
+        and     w12, w9, #3
+        lsl     w12, w12, #3
+        lsr     x11, x11, x12
+        and     w11, w11, #0xFF
+        str     w11, [x21, x26, lsl #2]
+        b       loop
+op_stb:
+        ldr     w9, [x21, x27, lsl #2]
+        add     w9, w9, w28
+        lsr     w10, w9, #2
+        and     w10, w10, #0x3FFFFF
+        ldr     x11, [x19, x10, lsl #3]
+        lsr     x11, x11, #16
+        and     w12, w9, #3
+        lsl     w12, w12, #3
+        mov     w13, #0xFF
+        lsl     w13, w13, w12
+        mvn     w14, w13
+        and     w11, w11, w14
+        ldr     w15, [x21, x26, lsl #2]
+        and     w15, w15, #0xFF
+        lsl     w15, w15, w12
+        orr     w11, w11, w15
+        mov     w0, w11
+        mov     w1, #10
+        bl      mkword
+        str     x0, [x19, x10, lsl #3]
+        b       loop
+op_bcopy:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w9, w9, #0x3FFFFF       // src
+        ldr     w10, [x21, x26, lsl #2]
+        and     w10, w10, #0x3FFFFF     // dst
+        and     w11, w28, #15
+        ldr     w11, [x21, x11, lsl #2] // count
+        cbz     w11, loop
+        sub     w12, w10, w9
+        and     w12, w12, #0x3FFFFF
+        cmp     w12, w11
+        b.lo    bc_back
+        mov     w13, #0
+bc_f:   cmp     w13, w11
+        b.hs    loop
+        add     w14, w9, w13
+        and     w14, w14, #0x3FFFFF
+        ldr     x15, [x19, x14, lsl #3]
+        add     w14, w10, w13
+        and     w14, w14, #0x3FFFFF
+        str     x15, [x19, x14, lsl #3]
+        add     w13, w13, #1
+        b       bc_f
+bc_back:
+        sub     w13, w11, #1
+bc_b:   add     w14, w9, w13
+        and     w14, w14, #0x3FFFFF
+        ldr     x15, [x19, x14, lsl #3]
+        add     w14, w10, w13
+        and     w14, w14, #0x3FFFFF
+        str     x15, [x19, x14, lsl #3]
+        subs    w13, w13, #1
+        b.hs    bc_b
+        b       loop
+op_bfill:
+        ldr     w9, [x21, x26, lsl #2]
+        and     w9, w9, #0x3FFFFF
+        ldr     w0, [x21, x27, lsl #2]
+        mov     w1, #10
+        bl      mkword
+        and     w11, w28, #15
+        ldr     w11, [x21, x11, lsl #2]
+        cbz     w11, loop
+        mov     w13, #0
+bf_l:   add     w14, w9, w13
+        and     w14, w14, #0x3FFFFF
+        str     x0, [x19, x14, lsl #3]
+        add     w13, w13, #1
+        cmp     w13, w11
+        b.lo    bf_l
+        b       loop
+op_jmpf:
+        ubfx    x9, x10, #16, #32
+        and     w22, w9, #0xFFFFFF
+        b       loop
+op_callf:
+        ubfx    x9, x10, #16, #32
+        str     w22, [x21, #60]
+        and     w22, w9, #0xFFFFFF
+        b       loop
+
+// mkword: w0=payload, w1=nibble -> x0=word (clobbers x0,x2..x5)
+mkword:
+        adr     x2, heads
+        and     w3, w1, #3
+        ldrh    w4, [x2, x3, lsl #1]
+        rev16   w4, w4
+        lsr     w3, w1, #2
+        and     w3, w3, #3
+        ldrh    w5, [x2, x3, lsl #1]
+        lsl     x5, x5, #48
+        lsl     x0, x0, #16
+        orr     x0, x0, x4
+        orr     x0, x0, x5
+        ret
+
 trapG:
         add     w0, w22, #1         // shown = fetch pc + 1
         mov     w1, #71             // 'G'
@@ -305,6 +634,8 @@ halt:
         b       halt
 
         .section .rodata
+        .balign 2
+heads:  .hword 0x7FF1, 0xFFF1, 0x7FF8, 0xFFF8
 
         .balign 8
 guest_img:

@@ -452,11 +452,14 @@ Status: the AArch64 S1 has its boot and NaN16 decode/execute layers gated by
 `tools/qgate_a64.sh`: the gate assembles real `.nas` tests with nmk, runs the
 reference harness for the serial golden, converts the emitted image to the S1
 guest and requires byte-identical output on qemu virt. Covered ops: BOOL MOVI
-MOVHI ADD SUB CMP ADDI SHL SHR JMP JMPR CALL CALLR RET NOP PUTC LD ST HALT
-with predication, exact `!G`/`!O` + pc hex traps, over a 4M-word writable
-guest RAM (image copied at boot); HALT exits qemu via semihosting. The gate
-runs a purpose-built test, `carry_probe.nas` and `nalloc_test.nas` (3,156
-allocator checks). The remaining op table and devices land on the same frame.
+MOVHI ADD SUB MUL MULH MULHU DIV MOD DIVU MODU CMP CMPS ADDI SHL SHR SAR JMP
+JMPF JMPR CALL CALLF CALLR RET NOP PUTC LD ST LDB STB STW LDN BSWAPM BCOPY
+BFILL HALT, with predication and exact `!G`/`!O` + pc hex traps, over a
+4M-word writable guest RAM (image copied at boot); HALT exits qemu via
+semihosting. The gate runs seven real programs differentially: s1_test,
+carry_probe, nalloc_test (3,156 allocator checks), a64_test (portable core
+self-test), n16de_test, a2_boot_test and nan16dump_test. Remaining: float
+ops, device/port ops (TICK/KEY/DISP/FB), then the work image.
 
 ### 12.3 Android: bare-minimum C
 
