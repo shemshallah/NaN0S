@@ -1,4 +1,4 @@
-; src/nan/lanes9.nas - word-lane engine + self-check cart (org 0).
+; src/nan/netcart.nas - word-lane engine + self-check cart (org 0).
 ; 64-bit lane math rebuilt from 32-bit registers per the lane model.
 ; Neutral plumbing: forward/inverse round steps, wall-clock-free
 ; self-checks derived from standard mixer studies. Internal docs kept out.
@@ -30,6 +30,22 @@
 .equ pti 174
 
 main:
+  CALL @ka
+  CALL @kb
+  CALL @kc
+  CALL @kd
+  CALL @ke
+  CALL @kf
+  CALL @kg
+  CALL @kh
+  CALL @ki
+  CALL @kj
+  CALL @kk
+  CALL @kl
+  JMP @halt16
+
+ka:
+  ST r15,r0,@ksl11
   MOVI r13,1
   MOVI r12,65535
   MOVHI r12,65535
@@ -38,13 +54,20289 @@ main:
   MOVI r1,0
   MOVI r2,176
   MOVI r3,0
-mz_loop:
+kaz:
+  ST r15,r0,@ksl11
   ADD r4,r14,r3
   ST r1,r4,0
   ADDI r3,r3,1
   SUB r2,r2,r13
   CMP r2,r0
-  JMP[NE] @mz_loop
+  JMP[NE] @kaz
+  MOVI r1,14
+  ST r1,r14,#rounds
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  CALL @lcgreset
+  MOVI r1,0
+  MOVI r2,8
+  CALL @fill
+  MOVI r1,0
+  ST r1,r14,#WK
+  ST r1,r14,#WK+1
+  CALL @dif
+  MOVI r6,0
+  ST r6,r14,#pwbase
+  MOVI r6,8
+  ST r6,r14,#pwcnt
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,82
+  PUTC r1
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  CALL @putwordl
+  CALL @nl
+  CALL @lcgreset
+  MOVI r1,0
+  MOVI r2,8
+  CALL @fill
+  CALL @undif
+  MOVI r6,0
+  ST r6,r14,#pwbase
+  MOVI r6,8
+  ST r6,r14,#pwcnt
+  MOVI r1,85
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,73
+  PUTC r1
+  MOVI r1,88
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  CALL @putwordl
+  CALL @nl
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,4
+  CALL @fill
+  CALL @lcgreset
+  MOVI r1,48
+  MOVI r2,2
+  CALL @fill
+  CALL @lcgreset
+  MOVI r1,80
+  MOVI r2,3
+  CALL @fill
+  MOVI r1,0
+  ST r1,r14,#ia
+  MOVI r1,3
+  ST r1,r14,#oa
+  CALL @pack
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,3
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  CALL @lcgreset
+  MOVI r1,64
+  MOVI r2,2
+  CALL @fill
+  CALL @lcgreset
+  MOVI r1,80
+  MOVI r2,3
+  CALL @fill
+  MOVI r1,2
+  ST r1,r14,#ia
+  MOVI r1,3
+  ST r1,r14,#oa
+  CALL @pack
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,3
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,104
+  ST r1,r14,160
+  LD r1,r14,105
+  ST r1,r14,161
+  LD r1,r14,106
+  ST r1,r14,162
+  LD r1,r14,107
+  ST r1,r14,163
+  LD r1,r14,108
+  ST r1,r14,164
+  LD r1,r14,109
+  ST r1,r14,165
+  LD r1,r14,110
+  ST r1,r14,166
+  LD r1,r14,111
+  ST r1,r14,167
+  LD r1,r14,112
+  ST r1,r14,168
+  LD r1,r14,113
+  ST r1,r14,169
+  LD r1,r14,114
+  ST r1,r14,170
+  LD r1,r14,115
+  ST r1,r14,171
+  LD r1,r14,105
+  BOOL.6 r1,r1,r13
+  ST r1,r14,105
+  CALL @unpack
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @rbt1_bad
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  JMP @rbt1_d
+rbt1_bad:
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+rbt1_d:
+  CALL @nl
+  LD r1,r14,160
+  ST r1,r14,104
+  LD r1,r14,161
+  ST r1,r14,105
+  LD r1,r14,162
+  ST r1,r14,106
+  LD r1,r14,163
+  ST r1,r14,107
+  LD r1,r14,164
+  ST r1,r14,108
+  LD r1,r14,165
+  ST r1,r14,109
+  LD r1,r14,166
+  ST r1,r14,110
+  LD r1,r14,167
+  ST r1,r14,111
+  LD r1,r14,168
+  ST r1,r14,112
+  LD r1,r14,169
+  ST r1,r14,113
+  LD r1,r14,170
+  ST r1,r14,114
+  LD r1,r14,171
+  ST r1,r14,115
+  LD r1,r14,97
+  BOOL.6 r1,r1,r13
+  ST r1,r14,97
+  CALL @unpack
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @rbt2_bad
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  JMP @rbt2_d
+rbt2_bad:
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+rbt2_d:
+  CALL @nl
+  LD r1,r14,97
+  BOOL.6 r1,r1,r13
+  ST r1,r14,97
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl11
+  RET
+
+kb:
+  ST r15,r0,@ksl0
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kbz:
+  ST r15,r0,@ksl0
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kbz
+  MOVI r1,14
+  ST r1,r14,#rounds
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,4
+  CALL @fill
+  CALL @lcgreset
+  MOVI r1,80
+  MOVI r2,3
+  CALL @fill
+  MOVI r1,3
+  ST r1,r14,#oa
+  MOVI r1,1
+  ST r1,r14,#ia
+  MOVI r1,0
+  ST r1,r14,50
+  MOVI r1,3
+  ST r1,r14,51
+  MOVI r1,16
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,16
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,17
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,17
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,4
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,18
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,18
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,2
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,19
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,19
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,105
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,105
+  MOVI r1,0
+  ST r1,r14,104
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,20
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,20
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+mk_nl:
+  SHR r3,r6,3
+  MOVI r4,7
+  BOOL.8 r7,r6,r4
+  ADD r1,r3,r3
+  MOVI r2,88
+  ADD r1,r1,r2
+  MOVI r4,4
+  CMP r3,r4
+  JMP[GE] @mk_nb
+  MOVI r2,16
+  ADD r1,r1,r2
+mk_nb:
+  ADD r2,r14,r1
+  LD r8,r2,0
+  LD r9,r2,1
+  CMP r7,r4
+  JMP[LT] @mk_nc
+  ADDI r8,r9,0
+mk_nc:
+  MOVI r4,3
+  BOOL.8 r7,r7,r4
+  SUB r7,r4,r7
+mk_ns:
+  CMP r7,r0
+  JMP[EQ] @mk_nd
+  SHR r8,r8,8
+  SUB r7,r7,r13
+  JMP @mk_ns
+mk_nd:
+  MOVI r4,255
+  BOOL.8 r8,r8,r4
+  MOVI r4,52
+  MOD r1,r8,r4
+  MOVI r4,26
+  CMP r1,r4
+  JMP[GE] @mk_ne
+  MOVI r4,97
+  JMP @mk_nf
+mk_ne:
+  MOVI r4,39
+mk_nf:
+  ADD r1,r1,r4
+  PUTC r1
+  ADDI r6,r6,1
+  MOVI r4,52
+  CMP r6,r4
+  JMP[LT] @mk_nl
+  CALL @nl
+  MOVI r1,21
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,21
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,4
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,22
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,22
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,105
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  ST r1,r14,105
+  MOVI r1,0
+  ST r1,r14,104
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,23
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,23
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,2
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,24
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,24
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,2
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,25
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,25
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r3,r14,96
+  LD r4,r14,97
+  LD r8,r14,104
+  LD r9,r14,105
+  BOOL.6 r3,r3,r8
+  BOOL.6 r4,r4,r9
+  ST r3,r14,96
+  ST r4,r14,97
+  LD r3,r14,98
+  LD r4,r14,99
+  LD r8,r14,106
+  LD r9,r14,107
+  BOOL.6 r3,r3,r8
+  BOOL.6 r4,r4,r9
+  ST r3,r14,98
+  ST r4,r14,99
+  LD r3,r14,100
+  LD r4,r14,101
+  LD r8,r14,108
+  LD r9,r14,109
+  BOOL.6 r3,r3,r8
+  BOOL.6 r4,r4,r9
+  ST r3,r14,100
+  ST r4,r14,101
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,3
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,26
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,26
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,105
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,105
+  MOVI r1,0
+  ST r1,r14,104
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,27
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,27
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,2
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,28
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,28
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,29
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,29
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,30
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,30
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,2
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,31
+  MOVHI r1,28011
+  ST r1,r14,49
+  MOVI r1,0
+  ST r1,r14,48
+  MOVI r1,31
+  ST r1,r14,65
+  MOVI r1,0
+  ST r1,r14,64
+  CALL @pack
+  MOVI r1,77
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,3
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl0
+  RET
+
+kc:
+  ST r15,r0,@ksl1
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kcz:
+  ST r15,r0,@ksl1
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kcz
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,4
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,1
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,32
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,8
+crcp1:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp1
+  MOVI r1,0
+  ST r1,r14,109
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,7
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno2
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,32
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno2
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno2
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno2
+  LD r1,r14,109
+  CMP r1,r0
+  JMP[NE] @dcno2
+  MOVI r6,0
+dccl3:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno2
+  ADDI r6,r6,1
+  MOVI r2,8
+  CMP r6,r2
+  JMP[LT] @dccl3
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn4
+dcno2:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn4:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,2
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,2
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,16
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,4
+crcp5:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp5
+  MOVI r1,0
+  ST r1,r14,105
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,5
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno6
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,16
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno6
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno6
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno6
+  LD r1,r14,105
+  CMP r1,r0
+  JMP[NE] @dcno6
+  MOVI r6,0
+dccl7:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno6
+  ADDI r6,r6,1
+  MOVI r2,4
+  CMP r6,r2
+  JMP[LT] @dccl7
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn8
+dcno6:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn8:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,3
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,3
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,24
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,6
+crcp9:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp9
+  MOVI r1,0
+  ST r1,r14,107
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno10
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,24
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno10
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno10
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno10
+  LD r1,r14,107
+  CMP r1,r0
+  JMP[NE] @dcno10
+  MOVI r6,0
+dccl11:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno10
+  ADDI r6,r6,1
+  MOVI r2,6
+  CMP r6,r2
+  JMP[LT] @dccl11
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn12
+dcno10:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn12:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,3
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,4
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,24
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,6
+crcp13:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp13
+  MOVI r1,0
+  ST r1,r14,107
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno14
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,4
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,24
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno14
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno14
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno14
+  LD r1,r14,107
+  CMP r1,r0
+  JMP[NE] @dcno14
+  MOVI r6,0
+dccl15:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno14
+  ADDI r6,r6,1
+  MOVI r2,6
+  CMP r6,r2
+  JMP[LT] @dccl15
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn16
+dcno14:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn16:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,1
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,5
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,8
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,2
+crcp17:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp17
+  MOVI r1,0
+  ST r1,r14,103
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,4
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno18
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,5
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,8
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno18
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno18
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno18
+  LD r1,r14,103
+  CMP r1,r0
+  JMP[NE] @dcno18
+  MOVI r6,0
+dccl19:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno18
+  ADDI r6,r6,1
+  MOVI r2,2
+  CMP r6,r2
+  JMP[LT] @dccl19
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn20
+dcno18:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn20:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,1
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,6
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,8
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,2
+crcp21:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp21
+  MOVI r1,0
+  ST r1,r14,103
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,4
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno22
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,6
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,8
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno22
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno22
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno22
+  LD r1,r14,103
+  CMP r1,r0
+  JMP[NE] @dcno22
+  MOVI r6,0
+dccl23:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno22
+  ADDI r6,r6,1
+  MOVI r2,2
+  CMP r6,r2
+  JMP[LT] @dccl23
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn24
+dcno22:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn24:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,1
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,7
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,8
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,2
+crcp25:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp25
+  MOVI r1,0
+  ST r1,r14,103
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,4
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno26
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,7
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,8
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno26
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno26
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno26
+  LD r1,r14,103
+  CMP r1,r0
+  JMP[NE] @dcno26
+  MOVI r6,0
+dccl27:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno26
+  ADDI r6,r6,1
+  MOVI r2,2
+  CMP r6,r2
+  JMP[LT] @dccl27
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn28
+dcno26:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn28:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,1
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,8
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,8
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,2
+crcp29:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp29
+  MOVI r1,0
+  ST r1,r14,103
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,4
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno30
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,8
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,8
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno30
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno30
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno30
+  LD r1,r14,103
+  CMP r1,r0
+  JMP[NE] @dcno30
+  MOVI r6,0
+dccl31:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno30
+  ADDI r6,r6,1
+  MOVI r2,2
+  CMP r6,r2
+  JMP[LT] @dccl31
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn32
+dcno30:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn32:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,2
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,9
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,16
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,4
+crcp33:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp33
+  MOVI r1,0
+  ST r1,r14,105
+  MOVI r1,75
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,5
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno34
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,9
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,16
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno34
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno34
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno34
+  LD r1,r14,105
+  CMP r1,r0
+  JMP[NE] @dcno34
+  MOVI r6,0
+dccl35:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno34
+  ADDI r6,r6,1
+  MOVI r2,4
+  CMP r6,r2
+  JMP[LT] @dccl35
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn36
+dcno34:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn36:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,4
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,1
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,32
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,8
+crcp37:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp37
+  MOVI r1,0
+  ST r1,r14,109
+  MOVI r6,0
+twf38:
+  MOVI r2,96
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r8,r1,0
+  LD r9,r1,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r1,0
+  ST r9,r1,1
+  ADDI r6,r6,2
+  MOVI r2,14
+  CMP r6,r2
+  JMP[LT] @twf38
+  MOVI r6,0
+twf39:
+  MOVI r2,96
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r8,r1,0
+  LD r9,r1,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r1,0
+  ST r9,r1,1
+  ADDI r6,r6,2
+  MOVI r2,14
+  CMP r6,r2
+  JMP[LT] @twf39
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno40
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,32
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno40
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno40
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno40
+  LD r1,r14,109
+  CMP r1,r0
+  JMP[NE] @dcno40
+  MOVI r6,0
+dccl41:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno40
+  ADDI r6,r6,1
+  MOVI r2,8
+  CMP r6,r2
+  JMP[LT] @dccl41
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn42
+dcno40:
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn42:
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,2
+  CALL @fill
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r14,96
+  MOVI r1,9
+  SHL r1,r1,24
+  MOVI r2,258
+  MOVHI r2,3
+  ADD r1,r1,r2
+  ST r1,r14,97
+  MOVI r1,42
+  ST r1,r14,98
+  MOVI r1,16
+  SHL r1,r1,16
+  MOVI r2,512
+  ADD r1,r1,r2
+  ST r1,r14,99
+  MOVI r1,0
+  ST r1,r14,100
+  MOVI r5,0
+  MOVI r6,4
+crcp43:
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  CMP r5,r6
+  JMP[LT] @crcp43
+  MOVI r1,0
+  ST r1,r14,105
+  MOVI r6,0
+twf44:
+  MOVI r2,96
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r8,r1,0
+  LD r9,r1,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r1,0
+  ST r9,r1,1
+  ADDI r6,r6,2
+  MOVI r2,10
+  CMP r6,r2
+  JMP[LT] @twf44
+  MOVI r6,0
+twf45:
+  MOVI r2,96
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r8,r1,0
+  LD r9,r1,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r1,0
+  ST r9,r1,1
+  ADDI r6,r6,2
+  MOVI r2,10
+  CMP r6,r2
+  JMP[LT] @twf45
+  LD r1,r14,96
+  SHR r1,r1,16
+  MOVI r2,17486
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,96
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,96
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno46
+  LD r1,r14,97
+  SHR r1,r1,24
+  MOVI r2,9
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,97
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,97
+  MOVI r2,65535
+  BOOL.8 r1,r1,r2
+  MOVI r2,258
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,98
+  MOVI r2,42
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,99
+  SHR r1,r1,16
+  MOVI r2,16
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,99
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @dcno46
+  LD r1,r14,99
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[NE] @dcno46
+  LD r1,r14,100
+  CMP r1,r0
+  JMP[NE] @dcno46
+  LD r1,r14,105
+  CMP r1,r0
+  JMP[NE] @dcno46
+  MOVI r6,0
+dccl47:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,101
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @dcno46
+  ADDI r6,r6,1
+  MOVI r2,4
+  CMP r6,r2
+  JMP[LT] @dccl47
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @dcdn48
+dcno46:
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+dcdn48:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl1
+  RET
+
+kd:
+  ST r15,r0,@ksl2
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kdz:
+  ST r15,r0,@ksl2
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kdz
+  MOVI r1,0
+  ST r1,r14,60
+  ST r1,r14,62
+  ST r1,r14,66
+  ST r1,r14,72
+lbad49:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @lbad50
+  MOVI r1,1
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,3000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad50:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @lbad51
+  MOVI r1,2
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,4000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad51:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @lbad52
+  MOVI r1,3
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,8000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad52:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @lbad53
+  MOVI r1,2
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,4000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad53:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @lbad54
+  MOVI r1,4
+  ST r1,r14,60
+  MOVI r1,0
+  ST r1,r14,62
+lbad54:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,4
+  CMP r1,r2
+  JMP[NE] @lbad55
+  MOVI r1,5
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,15000
+  ADD r1,r1,r2
+  ST r1,r14,62
+  LD r1,r14,72
+  MOVI r2,3
+  BOOL.8 r3,r1,r2
+  MOVI r2,6
+  MUL r3,r3,r2
+  MOVI r2,200
+  ADD r3,r2,r3
+  ADD r4,r14,r3
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r4,0
+  MOVI r1,258
+  MOVHI r1,1795
+  ST r1,r4,1
+  MOVI r1,42
+  ST r1,r4,2
+  MOVI r1,512
+  ST r1,r4,3
+  MOVI r1,0
+  ST r1,r4,4
+  MOVI r1,0
+  ST r1,r4,5
+  LD r1,r14,72
+  ADDI r1,r1,1
+  ST r1,r14,72
+lbad55:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,15000
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,5
+  CMP r1,r2
+  JMP[NE] @lbad56
+  MOVI r1,5
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,15000
+  ADD r1,r1,r2
+  ST r1,r14,62
+  LD r1,r14,72
+  MOVI r2,3
+  BOOL.8 r3,r1,r2
+  MOVI r2,6
+  MUL r3,r3,r2
+  MOVI r2,200
+  ADD r3,r2,r3
+  ADD r4,r14,r3
+  MOVI r1,256
+  MOVHI r1,17486
+  ST r1,r4,0
+  MOVI r1,258
+  MOVHI r1,1795
+  ST r1,r4,1
+  MOVI r1,42
+  ST r1,r4,2
+  MOVI r1,512
+  ST r1,r4,3
+  MOVI r1,0
+  ST r1,r4,4
+  MOVI r1,0
+  ST r1,r4,5
+  LD r1,r14,72
+  ADDI r1,r1,1
+  ST r1,r14,72
+lbad56:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,15000
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,5
+  CMP r1,r2
+  JMP[NE] @lbad57
+  LD r1,r14,66
+  CMP r1,r0
+  JMP[EQ] @l658
+  LD r3,r14,64
+  SUB r3,r3,r1
+  MOVI r2,60000
+  CMP r3,r2
+  JMP[LT] @l759
+  JMP @l658
+l759:
+  MOVI r1,7
+  ST r1,r14,60
+  JMP @ld60
+l658:
+  MOVI r1,6
+  ST r1,r14,60
+ld60:
+  LD r1,r14,64
+  ST r1,r14,66
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad57:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,6
+  CMP r1,r2
+  JMP[NE] @lbad61
+  LD r1,r14,66
+  CMP r1,r0
+  JMP[EQ] @l662
+  LD r3,r14,64
+  SUB r3,r3,r1
+  MOVI r2,60000
+  CMP r3,r2
+  JMP[LT] @l763
+  JMP @l662
+l763:
+  MOVI r1,7
+  ST r1,r14,60
+  JMP @ld64
+l662:
+  MOVI r1,6
+  ST r1,r14,60
+ld64:
+  LD r1,r14,64
+  ST r1,r14,66
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad61:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  ST r1,r14,76
+  LD r1,r14,72
+  ST r1,r14,82
+  MOVI r1,0
+  ST r1,r14,60
+  ST r1,r14,62
+  ST r1,r14,66
+  ST r1,r14,72
+lbad65:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @lbad66
+  MOVI r1,1
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,3000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad66:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @lbad67
+  LD r1,r14,66
+  CMP r1,r0
+  JMP[EQ] @l668
+  LD r3,r14,64
+  SUB r3,r3,r1
+  MOVI r2,60000
+  CMP r3,r2
+  JMP[LT] @l769
+  JMP @l668
+l769:
+  MOVI r1,7
+  ST r1,r14,60
+  JMP @ld70
+l668:
+  MOVI r1,6
+  ST r1,r14,60
+ld70:
+  LD r1,r14,64
+  ST r1,r14,66
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad67:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,60001
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,6
+  CMP r1,r2
+  JMP[NE] @lbad71
+  LD r1,r14,66
+  CMP r1,r0
+  JMP[EQ] @l672
+  LD r3,r14,64
+  SUB r3,r3,r1
+  MOVI r2,60000
+  CMP r3,r2
+  JMP[LT] @l773
+  JMP @l672
+l773:
+  MOVI r1,7
+  ST r1,r14,60
+  JMP @ld74
+l672:
+  MOVI r1,6
+  ST r1,r14,60
+ld74:
+  LD r1,r14,64
+  ST r1,r14,66
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad71:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  ST r1,r14,78
+  MOVI r1,0
+  ST r1,r14,60
+  ST r1,r14,62
+  ST r1,r14,66
+  ST r1,r14,72
+lbad75:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @lbad76
+  MOVI r1,1
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,3000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad76:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @lbad77
+  MOVI r1,2
+  ST r1,r14,60
+  LD r1,r14,64
+  MOVI r2,4000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad77:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,64
+  MOVI r2,4000
+  ADD r1,r1,r2
+  ST r1,r14,64
+  LD r1,r14,60
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @lbad78
+  LD r1,r14,64
+  LD r3,r14,62
+  CMP r1,r3
+  JMP[LT] @lbad78
+  MOVI r1,6
+  ST r1,r14,60
+  LD r1,r14,64
+  ST r1,r14,66
+  MOVI r2,1000
+  ADD r1,r1,r2
+  ST r1,r14,62
+lbad78:
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,60
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,62
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,60
+  ST r1,r14,80
+  LD r1,r14,76
+  MOVI r2,7
+  CMP r1,r2
+  JMP[EQ] @dok79
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @den81
+dok79:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+den81:
+  LD r1,r14,78
+  MOVI r2,6
+  CMP r1,r2
+  JMP[EQ] @dok82
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @den84
+dok82:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+den84:
+  LD r1,r14,80
+  MOVI r2,6
+  CMP r1,r2
+  JMP[NE] @d3e86
+  LD r2,r14,64
+  MOVI r3,1000
+  ADD r2,r2,r3
+  LD r1,r14,62
+  CMP r1,r2
+  JMP[NE] @d3e86
+  JMP @d3k85
+d3e86:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @d3k85_e
+d3k85:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+d3k85_e:
+  MOVI r1,82
+  PUTC r1
+  MOVI r1,73
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,71
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,82
+  CALL @puthex1
+  CALL @nl
+  MOVI r1,88
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  CALL @nl
+  MOVI r1,88
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r1,88
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl2
+  RET
+
+ke:
+  ST r15,r0,@ksl3
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kez:
+  ST r15,r0,@ksl3
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kez
+  MOVI r1,14
+  ST r1,r14,#rounds
+  MOVI r1,4369
+  MOVHI r1,4369
+  ST r1,r14,40
+  MOVI r1,8738
+  MOVHI r1,8738
+  ST r1,r14,41
+  MOVI r1,13107
+  MOVHI r1,13107
+  ST r1,r14,42
+  MOVI r1,17476
+  MOVHI r1,17476
+  ST r1,r14,43
+  MOVI r1,21845
+  MOVHI r1,21845
+  ST r1,r14,44
+  MOVI r1,26214
+  MOVHI r1,26214
+  ST r1,r14,45
+  MOVI r1,30583
+  MOVHI r1,30583
+  ST r1,r14,46
+  MOVI r1,34952
+  MOVHI r1,34952
+  ST r1,r14,47
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,48
+  MOVI r1,23063
+  MOVHI r1,44224
+  ST r1,r14,49
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,50
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,51
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,64
+  MOVI r1,18
+  MOVHI r1,0
+  ST r1,r14,65
+  MOVI r1,25970
+  MOVHI r1,30067
+  ST r1,r14,66
+  MOVI r1,12337
+  MOVHI r1,48
+  ST r1,r14,67
+  MOVI r1,26979
+  MOVHI r1,24940
+  ST r1,r14,68
+  MOVI r1,0
+  MOVHI r1,25856
+  ST r1,r14,69
+  MOVI r1,3
+  MOVHI r1,0
+  ST r1,r14,72
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,88
+  CALL @pack
+  MOVI r1,82
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r5,0
+cpc87:
+  MOVI r2,104
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,40
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  MOVI r2,8
+  CMP r5,r2
+  JMP[LT] @cpc87
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,48
+  MOVI r1,23063
+  MOVHI r1,44225
+  ST r1,r14,49
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,80
+  MOVI r1,40176
+  MOVHI r1,0
+  ST r1,r14,81
+  MOVI r1,1
+  MOVHI r1,0
+  ST r1,r14,88
+  CALL @pack
+  MOVI r1,82
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,96
+  ST r6,r14,#pwbase
+  MOVI r6,1
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r5,0
+cpc88:
+  MOVI r2,96
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,140
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  MOVI r2,2
+  CMP r5,r2
+  JMP[LT] @cpc88
+  MOVI r5,0
+cpc89:
+  MOVI r2,104
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,142
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  MOVI r2,12
+  CMP r5,r2
+  JMP[LT] @cpc89
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,48
+  MOVI r1,23063
+  MOVHI r1,44226
+  ST r1,r14,49
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,50
+  MOVI r1,61185
+  MOVHI r1,190
+  ST r1,r14,51
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,64
+  MOVI r1,31
+  MOVHI r1,0
+  ST r1,r14,65
+  MOVI r1,1
+  MOVHI r1,0
+  ST r1,r14,72
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,88
+  CALL @pack
+  MOVI r1,76
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r5,0
+cpc90:
+  MOVI r2,104
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,120
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  MOVI r2,12
+  CMP r5,r2
+  JMP[LT] @cpc90
+  CALL @pack
+  MOVI r1,76
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,104
+  ST r6,r14,#pwbase
+  MOVI r6,6
+  ST r6,r14,#pwcnt
+  CALL @putwordl
+  CALL @nl
+  MOVI r5,0
+ccl93:
+  MOVI r2,104
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,120
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r3,r7
+  JMP[NE] @cno91
+  ADDI r5,r5,1
+  MOVI r2,12
+  CMP r5,r2
+  JMP[LT] @ccl93
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @cdn92
+cno91:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+cdn92:
+  MOVI r5,0
+cpc94:
+  MOVI r2,140
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,96
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  MOVI r2,2
+  CMP r5,r2
+  JMP[LT] @cpc94
+  MOVI r5,0
+cpc95:
+  MOVI r2,142
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,104
+  ADD r1,r2,r5
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r5,r5,1
+  MOVI r2,12
+  CMP r5,r2
+  JMP[LT] @cpc95
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,48
+  MOVI r1,23063
+  MOVHI r1,44225
+  ST r1,r14,49
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,50
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,51
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,64
+  MOVI r1,18
+  MOVHI r1,0
+  ST r1,r14,65
+  MOVI r1,25970
+  MOVHI r1,30067
+  ST r1,r14,66
+  MOVI r1,12337
+  MOVHI r1,48
+  ST r1,r14,67
+  MOVI r1,26979
+  MOVHI r1,24940
+  ST r1,r14,68
+  MOVI r1,0
+  MOVHI r1,25856
+  ST r1,r14,69
+  MOVI r1,3
+  MOVHI r1,0
+  ST r1,r14,72
+  MOVI r1,1
+  MOVHI r1,0
+  ST r1,r14,88
+  CALL @unpack
+  CMP r1,r0
+  JMP[NE] @d2no96
+  LD r1,r14,80
+  CMP r1,r0
+  JMP[NE] @d2no96
+  LD r1,r14,81
+  MOVI r2,40176
+  CMP r1,r2
+  JMP[NE] @d2no96
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @d2dn97
+d2no96:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+d2dn97:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl3
+  RET
+
+kf:
+  ST r15,r0,@ksl4
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kfz:
+  ST r15,r0,@ksl4
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kfz
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  MOVI r7,0
+pl_i98:
+  MOVI r2,1000
+  ADD r1,r2,r7
+  ADD r1,r14,r1
+  ST r7,r1,0
+  ADDI r7,r7,1
+  MOVI r2,256
+  CMP r7,r2
+  JMP[LT] @pl_i98
+  MOVI r1,4660
+  ST r1,r14,96
+  MOVI r7,255
+pl_s99:
+  LD r3,r14,96
+  MOVI r4,26125
+  MOVHI r4,25
+  MUL r3,r3,r4
+  MOVI r4,62303
+  MOVHI r4,15470
+  ADD r3,r3,r4
+  ST r3,r14,96
+  ADDI r4,r7,1
+  MODU r5,r3,r4
+  MOVI r2,1000
+  ADD r1,r2,r7
+  ADD r1,r14,r1
+  LD r8,r1,0
+  MOVI r2,1000
+  ADD r10,r2,r5
+  ADD r10,r14,r10
+  LD r9,r10,0
+  ST r9,r1,0
+  ST r8,r10,0
+  MOVI r2,1
+  SUB r7,r7,r2
+  CMP r7,r0
+  JMP[GT] @pl_s99
+  MOVI r7,0
+iv_i100:
+  MOVI r2,1000
+  ADD r1,r2,r7
+  ADD r1,r14,r1
+  LD r8,r1,0
+  MOVI r2,1300
+  ADD r10,r2,r8
+  ADD r10,r14,r10
+  ST r7,r10,0
+  ADDI r7,r7,1
+  MOVI r2,256
+  CMP r7,r2
+  JMP[LT] @iv_i100
+  MOVI r1,65
+  ST r1,r14,1600
+  MOVI r1,66
+  ST r1,r14,1601
+  MOVI r1,67
+  ST r1,r14,1602
+  MOVI r1,68
+  ST r1,r14,1603
+  MOVI r1,69
+  ST r1,r14,1604
+  MOVI r1,70
+  ST r1,r14,1605
+  MOVI r1,71
+  ST r1,r14,1606
+  MOVI r1,72
+  ST r1,r14,1607
+  MOVI r1,73
+  ST r1,r14,1608
+  MOVI r1,74
+  ST r1,r14,1609
+  MOVI r1,75
+  ST r1,r14,1610
+  MOVI r1,76
+  ST r1,r14,1611
+  MOVI r1,77
+  ST r1,r14,1612
+  MOVI r1,78
+  ST r1,r14,1613
+  MOVI r1,79
+  ST r1,r14,1614
+  MOVI r1,80
+  ST r1,r14,1615
+  MOVI r1,81
+  ST r1,r14,1616
+  MOVI r1,82
+  ST r1,r14,1617
+  MOVI r1,83
+  ST r1,r14,1618
+  MOVI r1,84
+  ST r1,r14,1619
+  MOVI r1,85
+  ST r1,r14,1620
+  MOVI r1,86
+  ST r1,r14,1621
+  MOVI r1,87
+  ST r1,r14,1622
+  MOVI r1,88
+  ST r1,r14,1623
+  MOVI r1,89
+  ST r1,r14,1624
+  MOVI r1,90
+  ST r1,r14,1625
+  MOVI r1,50
+  ST r1,r14,1626
+  MOVI r1,51
+  ST r1,r14,1627
+  MOVI r1,52
+  ST r1,r14,1628
+  MOVI r1,53
+  ST r1,r14,1629
+  MOVI r1,54
+  ST r1,r14,1630
+  MOVI r1,55
+  ST r1,r14,1631
+  MOVI r1,0
+  ST r1,r14,1640
+  MOVI r1,1
+  ST r1,r14,1641
+  MOVI r1,3
+  ST r1,r14,1642
+  MOVI r1,7
+  ST r1,r14,1643
+  MOVI r1,15
+  ST r1,r14,1644
+  MOVI r1,31
+  ST r1,r14,1645
+  MOVI r1,63
+  ST r1,r14,1646
+  MOVI r1,127
+  ST r1,r14,1647
+  MOVI r1,165
+  ST r1,r14,1650
+  MOVI r1,90
+  ST r1,r14,1651
+  MOVI r1,23
+  ST r1,r14,1652
+  MOVI r1,195
+  ST r1,r14,1653
+  MOVI r1,0
+  ST r1,r14,1765
+  MOVI r1,1
+  ST r1,r14,1766
+  MOVI r1,2
+  ST r1,r14,1767
+  MOVI r1,3
+  ST r1,r14,1768
+  MOVI r1,4
+  ST r1,r14,1769
+  MOVI r1,5
+  ST r1,r14,1770
+  MOVI r1,6
+  ST r1,r14,1771
+  MOVI r1,7
+  ST r1,r14,1772
+  MOVI r1,8
+  ST r1,r14,1773
+  MOVI r1,9
+  ST r1,r14,1774
+  MOVI r1,10
+  ST r1,r14,1775
+  MOVI r1,11
+  ST r1,r14,1776
+  MOVI r1,12
+  ST r1,r14,1777
+  MOVI r1,13
+  ST r1,r14,1778
+  MOVI r1,14
+  ST r1,r14,1779
+  MOVI r1,15
+  ST r1,r14,1780
+  MOVI r1,16
+  ST r1,r14,1781
+  MOVI r1,17
+  ST r1,r14,1782
+  MOVI r1,18
+  ST r1,r14,1783
+  MOVI r1,19
+  ST r1,r14,1784
+  MOVI r1,20
+  ST r1,r14,1785
+  MOVI r1,21
+  ST r1,r14,1786
+  MOVI r1,22
+  ST r1,r14,1787
+  MOVI r1,23
+  ST r1,r14,1788
+  MOVI r1,24
+  ST r1,r14,1789
+  MOVI r1,25
+  ST r1,r14,1790
+  MOVI r1,26
+  ST r1,r14,1750
+  MOVI r1,27
+  ST r1,r14,1751
+  MOVI r1,28
+  ST r1,r14,1752
+  MOVI r1,29
+  ST r1,r14,1753
+  MOVI r1,30
+  ST r1,r14,1754
+  MOVI r1,31
+  ST r1,r14,1755
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,6
+  CALL @fill
+  LD r3,r14,40
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,200
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,201
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,202
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,203
+  LD r3,r14,41
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,204
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,205
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,206
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,207
+  LD r3,r14,42
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,208
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,209
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,210
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,211
+  LD r3,r14,43
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,212
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,213
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,214
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,215
+  LD r3,r14,44
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,216
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,217
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,218
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,219
+  LD r3,r14,45
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,220
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,221
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,222
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,223
+  LD r3,r14,46
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,224
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,225
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,226
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,227
+  LD r3,r14,47
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,228
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,229
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,230
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,231
+  LD r3,r14,48
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,232
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,233
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,234
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,235
+  LD r3,r14,49
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,236
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,237
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,238
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,239
+  LD r3,r14,50
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,240
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,241
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,242
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,243
+  LD r3,r14,51
+  SHR r1,r3,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,244
+  SHR r1,r3,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,245
+  SHR r1,r3,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,246
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,247
+  MOVI r1,0
+  ST r1,r14,97
+  LD r3,r14,200
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,248
+  ST r3,r14,97
+  LD r3,r14,201
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,249
+  ST r3,r14,97
+  LD r3,r14,202
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,250
+  ST r3,r14,97
+  LD r3,r14,203
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,251
+  ST r3,r14,97
+  LD r3,r14,204
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,252
+  ST r3,r14,97
+  LD r3,r14,205
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,253
+  ST r3,r14,97
+  LD r3,r14,206
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,254
+  ST r3,r14,97
+  LD r3,r14,207
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,255
+  ST r3,r14,97
+  LD r3,r14,208
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,256
+  ST r3,r14,97
+  LD r3,r14,209
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,257
+  ST r3,r14,97
+  LD r3,r14,210
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,258
+  ST r3,r14,97
+  LD r3,r14,211
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,259
+  ST r3,r14,97
+  LD r3,r14,212
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,260
+  ST r3,r14,97
+  LD r3,r14,213
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,261
+  ST r3,r14,97
+  LD r3,r14,214
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,262
+  ST r3,r14,97
+  LD r3,r14,215
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,263
+  ST r3,r14,97
+  LD r3,r14,216
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,264
+  ST r3,r14,97
+  LD r3,r14,217
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,265
+  ST r3,r14,97
+  LD r3,r14,218
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,266
+  ST r3,r14,97
+  LD r3,r14,219
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,267
+  ST r3,r14,97
+  LD r3,r14,220
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,268
+  ST r3,r14,97
+  LD r3,r14,221
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,269
+  ST r3,r14,97
+  LD r3,r14,222
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,270
+  ST r3,r14,97
+  LD r3,r14,223
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,271
+  ST r3,r14,97
+  LD r3,r14,224
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,272
+  ST r3,r14,97
+  LD r3,r14,225
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,273
+  ST r3,r14,97
+  LD r3,r14,226
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,274
+  ST r3,r14,97
+  LD r3,r14,227
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,275
+  ST r3,r14,97
+  LD r3,r14,228
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,276
+  ST r3,r14,97
+  LD r3,r14,229
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,277
+  ST r3,r14,97
+  LD r3,r14,230
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,278
+  ST r3,r14,97
+  LD r3,r14,231
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,279
+  ST r3,r14,97
+  LD r3,r14,232
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,280
+  ST r3,r14,97
+  LD r3,r14,233
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,281
+  ST r3,r14,97
+  LD r3,r14,234
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,282
+  ST r3,r14,97
+  LD r3,r14,235
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,283
+  ST r3,r14,97
+  LD r3,r14,236
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,284
+  ST r3,r14,97
+  LD r3,r14,237
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,285
+  ST r3,r14,97
+  LD r3,r14,238
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,286
+  ST r3,r14,97
+  LD r3,r14,239
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,287
+  ST r3,r14,97
+  LD r3,r14,240
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,288
+  ST r3,r14,97
+  LD r3,r14,241
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,289
+  ST r3,r14,97
+  LD r3,r14,242
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,290
+  ST r3,r14,97
+  LD r3,r14,243
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,291
+  ST r3,r14,97
+  LD r3,r14,244
+  MOVI r2,165
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,292
+  ST r3,r14,97
+  LD r3,r14,245
+  MOVI r2,90
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,293
+  ST r3,r14,97
+  LD r3,r14,246
+  MOVI r2,23
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,294
+  ST r3,r14,97
+  LD r3,r14,247
+  MOVI r2,195
+  BOOL.6 r3,r3,r2
+  LD r4,r14,97
+  BOOL.6 r3,r3,r4
+  ST r3,r14,295
+  ST r3,r14,97
+  MOVI r6,0
+sm_l101:
+  MOVI r2,248
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,1000
+  ADD r1,r2,r3
+  ADD r1,r14,r1
+  LD r4,r1,0
+  MOVI r2,296
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r4,r1,0
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @sm_l101
+  MOVI r1,65535
+  MOVHI r1,65535
+  ST r1,r14,98
+  MOVI r6,0
+cl_l102:
+  MOVI r2,296
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  LD r1,r14,98
+  BOOL.6 r1,r1,r3
+  ST r1,r14,98
+  MOVI r7,0
+cb_l103:
+  LD r1,r14,98
+  MOVI r2,1
+  BOOL.8 r3,r1,r2
+  CMP r3,r0
+  JMP[EQ] @cz_l104
+  SHR r1,r1,1
+  MOVI r2,33568
+  MOVHI r2,60856
+  BOOL.6 r1,r1,r2
+  JMP @cj_l105
+cz_l104:
+  SHR r1,r1,1
+cj_l105:
+  ST r1,r14,98
+  ADDI r7,r7,1
+  MOVI r2,8
+  CMP r7,r2
+  JMP[LT] @cb_l103
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @cl_l102
+  LD r1,r14,98
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,98
+  MOVI r6,0
+b3_l106:
+  MOVI r2,296
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @b3_l106
+  LD r3,r14,98
+  ADDI r1,r3,0
+  SHR r1,r1,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,392
+  ADDI r1,r3,0
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,393
+  ADDI r1,r3,0
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,394
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  ST r1,r14,395
+  MOVI r1,66
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pbx107:
+  MOVI r2,200
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @pbx107
+  CALL @nl
+  MOVI r1,66
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pbx108:
+  MOVI r2,248
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @pbx108
+  CALL @nl
+  MOVI r1,66
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pbx109:
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,52
+  CMP r6,r2
+  JMP[LT] @pbx109
+  CALL @nl
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r6,0
+pbx110:
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @pbx110
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r6,0
+pbx111:
+  MOVI r2,392
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,4
+  CMP r6,r2
+  JMP[LT] @pbx111
+  CALL @nl
+  MOVI r1,0
+  ST r1,r14,60
+  ST r1,r14,61
+  MOVI r11,0
+  MOVI r7,0
+ar112:
+  LD r1,r14,61
+  SHL r1,r1,8
+  MOVI r2,344
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r3,r10,0
+  BOOL.14 r1,r1,r3
+  ST r1,r14,61
+  LD r1,r14,60
+  MOVI r2,8
+  ADD r1,r1,r2
+  ST r1,r14,60
+aw113:
+  LD r2,r14,60
+  MOVI r3,5
+  CMP r2,r3
+  JMP[LT] @ad116
+  SUB r2,r2,r3
+  LD r1,r14,61
+  MOVI r8,0
+as114:
+  CMP r8,r2
+  JMP[EQ] @asd115
+  SHR r1,r1,1
+  ADDI r8,r8,1
+  JMP @as114
+asd115:
+  MOVI r3,31
+  BOOL.8 r1,r1,r3
+  MOVI r2,1600
+  ADD r10,r2,r1
+  ADD r10,r14,r10
+  LD r4,r10,0
+  MOVI r2,400
+  ADD r10,r2,r11
+  ADD r10,r14,r10
+  ST r4,r10,0
+  ADDI r11,r11,1
+  LD r1,r14,60
+  MOVI r3,5
+  SUB r1,r1,r3
+  ST r1,r14,60
+  MOVI r2,1640
+  ADD r10,r2,r1
+  ADD r10,r14,r10
+  LD r2,r10,0
+  LD r1,r14,61
+  BOOL.8 r1,r1,r2
+  ST r1,r14,61
+  JMP @aw113
+ad116:
+  ADDI r7,r7,1
+  MOVI r2,52
+  CMP r7,r2
+  JMP[LT] @ar112
+  LD r1,r14,60
+  CMP r1,r0
+  JMP[EQ] @af117
+  MOVI r2,5
+  SUB r2,r2,r1
+  LD r1,r14,61
+  MOVI r8,0
+al118:
+  CMP r8,r2
+  JMP[EQ] @ald119
+  SHL r1,r1,1
+  ADDI r8,r8,1
+  JMP @al118
+ald119:
+  MOVI r3,31
+  BOOL.8 r1,r1,r3
+  MOVI r2,1600
+  ADD r10,r2,r1
+  ADD r10,r14,r10
+  LD r4,r10,0
+  MOVI r2,400
+  ADD r10,r2,r11
+  ADD r10,r14,r10
+  ST r4,r10,0
+  ADDI r11,r11,1
+af117:
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+dp120:
+  CMP r6,r11
+  JMP[GE] @dp120e
+  MOVI r2,400
+  ADD r10,r2,r6
+  ADD r10,r14,r10
+  LD r1,r10,0
+  PUTC r1
+  ADDI r6,r6,1
+  JMP @dp120
+dp120e:
+  CALL @nl
+  MOVI r1,81
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pc121:
+  MOVI r2,400
+  ADD r10,r2,r6
+  ADD r10,r14,r10
+  LD r1,r10,0
+  PUTC r1
+  ADDI r6,r6,1
+  MOVI r2,63
+  CMP r6,r2
+  JMP[LT] @pc121
+  MOVI r1,46
+  PUTC r1
+  MOVI r6,0
+pc122:
+  MOVI r2,463
+  ADD r10,r2,r6
+  ADD r10,r14,r10
+  LD r1,r10,0
+  PUTC r1
+  ADDI r6,r6,1
+  MOVI r2,21
+  CMP r6,r2
+  JMP[LT] @pc122
+  MOVI r1,46
+  PUTC r1
+  MOVI r1,113
+  PUTC r1
+  CALL @nl
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pbx123:
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,52
+  CMP r6,r2
+  JMP[LT] @pbx123
+  CALL @nl
+  LD r1,r14,248
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs124
+  MOVI r3,65
+  JMP @cu125
+cs124:
+  MOVI r3,97
+cu125:
+  ST r3,r14,600
+  LD r1,r14,248
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs126
+  MOVI r3,66
+  JMP @cu127
+cs126:
+  MOVI r3,98
+cu127:
+  ST r3,r14,601
+  LD r1,r14,248
+  SHR r1,r1,5
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs128
+  MOVI r3,67
+  JMP @cu129
+cs128:
+  MOVI r3,99
+cu129:
+  ST r3,r14,602
+  LD r1,r14,248
+  SHR r1,r1,4
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs130
+  MOVI r3,68
+  JMP @cu131
+cs130:
+  MOVI r3,100
+cu131:
+  ST r3,r14,603
+  LD r1,r14,248
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs132
+  MOVI r3,69
+  JMP @cu133
+cs132:
+  MOVI r3,101
+cu133:
+  ST r3,r14,604
+  LD r1,r14,248
+  SHR r1,r1,2
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs134
+  MOVI r3,70
+  JMP @cu135
+cs134:
+  MOVI r3,102
+cu135:
+  ST r3,r14,605
+  LD r1,r14,248
+  SHR r1,r1,1
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs136
+  MOVI r3,71
+  JMP @cu137
+cs136:
+  MOVI r3,103
+cu137:
+  ST r3,r14,606
+  LD r1,r14,248
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs138
+  MOVI r3,72
+  JMP @cu139
+cs138:
+  MOVI r3,104
+cu139:
+  ST r3,r14,607
+  LD r1,r14,249
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs140
+  MOVI r3,73
+  JMP @cu141
+cs140:
+  MOVI r3,105
+cu141:
+  ST r3,r14,608
+  LD r1,r14,249
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs142
+  MOVI r3,74
+  JMP @cu143
+cs142:
+  MOVI r3,106
+cu143:
+  ST r3,r14,609
+  LD r1,r14,249
+  SHR r1,r1,5
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs144
+  MOVI r3,75
+  JMP @cu145
+cs144:
+  MOVI r3,107
+cu145:
+  ST r3,r14,610
+  LD r1,r14,249
+  SHR r1,r1,4
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs146
+  MOVI r3,76
+  JMP @cu147
+cs146:
+  MOVI r3,108
+cu147:
+  ST r3,r14,611
+  LD r1,r14,249
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs148
+  MOVI r3,77
+  JMP @cu149
+cs148:
+  MOVI r3,109
+cu149:
+  ST r3,r14,612
+  LD r1,r14,249
+  SHR r1,r1,2
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs150
+  MOVI r3,78
+  JMP @cu151
+cs150:
+  MOVI r3,110
+cu151:
+  ST r3,r14,613
+  LD r1,r14,249
+  SHR r1,r1,1
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs152
+  MOVI r3,79
+  JMP @cu153
+cs152:
+  MOVI r3,111
+cu153:
+  ST r3,r14,614
+  LD r1,r14,249
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs154
+  MOVI r3,80
+  JMP @cu155
+cs154:
+  MOVI r3,112
+cu155:
+  ST r3,r14,615
+  LD r1,r14,250
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs156
+  MOVI r3,81
+  JMP @cu157
+cs156:
+  MOVI r3,113
+cu157:
+  ST r3,r14,616
+  LD r1,r14,250
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs158
+  MOVI r3,82
+  JMP @cu159
+cs158:
+  MOVI r3,114
+cu159:
+  ST r3,r14,617
+  LD r1,r14,250
+  SHR r1,r1,5
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs160
+  MOVI r3,83
+  JMP @cu161
+cs160:
+  MOVI r3,115
+cu161:
+  ST r3,r14,618
+  LD r1,r14,250
+  SHR r1,r1,4
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs162
+  MOVI r3,84
+  JMP @cu163
+cs162:
+  MOVI r3,116
+cu163:
+  ST r3,r14,619
+  LD r1,r14,250
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs164
+  MOVI r3,85
+  JMP @cu165
+cs164:
+  MOVI r3,117
+cu165:
+  ST r3,r14,620
+  LD r1,r14,250
+  SHR r1,r1,2
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs166
+  MOVI r3,86
+  JMP @cu167
+cs166:
+  MOVI r3,118
+cu167:
+  ST r3,r14,621
+  LD r1,r14,250
+  SHR r1,r1,1
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs168
+  MOVI r3,87
+  JMP @cu169
+cs168:
+  MOVI r3,119
+cu169:
+  ST r3,r14,622
+  LD r1,r14,250
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs170
+  MOVI r3,88
+  JMP @cu171
+cs170:
+  MOVI r3,120
+cu171:
+  ST r3,r14,623
+  LD r1,r14,251
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs172
+  MOVI r3,89
+  JMP @cu173
+cs172:
+  MOVI r3,121
+cu173:
+  ST r3,r14,624
+  LD r1,r14,251
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r1,r0
+  JMP[EQ] @cs174
+  MOVI r3,90
+  JMP @cu175
+cs174:
+  MOVI r3,122
+cu175:
+  ST r3,r14,625
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pc176:
+  MOVI r2,600
+  ADD r10,r2,r6
+  ADD r10,r14,r10
+  LD r1,r10,0
+  PUTC r1
+  ADDI r6,r6,1
+  MOVI r2,26
+  CMP r6,r2
+  JMP[LT] @pc176
+  CALL @nl
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,88
+  PUTC r1
+  MOVI r1,45
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,58
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r6,0
+pbx177:
+  MOVI r2,248
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r5,r1,0
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r5,r2
+  CALL @puthex1
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @pbx177
+  CALL @nl
+  LD r1,r14,248
+  MOVI r2,7
+  BOOL.8 r3,r1,r2
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r4,r1,r2
+  SHL r3,r3,13
+  SHL r4,r4,12
+  BOOL.14 r5,r3,r4
+  MOVI r2,100
+  BOOL.14 r5,r5,r2
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  ADDI r1,r5,0
+  SHR r1,r1,12
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  SHR r1,r1,8
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  CALL @nl
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,344
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,345
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,346
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,347
+  BOOL.14 r5,r5,r3
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,348
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,349
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,350
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,351
+  BOOL.14 r5,r5,r3
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,352
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,353
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,354
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,355
+  BOOL.14 r5,r5,r3
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,356
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,357
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,358
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,359
+  BOOL.14 r5,r5,r3
+  CALL @puthex8
+  CALL @nl
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,0
+  ST r1,r14,95
+  MOVI r6,0
+x1178:
+  MOVI r2,3
+  BOOL.8 r4,r6,r2
+  MOVI r2,1650
+  ADD r5,r2,r4
+  ADD r5,r14,r5
+  LD r7,r5,0
+  MOVI r2,248
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  BOOL.6 r3,r3,r7
+  LD r8,r14,95
+  BOOL.6 r3,r3,r8
+  MOVI r2,200
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r9,r1,0
+  CMP r3,r9
+  JMP[NE] @x1n179
+  MOVI r2,248
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r9,r1,0
+  ST r9,r14,95
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @x1178
+  JMP @x1d180
+x1n179:
+  MOVI r1,0
+  ST r1,r14,70
+x1d180:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk181
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn182
+dk181:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn182:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r6,0
+x2183:
+  MOVI r2,296
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,1300
+  ADD r5,r2,r3
+  ADD r5,r14,r5
+  LD r4,r5,0
+  MOVI r2,248
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r7,r1,0
+  CMP r4,r7
+  JMP[NE] @x2n184
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @x2183
+  JMP @x2d185
+x2n184:
+  MOVI r1,0
+  ST r1,r14,70
+x2d185:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk186
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn187
+dk186:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn187:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,65535
+  MOVHI r1,65535
+  ST r1,r14,94
+  MOVI r6,0
+c3188:
+  MOVI r2,296
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  LD r1,r14,94
+  BOOL.6 r1,r1,r3
+  ST r1,r14,94
+  MOVI r7,0
+cb3191:
+  LD r1,r14,94
+  MOVI r2,1
+  BOOL.8 r3,r1,r2
+  CMP r3,r0
+  JMP[EQ] @cz3192
+  SHR r1,r1,1
+  MOVI r2,33568
+  MOVHI r2,60856
+  BOOL.6 r1,r1,r2
+  JMP @cj3193
+cz3192:
+  SHR r1,r1,1
+cj3193:
+  ST r1,r14,94
+  ADDI r7,r7,1
+  MOVI r2,8
+  CMP r7,r2
+  JMP[LT] @cb3191
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @c3188
+  LD r1,r14,94
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,94
+  LD r3,r14,94
+  ADDI r1,r3,0
+  SHR r1,r1,24
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  LD r2,r14,392
+  CMP r1,r2
+  JMP[NE] @c3n189
+  LD r3,r14,94
+  ADDI r1,r3,0
+  SHR r1,r1,16
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  LD r2,r14,393
+  CMP r1,r2
+  JMP[NE] @c3n189
+  LD r3,r14,94
+  ADDI r1,r3,0
+  SHR r1,r1,8
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  LD r2,r14,394
+  CMP r1,r2
+  JMP[NE] @c3n189
+  LD r3,r14,94
+  ADDI r1,r3,0
+  MOVI r2,255
+  BOOL.8 r1,r1,r2
+  LD r2,r14,395
+  CMP r1,r2
+  JMP[NE] @c3n189
+  JMP @c3d190
+c3n189:
+  MOVI r1,0
+  ST r1,r14,70
+c3d190:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk194
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn195
+dk194:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn195:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,48
+  ST r1,r14,700
+  MOVI r6,0
+sp196:
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,701
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @sp196
+  MOVI r1,4
+  ST r1,r14,749
+  MOVI r6,0
+sq199:
+  MOVI r2,392
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,750
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,4
+  CMP r6,r2
+  JMP[LT] @sq199
+  LD r1,r14,700
+  MOVI r2,48
+  CMP r1,r2
+  JMP[NE] @spn197
+  LD r1,r14,749
+  MOVI r2,4
+  CMP r1,r2
+  JMP[NE] @spn197
+  MOVI r6,0
+jr200:
+  MOVI r2,701
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r4,r1,0
+  CMP r3,r4
+  JMP[NE] @spn197
+  ADDI r6,r6,1
+  MOVI r2,48
+  CMP r6,r2
+  JMP[LT] @jr200
+  MOVI r6,0
+jr2201:
+  MOVI r2,750
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,392
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r4,r1,0
+  CMP r3,r4
+  JMP[NE] @spn197
+  ADDI r6,r6,1
+  MOVI r2,4
+  CMP r6,r2
+  JMP[LT] @jr2201
+  JMP @spd198
+spn197:
+  MOVI r1,0
+  ST r1,r14,70
+spd198:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk202
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn203
+dk202:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,52
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn203:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,0
+  ST r1,r14,62
+  ST r1,r14,63
+  MOVI r9,0
+  MOVI r7,0
+a5204:
+  CMP r7,r11
+  JMP[GE] @a5d206
+  MOVI r2,400
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r3,r10,0
+  MOVI r2,1700
+  ADD r10,r2,r3
+  ADD r10,r14,r10
+  LD r4,r10,0
+  LD r1,r14,62
+  SHL r1,r1,5
+  BOOL.14 r1,r1,r4
+  ST r1,r14,62
+  LD r1,r14,63
+  MOVI r2,5
+  ADD r1,r1,r2
+  ST r1,r14,63
+a5w207:
+  LD r2,r14,63
+  MOVI r3,8
+  CMP r2,r3
+  JMP[LT] @a5x210
+  SUB r2,r2,r3
+  LD r1,r14,62
+  MOVI r8,0
+a5s208:
+  CMP r8,r2
+  JMP[EQ] @a5sd209
+  SHR r1,r1,1
+  ADDI r8,r8,1
+  JMP @a5s208
+a5sd209:
+  MOVI r3,255
+  BOOL.8 r1,r1,r3
+  MOVI r2,344
+  ADD r10,r2,r9
+  ADD r10,r14,r10
+  LD r2,r10,0
+  CMP r1,r2
+  JMP[NE] @a5n205
+  ADDI r9,r9,1
+  LD r1,r14,63
+  MOVI r3,8
+  SUB r1,r1,r3
+  ST r1,r14,63
+  MOVI r2,1640
+  ADD r10,r2,r1
+  ADD r10,r14,r10
+  LD r2,r10,0
+  LD r1,r14,62
+  BOOL.8 r1,r1,r2
+  ST r1,r14,62
+  JMP @a5w207
+a5x210:
+  ADDI r7,r7,1
+  JMP @a5204
+a5n205:
+  MOVI r1,0
+  ST r1,r14,70
+a5d206:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[EQ] @a5d206k
+  MOVI r2,52
+  CMP r9,r2
+  JMP[EQ] @a5d206k
+  MOVI r1,0
+  ST r1,r14,70
+a5d206k:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk211
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn212
+dk211:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn212:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r6,0
+t6213:
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,800
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,52
+  CMP r6,r2
+  JMP[LT] @t6213
+  MOVI r6,0
+t6c216:
+  MOVI r2,800
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,344
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r4,r1,0
+  CMP r3,r4
+  JMP[NE] @t6n214
+  ADDI r6,r6,1
+  MOVI r2,52
+  CMP r6,r2
+  JMP[LT] @t6c216
+  JMP @t6d215
+t6n214:
+  MOVI r1,0
+  ST r1,r14,70
+t6d215:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk217
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn218
+dk217:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn218:
+  MOVI r1,1
+  ST r1,r14,70
+  LD r1,r14,600
+  MOVI r2,97
+  CMP r1,r2
+  JMP[EQ] @c7l221
+  MOVI r2,65
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k223
+c7l221:
+  MOVI r3,0
+c7k223:
+  LD r1,r14,248
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,601
+  MOVI r2,98
+  CMP r1,r2
+  JMP[EQ] @c7l224
+  MOVI r2,66
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k226
+c7l224:
+  MOVI r3,0
+c7k226:
+  LD r1,r14,248
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,602
+  MOVI r2,99
+  CMP r1,r2
+  JMP[EQ] @c7l227
+  MOVI r2,67
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k229
+c7l227:
+  MOVI r3,0
+c7k229:
+  LD r1,r14,248
+  SHR r1,r1,5
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,603
+  MOVI r2,100
+  CMP r1,r2
+  JMP[EQ] @c7l230
+  MOVI r2,68
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k232
+c7l230:
+  MOVI r3,0
+c7k232:
+  LD r1,r14,248
+  SHR r1,r1,4
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,604
+  MOVI r2,101
+  CMP r1,r2
+  JMP[EQ] @c7l233
+  MOVI r2,69
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k235
+c7l233:
+  MOVI r3,0
+c7k235:
+  LD r1,r14,248
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,605
+  MOVI r2,102
+  CMP r1,r2
+  JMP[EQ] @c7l236
+  MOVI r2,70
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k238
+c7l236:
+  MOVI r3,0
+c7k238:
+  LD r1,r14,248
+  SHR r1,r1,2
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,606
+  MOVI r2,103
+  CMP r1,r2
+  JMP[EQ] @c7l239
+  MOVI r2,71
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k241
+c7l239:
+  MOVI r3,0
+c7k241:
+  LD r1,r14,248
+  SHR r1,r1,1
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,607
+  MOVI r2,104
+  CMP r1,r2
+  JMP[EQ] @c7l242
+  MOVI r2,72
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k244
+c7l242:
+  MOVI r3,0
+c7k244:
+  LD r1,r14,248
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,608
+  MOVI r2,105
+  CMP r1,r2
+  JMP[EQ] @c7l245
+  MOVI r2,73
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k247
+c7l245:
+  MOVI r3,0
+c7k247:
+  LD r1,r14,249
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,609
+  MOVI r2,106
+  CMP r1,r2
+  JMP[EQ] @c7l248
+  MOVI r2,74
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k250
+c7l248:
+  MOVI r3,0
+c7k250:
+  LD r1,r14,249
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,610
+  MOVI r2,107
+  CMP r1,r2
+  JMP[EQ] @c7l251
+  MOVI r2,75
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k253
+c7l251:
+  MOVI r3,0
+c7k253:
+  LD r1,r14,249
+  SHR r1,r1,5
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,611
+  MOVI r2,108
+  CMP r1,r2
+  JMP[EQ] @c7l254
+  MOVI r2,76
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k256
+c7l254:
+  MOVI r3,0
+c7k256:
+  LD r1,r14,249
+  SHR r1,r1,4
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,612
+  MOVI r2,109
+  CMP r1,r2
+  JMP[EQ] @c7l257
+  MOVI r2,77
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k259
+c7l257:
+  MOVI r3,0
+c7k259:
+  LD r1,r14,249
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,613
+  MOVI r2,110
+  CMP r1,r2
+  JMP[EQ] @c7l260
+  MOVI r2,78
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k262
+c7l260:
+  MOVI r3,0
+c7k262:
+  LD r1,r14,249
+  SHR r1,r1,2
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,614
+  MOVI r2,111
+  CMP r1,r2
+  JMP[EQ] @c7l263
+  MOVI r2,79
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k265
+c7l263:
+  MOVI r3,0
+c7k265:
+  LD r1,r14,249
+  SHR r1,r1,1
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,615
+  MOVI r2,112
+  CMP r1,r2
+  JMP[EQ] @c7l266
+  MOVI r2,80
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k268
+c7l266:
+  MOVI r3,0
+c7k268:
+  LD r1,r14,249
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,616
+  MOVI r2,113
+  CMP r1,r2
+  JMP[EQ] @c7l269
+  MOVI r2,81
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k271
+c7l269:
+  MOVI r3,0
+c7k271:
+  LD r1,r14,250
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,617
+  MOVI r2,114
+  CMP r1,r2
+  JMP[EQ] @c7l272
+  MOVI r2,82
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k274
+c7l272:
+  MOVI r3,0
+c7k274:
+  LD r1,r14,250
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,618
+  MOVI r2,115
+  CMP r1,r2
+  JMP[EQ] @c7l275
+  MOVI r2,83
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k277
+c7l275:
+  MOVI r3,0
+c7k277:
+  LD r1,r14,250
+  SHR r1,r1,5
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,619
+  MOVI r2,116
+  CMP r1,r2
+  JMP[EQ] @c7l278
+  MOVI r2,84
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k280
+c7l278:
+  MOVI r3,0
+c7k280:
+  LD r1,r14,250
+  SHR r1,r1,4
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,620
+  MOVI r2,117
+  CMP r1,r2
+  JMP[EQ] @c7l281
+  MOVI r2,85
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k283
+c7l281:
+  MOVI r3,0
+c7k283:
+  LD r1,r14,250
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,621
+  MOVI r2,118
+  CMP r1,r2
+  JMP[EQ] @c7l284
+  MOVI r2,86
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k286
+c7l284:
+  MOVI r3,0
+c7k286:
+  LD r1,r14,250
+  SHR r1,r1,2
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,622
+  MOVI r2,119
+  CMP r1,r2
+  JMP[EQ] @c7l287
+  MOVI r2,87
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k289
+c7l287:
+  MOVI r3,0
+c7k289:
+  LD r1,r14,250
+  SHR r1,r1,1
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,623
+  MOVI r2,120
+  CMP r1,r2
+  JMP[EQ] @c7l290
+  MOVI r2,88
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k292
+c7l290:
+  MOVI r3,0
+c7k292:
+  LD r1,r14,250
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,624
+  MOVI r2,121
+  CMP r1,r2
+  JMP[EQ] @c7l293
+  MOVI r2,89
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k295
+c7l293:
+  MOVI r3,0
+c7k295:
+  LD r1,r14,251
+  SHR r1,r1,7
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  LD r1,r14,625
+  MOVI r2,122
+  CMP r1,r2
+  JMP[EQ] @c7l296
+  MOVI r2,90
+  CMP r1,r2
+  JMP[NE] @c7n219
+  MOVI r3,1
+  JMP @c7k298
+c7l296:
+  MOVI r3,0
+c7k298:
+  LD r1,r14,251
+  SHR r1,r1,6
+  MOVI r2,1
+  BOOL.8 r1,r1,r2
+  CMP r3,r1
+  JMP[NE] @c7n219
+  JMP @c7d220
+c7n219:
+  MOVI r1,0
+  ST r1,r14,70
+c7d220:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk299
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn300
+dk299:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,55
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn300:
+  MOVI r1,1
+  ST r1,r14,70
+  LD r1,r14,248
+  MOVI r2,15
+  BOOL.8 r3,r1,r2
+  SHR r4,r1,4
+  SHL r4,r4,4
+  BOOL.14 r4,r4,r3
+  CMP r4,r1
+  JMP[NE] @h8n301
+  LD r1,r14,249
+  MOVI r2,15
+  BOOL.8 r3,r1,r2
+  SHR r4,r1,4
+  SHL r4,r4,4
+  BOOL.14 r4,r4,r3
+  CMP r4,r1
+  JMP[NE] @h8n301
+  LD r1,r14,250
+  MOVI r2,15
+  BOOL.8 r3,r1,r2
+  SHR r4,r1,4
+  SHL r4,r4,4
+  BOOL.14 r4,r4,r3
+  CMP r4,r1
+  JMP[NE] @h8n301
+  LD r1,r14,251
+  MOVI r2,15
+  BOOL.8 r3,r1,r2
+  SHR r4,r1,4
+  SHL r4,r4,4
+  BOOL.14 r4,r4,r3
+  CMP r4,r1
+  JMP[NE] @h8n301
+  JMP @h8d302
+h8n301:
+  MOVI r1,0
+  ST r1,r14,70
+h8d302:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk303
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn304
+dk303:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn304:
+  MOVI r1,1
+  ST r1,r14,70
+  LD r1,r14,248
+  MOVI r2,7
+  BOOL.8 r3,r1,r2
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r4,r1,r2
+  SHL r3,r3,13
+  SHL r4,r4,12
+  BOOL.14 r5,r3,r4
+  MOVI r2,100
+  BOOL.14 r5,r5,r2
+  MOVI r2,13
+  SHR r6,r5,13
+  MOVI r2,7
+  BOOL.8 r6,r6,r2
+  MOVI r2,12
+  SHR r7,r5,12
+  MOVI r2,1
+  BOOL.8 r7,r7,r2
+  LD r1,r14,248
+  MOVI r2,7
+  BOOL.8 r8,r1,r2
+  CMP r6,r8
+  JMP[NE] @v9n305
+  SHR r1,r1,3
+  MOVI r2,1
+  BOOL.8 r8,r1,r2
+  CMP r7,r8
+  JMP[NE] @v9n305
+  JMP @v9d306
+v9n305:
+  MOVI r1,0
+  ST r1,r14,70
+v9d306:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk307
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn308
+dk307:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,57
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn308:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,344
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,345
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,346
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,347
+  BOOL.14 r5,r5,r3
+  MOVI r2,255
+  BOOL.8 r1,r5,r2
+  LD r2,r14,347
+  CMP r1,r2
+  JMP[NE] @t10n309
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,348
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,349
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,350
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,351
+  BOOL.14 r5,r5,r3
+  MOVI r2,255
+  BOOL.8 r1,r5,r2
+  LD r2,r14,351
+  CMP r1,r2
+  JMP[NE] @t10n309
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,352
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,353
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,354
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,355
+  BOOL.14 r5,r5,r3
+  MOVI r2,255
+  BOOL.8 r1,r5,r2
+  LD r2,r14,355
+  CMP r1,r2
+  JMP[NE] @t10n309
+  MOVI r5,0
+  SHL r5,r5,8
+  LD r3,r14,356
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,357
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,358
+  BOOL.14 r5,r5,r3
+  SHL r5,r5,8
+  LD r3,r14,359
+  BOOL.14 r5,r5,r3
+  MOVI r2,255
+  BOOL.8 r1,r5,r2
+  LD r2,r14,359
+  CMP r1,r2
+  JMP[NE] @t10n309
+  JMP @t10d310
+t10n309:
+  MOVI r1,0
+  ST r1,r14,70
+t10d310:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk311
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn312
+dk311:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn312:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r2,84
+  CMP r11,r2
+  JMP[EQ] @d11k
+  MOVI r1,0
+  ST r1,r14,70
+d11k:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk313
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn314
+dk313:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn314:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl4
+  RET
+
+kg:
+  ST r15,r0,@ksl5
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kgz:
+  ST r15,r0,@ksl5
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kgz
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  CALL @lcgreset
+  MOVI r1,0
+  MOVI r2,8
+  CALL @fill
+  LD r3,r14,0
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,0
+  MOVI r1,1
+  ST r1,r14,160
+  LD r3,r14,2
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  ST r3,r14,2
+  MOVI r1,0
+  ST r1,r14,161
+  LD r3,r14,4
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,4
+  MOVI r1,3
+  ST r1,r14,162
+  LD r3,r14,6
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  ST r3,r14,6
+  MOVI r1,2
+  ST r1,r14,163
+  LD r3,r14,8
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,8
+  MOVI r1,1
+  ST r1,r14,164
+  LD r3,r14,10
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  ST r3,r14,10
+  MOVI r1,0
+  ST r1,r14,165
+  LD r3,r14,12
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,12
+  MOVI r1,3
+  ST r1,r14,166
+  LD r3,r14,14
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  ST r3,r14,14
+  MOVI r1,2
+  ST r1,r14,167
+  MOVI r6,0
+sv315:
+  MOVI r2,0
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,80
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @sv315
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs316
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs316:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs317
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs317:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs318
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs318:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs319
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs319:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs320
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs320:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs321
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs321:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs322
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs322:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs323
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs323:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs324
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs324:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs325
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs325:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs326
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs326:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs327
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs327:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs328
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs328:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs329
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs329:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs330
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs330:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs331
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs331:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs332
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs332:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs333
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs333:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs334
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs334:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs335
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs335:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs336
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs336:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs337
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs337:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs338
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs338:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs339
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs339:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs340
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs340:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs341
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs341:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs342
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs342:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs343
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs343:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs344
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs344:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs345
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs345:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs346
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs346:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs347
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs347:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs348
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs348:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs349
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs349:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs350
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs350:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs351
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs351:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs352
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs352:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs353
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs353:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs354
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs354:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs355
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs355:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs356
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs356:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs357
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs357:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs358
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs358:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs359
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs359:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs360
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs360:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs361
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs361:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs362
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs362:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs363
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs363:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs364
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs364:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs365
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs365:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs366
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs366:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs367
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs367:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs368
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs368:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs369
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs369:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs370
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs370:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs371
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs371:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs372
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs372:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs373
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs373:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs374
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs374:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs375
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs375:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs376
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs376:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs377
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs377:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs378
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs378:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs379
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs379:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs380
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs380:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs381
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs381:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs382
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs382:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs383
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs383:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs384
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs384:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs385
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs385:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs386
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs386:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs387
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs387:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs388
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs388:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs389
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs389:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs390
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs390:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs391
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs391:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs392
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs392:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs393
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs393:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs394
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs394:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs395
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs395:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs396
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs396:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs397
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs397:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs398
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs398:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs399
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs399:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs400
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs400:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs401
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs401:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs402
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs402:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs403
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs403:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs404
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs404:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs405
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs405:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs406
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs406:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs407
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs407:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs408
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs408:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs409
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs409:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs410
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs410:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs411
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs411:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs412
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs412:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs413
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs413:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs414
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs414:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs415
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs415:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs416
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs416:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs417
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs417:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs418
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs418:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs419
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs419:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs420
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs420:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs421
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs421:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs422
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs422:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs423
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs423:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs424
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs424:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs425
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs425:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs426
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs426:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs427
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs427:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs428
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs428:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs429
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs429:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs430
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs430:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs431
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs431:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs432
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs432:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs433
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs433:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs434
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs434:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs435
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs435:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs436
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs436:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs437
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs437:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs438
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs438:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs439
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs439:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs440
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs440:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs441
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs441:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs442
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs442:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs443
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs443:
+  MOVI r9,0
+lr444:
+  MOVI r2,0
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,120
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r9,r9,1
+  MOVI r2,16
+  CMP r9,r2
+  JMP[LT] @lr444
+  LD r3,r14,126
+  ST r3,r14,0
+  LD r3,r14,127
+  ST r3,r14,1
+  LD r3,r14,120
+  ST r3,r14,2
+  LD r3,r14,121
+  ST r3,r14,3
+  LD r3,r14,122
+  ST r3,r14,4
+  LD r3,r14,123
+  ST r3,r14,5
+  LD r3,r14,124
+  ST r3,r14,6
+  LD r3,r14,125
+  ST r3,r14,7
+  LD r3,r14,132
+  ST r3,r14,8
+  LD r3,r14,133
+  ST r3,r14,9
+  LD r3,r14,134
+  ST r3,r14,10
+  LD r3,r14,135
+  ST r3,r14,11
+  LD r3,r14,128
+  ST r3,r14,12
+  LD r3,r14,129
+  ST r3,r14,13
+  LD r3,r14,130
+  ST r3,r14,14
+  LD r3,r14,131
+  ST r3,r14,15
+  MOVI r6,0
+sv2445:
+  MOVI r2,0
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,96
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @sv2445
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,160
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,161
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,162
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,163
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,164
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,165
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,166
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,167
+  ADDI r1,r1,48
+  PUTC r1
+  CALL @nl
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r9,0
+dd446:
+  CMP r9,r0
+  JMP[EQ] @nn447
+  MOVI r1,32
+  PUTC r1
+nn447:
+  ADDI r7,r9,0
+  ADD r7,r7,r9
+  MOVI r2,80
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r7,r7,1
+  MOVI r2,80
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r9,r9,1
+  MOVI r2,8
+  CMP r9,r2
+  JMP[LT] @dd446
+  CALL @nl
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r9,0
+dd448:
+  CMP r9,r0
+  JMP[EQ] @nn449
+  MOVI r1,32
+  PUTC r1
+nn449:
+  ADDI r7,r9,0
+  ADD r7,r7,r9
+  MOVI r2,96
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r7,r7,1
+  MOVI r2,96
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r9,r9,1
+  MOVI r2,8
+  CMP r9,r2
+  JMP[LT] @dd448
+  CALL @nl
+  MOVI r9,0
+lr450:
+  MOVI r2,0
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,120
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r9,r9,1
+  MOVI r2,16
+  CMP r9,r2
+  JMP[LT] @lr450
+  LD r3,r14,122
+  ST r3,r14,0
+  LD r3,r14,123
+  ST r3,r14,1
+  LD r3,r14,124
+  ST r3,r14,2
+  LD r3,r14,125
+  ST r3,r14,3
+  LD r3,r14,126
+  ST r3,r14,4
+  LD r3,r14,127
+  ST r3,r14,5
+  LD r3,r14,120
+  ST r3,r14,6
+  LD r3,r14,121
+  ST r3,r14,7
+  LD r3,r14,132
+  ST r3,r14,8
+  LD r3,r14,133
+  ST r3,r14,9
+  LD r3,r14,134
+  ST r3,r14,10
+  LD r3,r14,135
+  ST r3,r14,11
+  LD r3,r14,128
+  ST r3,r14,12
+  LD r3,r14,129
+  ST r3,r14,13
+  LD r3,r14,130
+  ST r3,r14,14
+  LD r3,r14,131
+  ST r3,r14,15
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs451
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs451:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs452
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs452:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs453
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs453:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs454
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs454:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs455
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs455:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs456
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs456:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs457
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs457:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs458
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs458:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs459
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs459:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs460
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs460:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs461
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs461:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs462
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs462:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs463
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs463:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs464
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs464:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs465
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs465:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs466
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs466:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs467
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs467:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs468
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs468:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs469
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs469:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs470
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs470:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs471
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs471:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs472
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs472:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs473
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs473:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs474
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs474:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs475
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs475:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs476
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs476:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs477
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs477:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs478
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs478:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs479
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs479:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs480
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs480:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs481
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs481:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs482
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs482:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs483
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs483:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs484
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs484:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs485
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs485:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs486
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs486:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs487
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs487:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs488
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs488:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs489
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs489:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs490
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs490:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs491
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs491:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs492
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs492:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs493
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs493:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs494
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs494:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs495
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs495:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs496
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs496:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs497
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs497:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs498
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs498:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs499
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs499:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs500
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs500:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs501
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs501:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs502
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs502:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs503
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs503:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs504
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs504:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs505
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs505:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs506
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs506:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs507
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs507:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs508
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs508:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs509
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs509:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs510
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs510:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs511
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs511:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs512
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs512:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs513
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs513:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs514
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs514:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs515
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs515:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs516
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs516:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs517
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs517:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs518
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs518:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs519
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs519:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs520
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs520:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs521
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs521:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs522
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs522:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs523
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs523:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs524
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs524:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs525
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs525:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs526
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs526:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs527
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs527:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs528
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs528:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs529
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs529:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs530
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs530:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs531
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs531:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs532
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs532:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs533
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs533:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs534
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs534:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs535
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs535:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs536
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs536:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs537
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs537:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs538
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs538:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs539
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs539:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs540
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs540:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs541
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs541:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs542
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs542:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs543
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs543:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs544
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs544:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs545
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs545:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs546
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs546:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs547
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs547:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs548
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs548:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs549
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs549:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs550
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs550:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs551
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs551:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs552
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs552:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs553
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs553:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs554
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs554:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs555
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs555:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs556
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs556:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs557
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs557:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs558
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs558:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs559
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs559:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs560
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs560:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs561
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs561:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs562
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs562:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs563
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs563:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs564
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs564:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs565
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs565:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs566
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs566:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs567
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs567:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs568
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs568:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs569
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs569:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs570
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs570:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs571
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs571:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs572
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs572:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs573
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs573:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs574
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs574:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs575
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs575:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs576
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs576:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs577
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs577:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs578
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs578:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r6,0
+cp579:
+  MOVI r2,0
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,80
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r4,r1,0
+  CMP r3,r4
+  JMP[NE] @cpn580
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @cp579
+  JMP @cpd581
+cpn580:
+  MOVI r1,0
+  ST r1,r14,70
+cpd581:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk582
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn583
+dk582:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn583:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl5
+  RET
+
+kh:
+  ST r15,r0,@ksl6
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+khz:
+  ST r15,r0,@ksl6
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @khz
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  CALL @lcgreset
+  MOVI r1,0
+  MOVI r2,8
+  CALL @fill
+  LD r3,r14,0
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,0
+  MOVI r1,1
+  ST r1,r14,160
+  LD r3,r14,2
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  ST r3,r14,2
+  MOVI r1,0
+  ST r1,r14,161
+  LD r3,r14,4
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,4
+  MOVI r1,3
+  ST r1,r14,162
+  LD r3,r14,6
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  ST r3,r14,6
+  MOVI r1,2
+  ST r1,r14,163
+  LD r3,r14,8
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,8
+  MOVI r1,1
+  ST r1,r14,164
+  LD r3,r14,10
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  ST r3,r14,10
+  MOVI r1,0
+  ST r1,r14,165
+  LD r3,r14,12
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,8
+  BOOL.14 r3,r3,r2
+  ST r3,r14,12
+  MOVI r1,3
+  ST r1,r14,166
+  LD r3,r14,14
+  MOVI r2,65535
+  MOVHI r2,32759
+  BOOL.8 r3,r3,r2
+  MOVI r2,0
+  MOVHI r2,32768
+  BOOL.14 r3,r3,r2
+  ST r3,r14,14
+  MOVI r1,2
+  ST r1,r14,167
+  MOVI r1,0
+  ST r1,r14,#rcix
+  MOVI r6,0
+svp584:
+  MOVI r2,0
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,80
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @svp584
+  MOVI r6,0
+f8l585:
+  LD r1,r14,#rcix
+  ADD r8,r1,r6
+  CALL @kv
+  ADDI r1,r14,0
+  LD r2,r14,#za
+  LD r3,r14,#za+1
+  CALL @xorv
+  LD r1,r14,#rcix
+  ADD r8,r1,r6
+  ADDI r8,r8,3
+  CALL @kv
+  ADDI r1,r14,8
+  LD r2,r14,#za
+  LD r3,r14,#za+1
+  CALL @xorv
+  ADDI r1,r14,0
+  ADDI r2,r14,2
+  CALL @addm
+  LD r8,r14,4
+  LD r9,r14,5
+  LD r3,r14,0
+  LD r4,r14,1
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,2
+  ADDI r2,r14,4
+  CALL @addm
+  LD r8,r14,8
+  LD r9,r14,9
+  LD r3,r14,2
+  LD r4,r14,3
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,17
+  SHR r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,17
+  SHR r8,r8,15
+  BOOL.14 r4,r4,r8
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,4
+  ADDI r2,r14,6
+  CALL @addm
+  LD r8,r14,8
+  LD r9,r14,9
+  LD r3,r14,4
+  LD r4,r14,5
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,6
+  ADDI r2,r14,8
+  CALL @addm
+  LD r8,r14,12
+  LD r9,r14,13
+  LD r3,r14,6
+  LD r4,r14,7
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,17
+  SHR r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,17
+  SHR r8,r8,15
+  BOOL.14 r4,r4,r8
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,8
+  ADDI r2,r14,10
+  CALL @addm
+  LD r8,r14,12
+  LD r9,r14,13
+  LD r3,r14,8
+  LD r4,r14,9
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,10
+  ADDI r2,r14,12
+  CALL @addm
+  LD r8,r14,0
+  LD r9,r14,1
+  LD r3,r14,10
+  LD r4,r14,11
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,17
+  SHR r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,17
+  SHR r8,r8,15
+  BOOL.14 r4,r4,r8
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,12
+  ADDI r2,r14,14
+  CALL @addm
+  LD r8,r14,0
+  LD r9,r14,1
+  LD r3,r14,12
+  LD r4,r14,13
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,14
+  ADDI r2,r14,0
+  CALL @addm
+  LD r8,r14,4
+  LD r9,r14,5
+  LD r3,r14,14
+  LD r4,r14,15
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,17
+  SHR r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,17
+  SHR r8,r8,15
+  BOOL.14 r4,r4,r8
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,0
+  ADDI r2,r14,2
+  CALL @addm
+  LD r8,r14,4
+  LD r9,r14,5
+  LD r3,r14,0
+  LD r4,r14,1
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,24
+  SHR r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,24
+  SHR r8,r8,8
+  BOOL.14 r4,r4,r8
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,2
+  ADDI r2,r14,4
+  CALL @addm
+  LD r8,r14,8
+  LD r9,r14,9
+  LD r3,r14,2
+  LD r4,r14,3
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,29
+  SHR r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,29
+  SHR r8,r8,3
+  BOOL.14 r4,r4,r8
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,4
+  ADDI r2,r14,6
+  CALL @addm
+  LD r8,r14,8
+  LD r9,r14,9
+  LD r3,r14,4
+  LD r4,r14,5
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,24
+  SHR r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,24
+  SHR r8,r8,8
+  BOOL.14 r4,r4,r8
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,6
+  ADDI r2,r14,8
+  CALL @addm
+  LD r8,r14,12
+  LD r9,r14,13
+  LD r3,r14,6
+  LD r4,r14,7
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,29
+  SHR r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,29
+  SHR r8,r8,3
+  BOOL.14 r4,r4,r8
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,8
+  ADDI r2,r14,10
+  CALL @addm
+  LD r8,r14,12
+  LD r9,r14,13
+  LD r3,r14,8
+  LD r4,r14,9
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,24
+  SHR r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,24
+  SHR r8,r8,8
+  BOOL.14 r4,r4,r8
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,10
+  ADDI r2,r14,12
+  CALL @addm
+  LD r8,r14,0
+  LD r9,r14,1
+  LD r3,r14,10
+  LD r4,r14,11
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,29
+  SHR r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,29
+  SHR r8,r8,3
+  BOOL.14 r4,r4,r8
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,12
+  ADDI r2,r14,14
+  CALL @addm
+  LD r8,r14,0
+  LD r9,r14,1
+  LD r3,r14,12
+  LD r4,r14,13
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,24
+  SHR r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,24
+  SHR r8,r8,8
+  BOOL.14 r4,r4,r8
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,14
+  ADDI r2,r14,0
+  CALL @addm
+  LD r8,r14,4
+  LD r9,r14,5
+  LD r3,r14,14
+  LD r4,r14,15
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,29
+  SHR r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,29
+  SHR r8,r8,3
+  BOOL.14 r4,r4,r8
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,0
+  ADDI r2,r14,2
+  CALL @addm
+  LD r8,r14,4
+  LD r9,r14,5
+  LD r3,r14,0
+  LD r4,r14,1
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,16
+  SHR r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,16
+  SHR r8,r8,16
+  BOOL.14 r4,r4,r8
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,2
+  ADDI r2,r14,4
+  CALL @addm
+  LD r8,r14,8
+  LD r9,r14,9
+  LD r3,r14,2
+  LD r4,r14,3
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHR r3,r8,23
+  SHL r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,23
+  SHL r8,r8,9
+  BOOL.14 r4,r4,r8
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,4
+  ADDI r2,r14,6
+  CALL @addm
+  LD r8,r14,8
+  LD r9,r14,9
+  LD r3,r14,4
+  LD r4,r14,5
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,16
+  SHR r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,16
+  SHR r8,r8,16
+  BOOL.14 r4,r4,r8
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,6
+  ADDI r2,r14,8
+  CALL @addm
+  LD r8,r14,12
+  LD r9,r14,13
+  LD r3,r14,6
+  LD r4,r14,7
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHR r3,r8,23
+  SHL r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,23
+  SHL r8,r8,9
+  BOOL.14 r4,r4,r8
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,8
+  ADDI r2,r14,10
+  CALL @addm
+  LD r8,r14,12
+  LD r9,r14,13
+  LD r3,r14,8
+  LD r4,r14,9
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,16
+  SHR r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,16
+  SHR r8,r8,16
+  BOOL.14 r4,r4,r8
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,10
+  ADDI r2,r14,12
+  CALL @addm
+  LD r8,r14,0
+  LD r9,r14,1
+  LD r3,r14,10
+  LD r4,r14,11
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHR r3,r8,23
+  SHL r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,23
+  SHL r8,r8,9
+  BOOL.14 r4,r4,r8
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,12
+  ADDI r2,r14,14
+  CALL @addm
+  LD r8,r14,0
+  LD r9,r14,1
+  LD r3,r14,12
+  LD r4,r14,13
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHL r3,r8,16
+  SHR r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,16
+  SHR r8,r8,16
+  BOOL.14 r4,r4,r8
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,14
+  ADDI r2,r14,0
+  CALL @addm
+  LD r8,r14,4
+  LD r9,r14,5
+  LD r3,r14,14
+  LD r4,r14,15
+  BOOL.6 r8,r8,r3
+  BOOL.6 r9,r9,r4
+  SHR r3,r8,23
+  SHL r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,23
+  SHL r8,r8,9
+  BOOL.14 r4,r4,r8
+  ST r3,r14,4
+  ST r4,r14,5
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,1
+  ST r11,r14,0
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,5
+  ST r11,r14,4
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,9
+  ST r11,r14,8
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,13
+  ST r11,r14,12
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs586
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs586:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs587
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs587:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs588
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs588:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs589
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs589:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs590
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs590:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs591
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs591:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs592
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs592:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs593
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs593:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs594
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs594:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs595
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs595:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs596
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs596:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs597
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs597:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs598
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs598:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs599
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs599:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs600
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs600:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs601
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs601:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs602
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs602:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs603
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs603:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs604
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs604:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs605
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs605:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs606
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs606:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs607
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs607:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs608
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs608:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs609
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs609:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs610
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs610:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs611
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs611:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs612
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs612:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs613
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs613:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs614
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs614:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs615
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs615:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs616
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs616:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs617
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs617:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs618
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs618:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs619
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs619:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs620
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs620:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs621
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs621:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs622
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs622:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs623
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs623:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs624
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs624:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs625
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs625:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs626
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs626:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs627
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs627:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs628
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs628:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs629
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs629:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs630
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs630:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs631
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs631:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs632
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs632:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs633
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs633:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs634
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs634:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs635
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs635:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs636
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs636:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs637
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs637:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs638
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs638:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs639
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs639:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs640
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs640:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs641
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs641:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs642
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs642:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs643
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs643:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs644
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs644:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs645
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs645:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs646
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs646:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs647
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs647:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs648
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs648:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs649
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs649:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs650
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs650:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs651
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs651:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs652
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs652:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs653
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs653:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs654
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs654:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs655
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs655:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs656
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs656:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs657
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs657:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs658
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs658:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs659
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs659:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs660
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs660:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs661
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs661:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs662
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs662:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs663
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs663:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs664
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs664:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs665
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs665:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs666
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs666:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs667
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs667:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs668
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs668:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs669
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs669:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs670
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs670:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs671
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs671:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs672
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs672:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs673
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs673:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs674
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs674:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs675
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs675:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs676
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs676:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs677
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs677:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs678
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs678:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs679
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs679:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs680
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs680:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs681
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs681:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs682
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs682:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs683
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs683:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs684
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs684:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs685
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs685:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs686
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs686:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs687
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs687:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs688
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs688:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs689
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs689:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs690
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs690:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs691
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs691:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs692
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs692:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs693
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs693:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs694
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs694:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs695
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs695:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs696
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs696:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs697
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs697:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs698
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs698:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs699
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs699:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs700
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs700:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs701
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs701:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs702
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs702:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs703
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs703:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs704
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs704:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs705
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs705:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs706
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs706:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs707
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs707:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs708
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs708:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs709
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs709:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs710
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs710:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs711
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs711:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs712
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs712:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs713
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs713:
+  MOVI r9,0
+lr714:
+  MOVI r2,0
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,120
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r9,r9,1
+  MOVI r2,16
+  CMP r9,r2
+  JMP[LT] @lr714
+  LD r3,r14,126
+  ST r3,r14,0
+  LD r3,r14,127
+  ST r3,r14,1
+  LD r3,r14,120
+  ST r3,r14,2
+  LD r3,r14,121
+  ST r3,r14,3
+  LD r3,r14,122
+  ST r3,r14,4
+  LD r3,r14,123
+  ST r3,r14,5
+  LD r3,r14,124
+  ST r3,r14,6
+  LD r3,r14,125
+  ST r3,r14,7
+  LD r3,r14,132
+  ST r3,r14,8
+  LD r3,r14,133
+  ST r3,r14,9
+  LD r3,r14,134
+  ST r3,r14,10
+  LD r3,r14,135
+  ST r3,r14,11
+  LD r3,r14,128
+  ST r3,r14,12
+  LD r3,r14,129
+  ST r3,r14,13
+  LD r3,r14,130
+  ST r3,r14,14
+  LD r3,r14,131
+  ST r3,r14,15
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,12
+  SHR r4,r9,20
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,12
+  SHR r8,r8,20
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,17
+  SHR r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,17
+  SHR r8,r8,15
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,22
+  SHR r4,r9,10
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,22
+  SHR r8,r8,10
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,27
+  SHR r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,27
+  SHR r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+  LD r8,r14,10
+  LD r9,r14,11
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,22
+  SHL r4,r9,10
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,22
+  SHL r8,r8,10
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+  LD r1,r14,2
+  LD r2,r14,3
+  LD r3,r14,6
+  LD r4,r14,7
+  LD r5,r14,10
+  LD r7,r14,11
+  LD r8,r14,14
+  LD r9,r14,15
+  ST r3,r14,2
+  ST r4,r14,3
+  ST r5,r14,6
+  ST r7,r14,7
+  ST r8,r14,10
+  ST r9,r14,11
+  ST r1,r14,14
+  ST r2,r14,15
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @f8l585
+  MOVI r6,0
+svq715:
+  MOVI r2,0
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,96
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @svq715
+  MOVI r1,84
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,160
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,161
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,162
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,163
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,164
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,165
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,166
+  ADDI r1,r1,48
+  PUTC r1
+  LD r1,r14,167
+  ADDI r1,r1,48
+  PUTC r1
+  CALL @nl
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r9,0
+dd716:
+  CMP r9,r0
+  JMP[EQ] @nn717
+  MOVI r1,32
+  PUTC r1
+nn717:
+  ADDI r7,r9,0
+  ADD r7,r7,r9
+  MOVI r2,80
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r7,r7,1
+  MOVI r2,80
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r9,r9,1
+  MOVI r2,8
+  CMP r9,r2
+  JMP[LT] @dd716
+  CALL @nl
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r9,0
+dd718:
+  CMP r9,r0
+  JMP[EQ] @nn719
+  MOVI r1,32
+  PUTC r1
+nn719:
+  ADDI r7,r9,0
+  ADD r7,r7,r9
+  MOVI r2,96
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r7,r7,1
+  MOVI r2,96
+  ADD r10,r2,r7
+  ADD r10,r14,r10
+  LD r5,r10,0
+  CALL @puthex8
+  ADDI r9,r9,1
+  MOVI r2,8
+  CMP r9,r2
+  JMP[LT] @dd718
+  CALL @nl
+  MOVI r6,15
+i8l720:
+  LD r1,r14,2
+  LD r2,r14,3
+  LD r3,r14,6
+  LD r4,r14,7
+  LD r5,r14,10
+  LD r7,r14,11
+  LD r8,r14,14
+  LD r9,r14,15
+  ST r8,r14,2
+  ST r9,r14,3
+  ST r1,r14,6
+  ST r2,r14,7
+  ST r3,r14,10
+  ST r4,r14,11
+  ST r5,r14,14
+  ST r7,r14,15
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,22
+  SHL r4,r9,10
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,22
+  SHL r8,r8,10
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+  LD r8,r14,10
+  LD r9,r14,11
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,27
+  SHR r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,27
+  SHR r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,22
+  SHR r4,r9,10
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,22
+  SHR r8,r8,10
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,17
+  SHR r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,17
+  SHR r8,r8,15
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,12
+  SHR r4,r9,20
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,12
+  SHR r8,r8,20
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+  MOVI r9,0
+lr722:
+  MOVI r2,0
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,120
+  ADD r1,r2,r9
+  ADD r1,r14,r1
+  ST r3,r1,0
+  ADDI r9,r9,1
+  MOVI r2,16
+  CMP r9,r2
+  JMP[LT] @lr722
+  LD r3,r14,122
+  ST r3,r14,0
+  LD r3,r14,123
+  ST r3,r14,1
+  LD r3,r14,124
+  ST r3,r14,2
+  LD r3,r14,125
+  ST r3,r14,3
+  LD r3,r14,126
+  ST r3,r14,4
+  LD r3,r14,127
+  ST r3,r14,5
+  LD r3,r14,120
+  ST r3,r14,6
+  LD r3,r14,121
+  ST r3,r14,7
+  LD r3,r14,132
+  ST r3,r14,8
+  LD r3,r14,133
+  ST r3,r14,9
+  LD r3,r14,134
+  ST r3,r14,10
+  LD r3,r14,135
+  ST r3,r14,11
+  LD r3,r14,128
+  ST r3,r14,12
+  LD r3,r14,129
+  ST r3,r14,13
+  LD r3,r14,130
+  ST r3,r14,14
+  LD r3,r14,131
+  ST r3,r14,15
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs723
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs723:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs724
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs724:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs725
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs725:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs726
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs726:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs727
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs727:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs728
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs728:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs729
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs729:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs730
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs730:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs731
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs731:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs732
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs732:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs733
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs733:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs734
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs734:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs735
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs735:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs736
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs736:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs737
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs737:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs738
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs738:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs739
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs739:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs740
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs740:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs741
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs741:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs742
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs742:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs743
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs743:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs744
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs744:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs745
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs745:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs746
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs746:
+  LD r1,r14,160
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs747
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs747:
+  LD r1,r14,161
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs748
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs748:
+  LD r1,r14,162
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs749
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs749:
+  LD r1,r14,163
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs750
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs750:
+  LD r1,r14,164
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs751
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs751:
+  LD r1,r14,165
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs752
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs752:
+  LD r1,r14,166
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs753
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs753:
+  LD r1,r14,167
+  MOVI r2,3
+  CMP r1,r2
+  JMP[NE] @qs754
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs754:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs755
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs755:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs756
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs756:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs757
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs757:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs758
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs758:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs759
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs759:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs760
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs760:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs761
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs761:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs762
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs762:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs763
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs763:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs764
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs764:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs765
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs765:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs766
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs766:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs767
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs767:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs768
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs768:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs769
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs769:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs770
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs770:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs771
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs771:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs772
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs772:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs773
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs773:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs774
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs774:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs775
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs775:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs776
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs776:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs777
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs777:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs778
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs778:
+  LD r1,r14,160
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs779
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs779:
+  LD r1,r14,161
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs780
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs780:
+  LD r1,r14,162
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs781
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs781:
+  LD r1,r14,163
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs782
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs782:
+  LD r1,r14,164
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs783
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs783:
+  LD r1,r14,165
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs784
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs784:
+  LD r1,r14,166
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs785
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs785:
+  LD r1,r14,167
+  MOVI r2,2
+  CMP r1,r2
+  JMP[NE] @qs786
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs786:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs787
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs787:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs788
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs788:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs789
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs789:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs790
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs790:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs791
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs791:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs792
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs792:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs793
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs793:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs794
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs794:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs795
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs795:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs796
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs796:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs797
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs797:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs798
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs798:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs799
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs799:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs800
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs800:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs801
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs801:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs802
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs802:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs803
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs803:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs804
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs804:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs805
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs805:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs806
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs806:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs807
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs807:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs808
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs808:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs809
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs809:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs810
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs810:
+  LD r1,r14,160
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs811
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs811:
+  LD r1,r14,161
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs812
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs812:
+  LD r1,r14,162
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs813
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs813:
+  LD r1,r14,163
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs814
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs814:
+  LD r1,r14,164
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs815
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs815:
+  LD r1,r14,165
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs816
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs816:
+  LD r1,r14,166
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs817
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs817:
+  LD r1,r14,167
+  MOVI r2,1
+  CMP r1,r2
+  JMP[NE] @qs818
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs818:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs819
+  LD r1,r14,0
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,0
+  LD r1,r14,1
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,1
+qs819:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs820
+  LD r1,r14,2
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,2
+  LD r1,r14,3
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,3
+qs820:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs821
+  LD r1,r14,4
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,4
+  LD r1,r14,5
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,5
+qs821:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs822
+  LD r1,r14,6
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,6
+  LD r1,r14,7
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,7
+qs822:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs823
+  LD r1,r14,8
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,8
+  LD r1,r14,9
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,9
+qs823:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs824
+  LD r1,r14,10
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,10
+  LD r1,r14,11
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,11
+qs824:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs825
+  LD r1,r14,12
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,12
+  LD r1,r14,13
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,13
+qs825:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs826
+  LD r1,r14,14
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,14
+  LD r1,r14,15
+  MOVI r2,65535
+  MOVHI r2,65535
+  BOOL.6 r1,r1,r2
+  ST r1,r14,15
+qs826:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs827
+  LD r8,r14,2
+  LD r9,r14,3
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs827:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs828
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs828:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs829
+  LD r8,r14,6
+  LD r9,r14,7
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs829:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs830
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs830:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs831
+  LD r8,r14,10
+  LD r9,r14,11
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs831:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs832
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs832:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs833
+  LD r8,r14,14
+  LD r9,r14,15
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs833:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs834
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,27
+  SHL r4,r9,5
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,27
+  SHL r8,r8,5
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs834:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs835
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,0
+  ST r9,r14,1
+qs835:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs836
+  LD r8,r14,2
+  LD r9,r14,3
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,2
+  ST r9,r14,3
+qs836:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs837
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,4
+  ST r9,r14,5
+qs837:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs838
+  LD r8,r14,6
+  LD r9,r14,7
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,6
+  ST r9,r14,7
+qs838:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs839
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,8
+  ST r9,r14,9
+qs839:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs840
+  LD r8,r14,10
+  LD r9,r14,11
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,10
+  ST r9,r14,11
+qs840:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs841
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,12
+  ST r9,r14,13
+qs841:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs842
+  LD r8,r14,14
+  LD r9,r14,15
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r3,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r4,r2,r5
+  ADDI r8,r3,0
+  ADDI r9,r4,0
+  ST r8,r14,14
+  ST r9,r14,15
+qs842:
+  LD r1,r14,160
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs843
+  LD r8,r14,2
+  LD r9,r14,3
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,0
+  ST r11,r14,1
+qs843:
+  LD r1,r14,161
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs844
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,2
+  ST r11,r14,3
+qs844:
+  LD r1,r14,162
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs845
+  LD r8,r14,6
+  LD r9,r14,7
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,4
+  ST r11,r14,5
+qs845:
+  LD r1,r14,163
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs846
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,6
+  ST r11,r14,7
+qs846:
+  LD r1,r14,164
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs847
+  LD r8,r14,10
+  LD r9,r14,11
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,8
+  ST r11,r14,9
+qs847:
+  LD r1,r14,165
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs848
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,10
+  ST r11,r14,11
+qs848:
+  LD r1,r14,166
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs849
+  LD r8,r14,14
+  LD r9,r14,15
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,12
+  ST r11,r14,13
+qs849:
+  LD r1,r14,167
+  MOVI r2,0
+  CMP r1,r2
+  JMP[NE] @qs850
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,7
+  SHR r4,r9,25
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,7
+  SHR r8,r8,25
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r10,r10,r3
+  BOOL.6 r11,r11,r4
+  ST r10,r14,14
+  ST r11,r14,15
+qs850:
+  LD r8,r14,0
+  LD r9,r14,1
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,1
+  ST r11,r14,0
+  LD r8,r14,4
+  LD r9,r14,5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,5
+  ST r11,r14,4
+  LD r8,r14,8
+  LD r9,r14,9
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,9
+  ST r11,r14,8
+  LD r8,r14,12
+  LD r9,r14,13
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r8,r7
+  SHL r5,r5,8
+  SHR r2,r8,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r10,r2,r5
+  MOVI r7,255
+  MOVHI r7,255
+  BOOL.8 r5,r9,r7
+  SHL r5,r5,8
+  SHR r2,r9,8
+  BOOL.8 r2,r2,r7
+  BOOL.14 r5,r5,r2
+  MOVI r7,65535
+  BOOL.8 r2,r5,r7
+  SHL r2,r2,16
+  SHR r5,r5,16
+  BOOL.14 r11,r2,r5
+  ST r10,r14,13
+  ST r11,r14,12
+  LD r8,r14,4
+  LD r9,r14,5
+  SHL r3,r8,23
+  SHR r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,23
+  SHR r8,r8,9
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,14
+  ADDI r2,r14,0
+  CALL @subm
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,16
+  SHL r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,16
+  SHL r8,r8,16
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,12
+  ADDI r2,r14,14
+  CALL @subm
+  LD r8,r14,0
+  LD r9,r14,1
+  SHL r3,r8,23
+  SHR r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,23
+  SHR r8,r8,9
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,10
+  ADDI r2,r14,12
+  CALL @subm
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,16
+  SHL r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,16
+  SHL r8,r8,16
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,8
+  ADDI r2,r14,10
+  CALL @subm
+  LD r8,r14,12
+  LD r9,r14,13
+  SHL r3,r8,23
+  SHR r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,23
+  SHR r8,r8,9
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,6
+  ADDI r2,r14,8
+  CALL @subm
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,16
+  SHL r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,16
+  SHL r8,r8,16
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,4
+  ADDI r2,r14,6
+  CALL @subm
+  LD r8,r14,8
+  LD r9,r14,9
+  SHL r3,r8,23
+  SHR r4,r9,9
+  BOOL.14 r3,r3,r4
+  SHL r4,r9,23
+  SHR r8,r8,9
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,2
+  ADDI r2,r14,4
+  CALL @subm
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,16
+  SHL r4,r9,16
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,16
+  SHL r8,r8,16
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,0
+  ADDI r2,r14,2
+  CALL @subm
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,29
+  SHL r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,29
+  SHL r8,r8,3
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,14
+  ADDI r2,r14,0
+  CALL @subm
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,24
+  SHL r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,24
+  SHL r8,r8,8
+  BOOL.14 r4,r4,r8
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,12
+  ADDI r2,r14,14
+  CALL @subm
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,29
+  SHL r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,29
+  SHL r8,r8,3
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,10
+  ADDI r2,r14,12
+  CALL @subm
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,24
+  SHL r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,24
+  SHL r8,r8,8
+  BOOL.14 r4,r4,r8
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,8
+  ADDI r2,r14,10
+  CALL @subm
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,29
+  SHL r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,29
+  SHL r8,r8,3
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,6
+  ADDI r2,r14,8
+  CALL @subm
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,24
+  SHL r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,24
+  SHL r8,r8,8
+  BOOL.14 r4,r4,r8
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,4
+  ADDI r2,r14,6
+  CALL @subm
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,29
+  SHL r4,r9,3
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,29
+  SHL r8,r8,3
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,2
+  ADDI r2,r14,4
+  CALL @subm
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,24
+  SHL r4,r9,8
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,24
+  SHL r8,r8,8
+  BOOL.14 r4,r4,r8
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,0
+  ADDI r2,r14,2
+  CALL @subm
+  LD r8,r14,4
+  LD r9,r14,5
+  SHR r3,r8,17
+  SHL r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,17
+  SHL r8,r8,15
+  BOOL.14 r4,r4,r8
+  LD r10,r14,14
+  LD r11,r14,15
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,14
+  ADDI r2,r14,0
+  CALL @subm
+  LD r8,r14,0
+  LD r9,r14,1
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  LD r10,r14,12
+  LD r11,r14,13
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,12
+  ADDI r2,r14,14
+  CALL @subm
+  LD r8,r14,0
+  LD r9,r14,1
+  SHR r3,r8,17
+  SHL r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,17
+  SHL r8,r8,15
+  BOOL.14 r4,r4,r8
+  LD r10,r14,10
+  LD r11,r14,11
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,0
+  ST r4,r14,1
+  ADDI r1,r14,10
+  ADDI r2,r14,12
+  CALL @subm
+  LD r8,r14,12
+  LD r9,r14,13
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  LD r10,r14,8
+  LD r11,r14,9
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,8
+  ADDI r2,r14,10
+  CALL @subm
+  LD r8,r14,12
+  LD r9,r14,13
+  SHR r3,r8,17
+  SHL r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,17
+  SHL r8,r8,15
+  BOOL.14 r4,r4,r8
+  LD r10,r14,6
+  LD r11,r14,7
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,12
+  ST r4,r14,13
+  ADDI r1,r14,6
+  ADDI r2,r14,8
+  CALL @subm
+  LD r8,r14,8
+  LD r9,r14,9
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  LD r10,r14,4
+  LD r11,r14,5
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,4
+  ADDI r2,r14,6
+  CALL @subm
+  LD r8,r14,8
+  LD r9,r14,9
+  SHR r3,r8,17
+  SHL r4,r9,15
+  BOOL.14 r3,r3,r4
+  SHR r4,r9,17
+  SHL r8,r8,15
+  BOOL.14 r4,r4,r8
+  LD r10,r14,2
+  LD r11,r14,3
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,8
+  ST r4,r14,9
+  ADDI r1,r14,2
+  ADDI r2,r14,4
+  CALL @subm
+  LD r8,r14,4
+  LD r9,r14,5
+  ADDI r3,r9,0
+  ADDI r4,r8,0
+  LD r10,r14,0
+  LD r11,r14,1
+  BOOL.6 r3,r3,r10
+  BOOL.6 r4,r4,r11
+  ST r3,r14,4
+  ST r4,r14,5
+  ADDI r1,r14,0
+  ADDI r2,r14,2
+  CALL @subm
+  ADDI r8,r6,3
+  CALL @kv
+  ADDI r1,r14,8
+  LD r2,r14,#za
+  LD r3,r14,#za+1
+  CALL @xorv
+  ADDI r8,r6,0
+  CALL @kv
+  ADDI r1,r14,0
+  LD r2,r14,#za
+  LD r3,r14,#za+1
+  CALL @xorv
+  CMP r6,r0
+  JMP[EQ] @i8d721
+  MOVI r2,1
+  SUB r6,r6,r2
+  JMP @i8l720
+i8d721:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r6,0
+cmp8851:
+  MOVI r2,0
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  MOVI r2,80
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r4,r1,0
+  CMP r3,r4
+  JMP[NE] @cpn8853
+  ADDI r6,r6,1
+  MOVI r2,16
+  CMP r6,r2
+  JMP[LT] @cmp8851
+  JMP @cmpe852
+cpn8853:
+  MOVI r1,0
+  ST r1,r14,70
+cmpe852:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk854
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn855
+dk854:
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn855:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl6
+  RET
+
+ki:
+  ST r15,r0,@ksl7
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kiz:
+  ST r15,r0,@ksl7
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kiz
   LD r1,r0,@d_mhi
   ST r1,r14,#seedm
   LD r1,r0,@d_mlo
@@ -174,7 +20466,7 @@ mz_loop:
   MOVI r1,2
   ST r1,r14,167
   MOVI r6,0
-svr1:
+svr856:
   MOVI r2,0
   ADD r1,r2,r6
   ADD r1,r14,r1
@@ -186,7 +20478,7 @@ svr1:
   ADDI r6,r6,1
   MOVI r2,16
   CMP r6,r2
-  JMP[LT] @svr1
+  JMP[LT] @svr856
   MOVI r1,1
   ST r1,r14,70
   LD r1,r14,201
@@ -195,33 +20487,33 @@ svr1:
   BOOL.8 r1,r1,r2
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @ch_n2
+  JMP[NE] @ch_n857
   LD r1,r14,204
   SHR r1,r1,8
   MOVI r2,3
   BOOL.8 r1,r1,r2
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @ch_n2
+  JMP[NE] @ch_n857
   LD r1,r14,207
   SHR r1,r1,8
   MOVI r2,3
   BOOL.8 r1,r1,r2
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @ch_n2
+  JMP[NE] @ch_n857
   LD r1,r14,210
   SHR r1,r1,8
   MOVI r2,3
   BOOL.8 r1,r1,r2
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @ch_n2
-  JMP @ch_n2k
-ch_n2:
+  JMP[NE] @ch_n857
+  JMP @ch_n857k
+ch_n857:
   MOVI r1,0
   ST r1,r14,70
-ch_n2k:
+ch_n857k:
   MOVI r1,78
   PUTC r1
   MOVI r1,49
@@ -308,7 +20600,7 @@ ch_n2k:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs3
+  JMP[NE] @qs858
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -323,11 +20615,11 @@ ch_n2k:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs3:
+qs858:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs4
+  JMP[NE] @qs859
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -342,11 +20634,11 @@ qs3:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs4:
+qs859:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs5
+  JMP[NE] @qs860
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -361,11 +20653,11 @@ qs4:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs5:
+qs860:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs6
+  JMP[NE] @qs861
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -380,11 +20672,11 @@ qs5:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs6:
+qs861:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs7
+  JMP[NE] @qs862
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -399,11 +20691,11 @@ qs6:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs7:
+qs862:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs8
+  JMP[NE] @qs863
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -418,11 +20710,11 @@ qs7:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs8:
+qs863:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs9
+  JMP[NE] @qs864
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -437,11 +20729,11 @@ qs8:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs9:
+qs864:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs10
+  JMP[NE] @qs865
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -456,11 +20748,11 @@ qs9:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs10:
+qs865:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs11
+  JMP[NE] @qs866
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -491,11 +20783,11 @@ qs10:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs11:
+qs866:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs12
+  JMP[NE] @qs867
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -526,11 +20818,11 @@ qs11:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs12:
+qs867:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs13
+  JMP[NE] @qs868
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -561,11 +20853,11 @@ qs12:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs13:
+qs868:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs14
+  JMP[NE] @qs869
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -596,11 +20888,11 @@ qs13:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs14:
+qs869:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs15
+  JMP[NE] @qs870
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -631,11 +20923,11 @@ qs14:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs15:
+qs870:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs16
+  JMP[NE] @qs871
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -666,11 +20958,11 @@ qs15:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs16:
+qs871:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs17
+  JMP[NE] @qs872
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -701,11 +20993,11 @@ qs16:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs17:
+qs872:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs18
+  JMP[NE] @qs873
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -736,11 +21028,11 @@ qs17:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs18:
+qs873:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs19
+  JMP[NE] @qs874
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -755,11 +21047,11 @@ qs18:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs19:
+qs874:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs20
+  JMP[NE] @qs875
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -774,11 +21066,11 @@ qs19:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs20:
+qs875:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs21
+  JMP[NE] @qs876
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -793,11 +21085,11 @@ qs20:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs21:
+qs876:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs22
+  JMP[NE] @qs877
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -812,11 +21104,11 @@ qs21:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs22:
+qs877:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs23
+  JMP[NE] @qs878
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -831,11 +21123,11 @@ qs22:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs23:
+qs878:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs24
+  JMP[NE] @qs879
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -850,11 +21142,11 @@ qs23:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs24:
+qs879:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs25
+  JMP[NE] @qs880
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -869,11 +21161,11 @@ qs24:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs25:
+qs880:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs26
+  JMP[NE] @qs881
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -888,11 +21180,11 @@ qs25:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs26:
+qs881:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs27
+  JMP[NE] @qs882
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -903,11 +21195,11 @@ qs26:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs27:
+qs882:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs28
+  JMP[NE] @qs883
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -918,11 +21210,11 @@ qs27:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs28:
+qs883:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs29
+  JMP[NE] @qs884
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -933,11 +21225,11 @@ qs28:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs29:
+qs884:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs30
+  JMP[NE] @qs885
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -948,11 +21240,11 @@ qs29:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs30:
+qs885:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs31
+  JMP[NE] @qs886
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -963,11 +21255,11 @@ qs30:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs31:
+qs886:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs32
+  JMP[NE] @qs887
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -978,11 +21270,11 @@ qs31:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs32:
+qs887:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs33
+  JMP[NE] @qs888
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -993,11 +21285,11 @@ qs32:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs33:
+qs888:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs34
+  JMP[NE] @qs889
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -1008,11 +21300,11 @@ qs33:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs34:
+qs889:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs35
+  JMP[NE] @qs890
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -1027,11 +21319,11 @@ qs34:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs35:
+qs890:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs36
+  JMP[NE] @qs891
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -1046,11 +21338,11 @@ qs35:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs36:
+qs891:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs37
+  JMP[NE] @qs892
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -1065,11 +21357,11 @@ qs36:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs37:
+qs892:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs38
+  JMP[NE] @qs893
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -1084,11 +21376,11 @@ qs37:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs38:
+qs893:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs39
+  JMP[NE] @qs894
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -1103,11 +21395,11 @@ qs38:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs39:
+qs894:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs40
+  JMP[NE] @qs895
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -1122,11 +21414,11 @@ qs39:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs40:
+qs895:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs41
+  JMP[NE] @qs896
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -1141,11 +21433,11 @@ qs40:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs41:
+qs896:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs42
+  JMP[NE] @qs897
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -1160,11 +21452,11 @@ qs41:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs42:
+qs897:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs43
+  JMP[NE] @qs898
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -1195,11 +21487,11 @@ qs42:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs43:
+qs898:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs44
+  JMP[NE] @qs899
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -1230,11 +21522,11 @@ qs43:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs44:
+qs899:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs45
+  JMP[NE] @qs900
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -1265,11 +21557,11 @@ qs44:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs45:
+qs900:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs46
+  JMP[NE] @qs901
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -1300,11 +21592,11 @@ qs45:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs46:
+qs901:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs47
+  JMP[NE] @qs902
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -1335,11 +21627,11 @@ qs46:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs47:
+qs902:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs48
+  JMP[NE] @qs903
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -1370,11 +21662,11 @@ qs47:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs48:
+qs903:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs49
+  JMP[NE] @qs904
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -1405,11 +21697,11 @@ qs48:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs49:
+qs904:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs50
+  JMP[NE] @qs905
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -1440,11 +21732,11 @@ qs49:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs50:
+qs905:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs51
+  JMP[NE] @qs906
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -1459,11 +21751,11 @@ qs50:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs51:
+qs906:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs52
+  JMP[NE] @qs907
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -1478,11 +21770,11 @@ qs51:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs52:
+qs907:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs53
+  JMP[NE] @qs908
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -1497,11 +21789,11 @@ qs52:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs53:
+qs908:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs54
+  JMP[NE] @qs909
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -1516,11 +21808,11 @@ qs53:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs54:
+qs909:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs55
+  JMP[NE] @qs910
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -1535,11 +21827,11 @@ qs54:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs55:
+qs910:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs56
+  JMP[NE] @qs911
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -1554,11 +21846,11 @@ qs55:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs56:
+qs911:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs57
+  JMP[NE] @qs912
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -1573,11 +21865,11 @@ qs56:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs57:
+qs912:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs58
+  JMP[NE] @qs913
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -1592,11 +21884,11 @@ qs57:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs58:
+qs913:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs59
+  JMP[NE] @qs914
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -1607,11 +21899,11 @@ qs58:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs59:
+qs914:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs60
+  JMP[NE] @qs915
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -1622,11 +21914,11 @@ qs59:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs60:
+qs915:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs61
+  JMP[NE] @qs916
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -1637,11 +21929,11 @@ qs60:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs61:
+qs916:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs62
+  JMP[NE] @qs917
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -1652,11 +21944,11 @@ qs61:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs62:
+qs917:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs63
+  JMP[NE] @qs918
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -1667,11 +21959,11 @@ qs62:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs63:
+qs918:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs64
+  JMP[NE] @qs919
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -1682,11 +21974,11 @@ qs63:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs64:
+qs919:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs65
+  JMP[NE] @qs920
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -1697,11 +21989,11 @@ qs64:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs65:
+qs920:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs66
+  JMP[NE] @qs921
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -1712,11 +22004,11 @@ qs65:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs66:
+qs921:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs67
+  JMP[NE] @qs922
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -1731,11 +22023,11 @@ qs66:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs67:
+qs922:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs68
+  JMP[NE] @qs923
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -1750,11 +22042,11 @@ qs67:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs68:
+qs923:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs69
+  JMP[NE] @qs924
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -1769,11 +22061,11 @@ qs68:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs69:
+qs924:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs70
+  JMP[NE] @qs925
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -1788,11 +22080,11 @@ qs69:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs70:
+qs925:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs71
+  JMP[NE] @qs926
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -1807,11 +22099,11 @@ qs70:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs71:
+qs926:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs72
+  JMP[NE] @qs927
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -1826,11 +22118,11 @@ qs71:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs72:
+qs927:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs73
+  JMP[NE] @qs928
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -1845,11 +22137,11 @@ qs72:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs73:
+qs928:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs74
+  JMP[NE] @qs929
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -1864,11 +22156,11 @@ qs73:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs74:
+qs929:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs75
+  JMP[NE] @qs930
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -1899,11 +22191,11 @@ qs74:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs75:
+qs930:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs76
+  JMP[NE] @qs931
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -1934,11 +22226,11 @@ qs75:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs76:
+qs931:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs77
+  JMP[NE] @qs932
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -1969,11 +22261,11 @@ qs76:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs77:
+qs932:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs78
+  JMP[NE] @qs933
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -2004,11 +22296,11 @@ qs77:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs78:
+qs933:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs79
+  JMP[NE] @qs934
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -2039,11 +22331,11 @@ qs78:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs79:
+qs934:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs80
+  JMP[NE] @qs935
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -2074,11 +22366,11 @@ qs79:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs80:
+qs935:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs81
+  JMP[NE] @qs936
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -2109,11 +22401,11 @@ qs80:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs81:
+qs936:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs82
+  JMP[NE] @qs937
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -2144,11 +22436,11 @@ qs81:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs82:
+qs937:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs83
+  JMP[NE] @qs938
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -2163,11 +22455,11 @@ qs82:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs83:
+qs938:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs84
+  JMP[NE] @qs939
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -2182,11 +22474,11 @@ qs83:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs84:
+qs939:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs85
+  JMP[NE] @qs940
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -2201,11 +22493,11 @@ qs84:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs85:
+qs940:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs86
+  JMP[NE] @qs941
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -2220,11 +22512,11 @@ qs85:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs86:
+qs941:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs87
+  JMP[NE] @qs942
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -2239,11 +22531,11 @@ qs86:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs87:
+qs942:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs88
+  JMP[NE] @qs943
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -2258,11 +22550,11 @@ qs87:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs88:
+qs943:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs89
+  JMP[NE] @qs944
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -2277,11 +22569,11 @@ qs88:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs89:
+qs944:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs90
+  JMP[NE] @qs945
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -2296,11 +22588,11 @@ qs89:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs90:
+qs945:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs91
+  JMP[NE] @qs946
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -2311,11 +22603,11 @@ qs90:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs91:
+qs946:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs92
+  JMP[NE] @qs947
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -2326,11 +22618,11 @@ qs91:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs92:
+qs947:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs93
+  JMP[NE] @qs948
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -2341,11 +22633,11 @@ qs92:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs93:
+qs948:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs94
+  JMP[NE] @qs949
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -2356,11 +22648,11 @@ qs93:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs94:
+qs949:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs95
+  JMP[NE] @qs950
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -2371,11 +22663,11 @@ qs94:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs95:
+qs950:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs96
+  JMP[NE] @qs951
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -2386,11 +22678,11 @@ qs95:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs96:
+qs951:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs97
+  JMP[NE] @qs952
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -2401,11 +22693,11 @@ qs96:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs97:
+qs952:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs98
+  JMP[NE] @qs953
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -2416,11 +22708,11 @@ qs97:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs98:
+qs953:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs99
+  JMP[NE] @qs954
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -2435,11 +22727,11 @@ qs98:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs99:
+qs954:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs100
+  JMP[NE] @qs955
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -2454,11 +22746,11 @@ qs99:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs100:
+qs955:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs101
+  JMP[NE] @qs956
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -2473,11 +22765,11 @@ qs100:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs101:
+qs956:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs102
+  JMP[NE] @qs957
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -2492,11 +22784,11 @@ qs101:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs102:
+qs957:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs103
+  JMP[NE] @qs958
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -2511,11 +22803,11 @@ qs102:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs103:
+qs958:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs104
+  JMP[NE] @qs959
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -2530,11 +22822,11 @@ qs103:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs104:
+qs959:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs105
+  JMP[NE] @qs960
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -2549,11 +22841,11 @@ qs104:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs105:
+qs960:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs106
+  JMP[NE] @qs961
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -2568,11 +22860,11 @@ qs105:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs106:
+qs961:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs107
+  JMP[NE] @qs962
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -2603,11 +22895,11 @@ qs106:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs107:
+qs962:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs108
+  JMP[NE] @qs963
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -2638,11 +22930,11 @@ qs107:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs108:
+qs963:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs109
+  JMP[NE] @qs964
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -2673,11 +22965,11 @@ qs108:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs109:
+qs964:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs110
+  JMP[NE] @qs965
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -2708,11 +23000,11 @@ qs109:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs110:
+qs965:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs111
+  JMP[NE] @qs966
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -2743,11 +23035,11 @@ qs110:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs111:
+qs966:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs112
+  JMP[NE] @qs967
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -2778,11 +23070,11 @@ qs111:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs112:
+qs967:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs113
+  JMP[NE] @qs968
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -2813,11 +23105,11 @@ qs112:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs113:
+qs968:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs114
+  JMP[NE] @qs969
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -2848,11 +23140,11 @@ qs113:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs114:
+qs969:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs115
+  JMP[NE] @qs970
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -2867,11 +23159,11 @@ qs114:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs115:
+qs970:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs116
+  JMP[NE] @qs971
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -2886,11 +23178,11 @@ qs115:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs116:
+qs971:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs117
+  JMP[NE] @qs972
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -2905,11 +23197,11 @@ qs116:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs117:
+qs972:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs118
+  JMP[NE] @qs973
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -2924,11 +23216,11 @@ qs117:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs118:
+qs973:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs119
+  JMP[NE] @qs974
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -2943,11 +23235,11 @@ qs118:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs119:
+qs974:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs120
+  JMP[NE] @qs975
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -2962,11 +23254,11 @@ qs119:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs120:
+qs975:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs121
+  JMP[NE] @qs976
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -2981,11 +23273,11 @@ qs120:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs121:
+qs976:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs122
+  JMP[NE] @qs977
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -3000,11 +23292,11 @@ qs121:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs122:
+qs977:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs123
+  JMP[NE] @qs978
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -3015,11 +23307,11 @@ qs122:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs123:
+qs978:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs124
+  JMP[NE] @qs979
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -3030,11 +23322,11 @@ qs123:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs124:
+qs979:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs125
+  JMP[NE] @qs980
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -3045,11 +23337,11 @@ qs124:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs125:
+qs980:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs126
+  JMP[NE] @qs981
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -3060,11 +23352,11 @@ qs125:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs126:
+qs981:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs127
+  JMP[NE] @qs982
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -3075,11 +23367,11 @@ qs126:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs127:
+qs982:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs128
+  JMP[NE] @qs983
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -3090,11 +23382,11 @@ qs127:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs128:
+qs983:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs129
+  JMP[NE] @qs984
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -3105,11 +23397,11 @@ qs128:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs129:
+qs984:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs130
+  JMP[NE] @qs985
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -3120,9 +23412,9 @@ qs129:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs130:
+qs985:
   MOVI r9,0
-lr131:
+lr986:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -3134,7 +23426,7 @@ lr131:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr131
+  JMP[LT] @lr986
   LD r3,r14,126
   ST r3,r14,0
   LD r3,r14,127
@@ -3170,7 +23462,7 @@ lr131:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs132
+  JMP[NE] @qs987
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -3185,11 +23477,11 @@ lr131:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs132:
+qs987:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs133
+  JMP[NE] @qs988
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -3204,11 +23496,11 @@ qs132:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs133:
+qs988:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs134
+  JMP[NE] @qs989
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -3223,11 +23515,11 @@ qs133:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs134:
+qs989:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs135
+  JMP[NE] @qs990
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -3242,11 +23534,11 @@ qs134:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs135:
+qs990:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs136
+  JMP[NE] @qs991
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -3261,11 +23553,11 @@ qs135:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs136:
+qs991:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs137
+  JMP[NE] @qs992
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -3280,11 +23572,11 @@ qs136:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs137:
+qs992:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs138
+  JMP[NE] @qs993
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -3299,11 +23591,11 @@ qs137:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs138:
+qs993:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs139
+  JMP[NE] @qs994
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -3318,11 +23610,11 @@ qs138:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs139:
+qs994:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs140
+  JMP[NE] @qs995
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -3353,11 +23645,11 @@ qs139:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs140:
+qs995:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs141
+  JMP[NE] @qs996
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -3388,11 +23680,11 @@ qs140:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs141:
+qs996:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs142
+  JMP[NE] @qs997
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -3423,11 +23715,11 @@ qs141:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs142:
+qs997:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs143
+  JMP[NE] @qs998
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -3458,11 +23750,11 @@ qs142:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs143:
+qs998:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs144
+  JMP[NE] @qs999
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -3493,11 +23785,11 @@ qs143:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs144:
+qs999:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs145
+  JMP[NE] @qs1000
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -3528,11 +23820,11 @@ qs144:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs145:
+qs1000:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs146
+  JMP[NE] @qs1001
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -3563,11 +23855,11 @@ qs145:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs146:
+qs1001:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs147
+  JMP[NE] @qs1002
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -3598,11 +23890,11 @@ qs146:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs147:
+qs1002:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs148
+  JMP[NE] @qs1003
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -3617,11 +23909,11 @@ qs147:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs148:
+qs1003:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs149
+  JMP[NE] @qs1004
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -3636,11 +23928,11 @@ qs148:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs149:
+qs1004:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs150
+  JMP[NE] @qs1005
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -3655,11 +23947,11 @@ qs149:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs150:
+qs1005:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs151
+  JMP[NE] @qs1006
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -3674,11 +23966,11 @@ qs150:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs151:
+qs1006:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs152
+  JMP[NE] @qs1007
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -3693,11 +23985,11 @@ qs151:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs152:
+qs1007:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs153
+  JMP[NE] @qs1008
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -3712,11 +24004,11 @@ qs152:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs153:
+qs1008:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs154
+  JMP[NE] @qs1009
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -3731,11 +24023,11 @@ qs153:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs154:
+qs1009:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs155
+  JMP[NE] @qs1010
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -3750,11 +24042,11 @@ qs154:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs155:
+qs1010:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs156
+  JMP[NE] @qs1011
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -3765,11 +24057,11 @@ qs155:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs156:
+qs1011:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs157
+  JMP[NE] @qs1012
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -3780,11 +24072,11 @@ qs156:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs157:
+qs1012:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs158
+  JMP[NE] @qs1013
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -3795,11 +24087,11 @@ qs157:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs158:
+qs1013:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs159
+  JMP[NE] @qs1014
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -3810,11 +24102,11 @@ qs158:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs159:
+qs1014:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs160
+  JMP[NE] @qs1015
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -3825,11 +24117,11 @@ qs159:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs160:
+qs1015:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs161
+  JMP[NE] @qs1016
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -3840,11 +24132,11 @@ qs160:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs161:
+qs1016:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs162
+  JMP[NE] @qs1017
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -3855,11 +24147,11 @@ qs161:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs162:
+qs1017:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs163
+  JMP[NE] @qs1018
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -3870,11 +24162,11 @@ qs162:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs163:
+qs1018:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs164
+  JMP[NE] @qs1019
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -3889,11 +24181,11 @@ qs163:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs164:
+qs1019:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs165
+  JMP[NE] @qs1020
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -3908,11 +24200,11 @@ qs164:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs165:
+qs1020:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs166
+  JMP[NE] @qs1021
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -3927,11 +24219,11 @@ qs165:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs166:
+qs1021:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs167
+  JMP[NE] @qs1022
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -3946,11 +24238,11 @@ qs166:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs167:
+qs1022:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs168
+  JMP[NE] @qs1023
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -3965,11 +24257,11 @@ qs167:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs168:
+qs1023:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs169
+  JMP[NE] @qs1024
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -3984,11 +24276,11 @@ qs168:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs169:
+qs1024:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs170
+  JMP[NE] @qs1025
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -4003,11 +24295,11 @@ qs169:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs170:
+qs1025:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs171
+  JMP[NE] @qs1026
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -4022,11 +24314,11 @@ qs170:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs171:
+qs1026:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs172
+  JMP[NE] @qs1027
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -4057,11 +24349,11 @@ qs171:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs172:
+qs1027:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs173
+  JMP[NE] @qs1028
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -4092,11 +24384,11 @@ qs172:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs173:
+qs1028:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs174
+  JMP[NE] @qs1029
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -4127,11 +24419,11 @@ qs173:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs174:
+qs1029:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs175
+  JMP[NE] @qs1030
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -4162,11 +24454,11 @@ qs174:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs175:
+qs1030:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs176
+  JMP[NE] @qs1031
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -4197,11 +24489,11 @@ qs175:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs176:
+qs1031:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs177
+  JMP[NE] @qs1032
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -4232,11 +24524,11 @@ qs176:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs177:
+qs1032:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs178
+  JMP[NE] @qs1033
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -4267,11 +24559,11 @@ qs177:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs178:
+qs1033:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs179
+  JMP[NE] @qs1034
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -4302,11 +24594,11 @@ qs178:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs179:
+qs1034:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs180
+  JMP[NE] @qs1035
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -4321,11 +24613,11 @@ qs179:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs180:
+qs1035:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs181
+  JMP[NE] @qs1036
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -4340,11 +24632,11 @@ qs180:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs181:
+qs1036:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs182
+  JMP[NE] @qs1037
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -4359,11 +24651,11 @@ qs181:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs182:
+qs1037:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs183
+  JMP[NE] @qs1038
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -4378,11 +24670,11 @@ qs182:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs183:
+qs1038:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs184
+  JMP[NE] @qs1039
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -4397,11 +24689,11 @@ qs183:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs184:
+qs1039:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs185
+  JMP[NE] @qs1040
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -4416,11 +24708,11 @@ qs184:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs185:
+qs1040:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs186
+  JMP[NE] @qs1041
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -4435,11 +24727,11 @@ qs185:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs186:
+qs1041:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs187
+  JMP[NE] @qs1042
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -4454,11 +24746,11 @@ qs186:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs187:
+qs1042:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs188
+  JMP[NE] @qs1043
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -4469,11 +24761,11 @@ qs187:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs188:
+qs1043:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs189
+  JMP[NE] @qs1044
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -4484,11 +24776,11 @@ qs188:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs189:
+qs1044:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs190
+  JMP[NE] @qs1045
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -4499,11 +24791,11 @@ qs189:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs190:
+qs1045:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs191
+  JMP[NE] @qs1046
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -4514,11 +24806,11 @@ qs190:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs191:
+qs1046:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs192
+  JMP[NE] @qs1047
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -4529,11 +24821,11 @@ qs191:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs192:
+qs1047:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs193
+  JMP[NE] @qs1048
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -4544,11 +24836,11 @@ qs192:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs193:
+qs1048:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs194
+  JMP[NE] @qs1049
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -4559,11 +24851,11 @@ qs193:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs194:
+qs1049:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs195
+  JMP[NE] @qs1050
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -4574,11 +24866,11 @@ qs194:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs195:
+qs1050:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs196
+  JMP[NE] @qs1051
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -4593,11 +24885,11 @@ qs195:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs196:
+qs1051:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs197
+  JMP[NE] @qs1052
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -4612,11 +24904,11 @@ qs196:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs197:
+qs1052:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs198
+  JMP[NE] @qs1053
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -4631,11 +24923,11 @@ qs197:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs198:
+qs1053:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs199
+  JMP[NE] @qs1054
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -4650,11 +24942,11 @@ qs198:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs199:
+qs1054:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs200
+  JMP[NE] @qs1055
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -4669,11 +24961,11 @@ qs199:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs200:
+qs1055:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs201
+  JMP[NE] @qs1056
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -4688,11 +24980,11 @@ qs200:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs201:
+qs1056:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs202
+  JMP[NE] @qs1057
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -4707,11 +24999,11 @@ qs201:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs202:
+qs1057:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs203
+  JMP[NE] @qs1058
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -4726,11 +25018,11 @@ qs202:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs203:
+qs1058:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs204
+  JMP[NE] @qs1059
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -4761,11 +25053,11 @@ qs203:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs204:
+qs1059:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs205
+  JMP[NE] @qs1060
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -4796,11 +25088,11 @@ qs204:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs205:
+qs1060:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs206
+  JMP[NE] @qs1061
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -4831,11 +25123,11 @@ qs205:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs206:
+qs1061:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs207
+  JMP[NE] @qs1062
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -4866,11 +25158,11 @@ qs206:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs207:
+qs1062:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs208
+  JMP[NE] @qs1063
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -4901,11 +25193,11 @@ qs207:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs208:
+qs1063:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs209
+  JMP[NE] @qs1064
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -4936,11 +25228,11 @@ qs208:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs209:
+qs1064:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs210
+  JMP[NE] @qs1065
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -4971,11 +25263,11 @@ qs209:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs210:
+qs1065:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs211
+  JMP[NE] @qs1066
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -5006,11 +25298,11 @@ qs210:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs211:
+qs1066:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs212
+  JMP[NE] @qs1067
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -5025,11 +25317,11 @@ qs211:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs212:
+qs1067:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs213
+  JMP[NE] @qs1068
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -5044,11 +25336,11 @@ qs212:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs213:
+qs1068:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs214
+  JMP[NE] @qs1069
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -5063,11 +25355,11 @@ qs213:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs214:
+qs1069:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs215
+  JMP[NE] @qs1070
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -5082,11 +25374,11 @@ qs214:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs215:
+qs1070:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs216
+  JMP[NE] @qs1071
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -5101,11 +25393,11 @@ qs215:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs216:
+qs1071:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs217
+  JMP[NE] @qs1072
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -5120,11 +25412,11 @@ qs216:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs217:
+qs1072:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs218
+  JMP[NE] @qs1073
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -5139,11 +25431,11 @@ qs217:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs218:
+qs1073:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs219
+  JMP[NE] @qs1074
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -5158,11 +25450,11 @@ qs218:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs219:
+qs1074:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs220
+  JMP[NE] @qs1075
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -5173,11 +25465,11 @@ qs219:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs220:
+qs1075:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs221
+  JMP[NE] @qs1076
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -5188,11 +25480,11 @@ qs220:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs221:
+qs1076:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs222
+  JMP[NE] @qs1077
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -5203,11 +25495,11 @@ qs221:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs222:
+qs1077:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs223
+  JMP[NE] @qs1078
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -5218,11 +25510,11 @@ qs222:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs223:
+qs1078:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs224
+  JMP[NE] @qs1079
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -5233,11 +25525,11 @@ qs223:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs224:
+qs1079:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs225
+  JMP[NE] @qs1080
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -5248,11 +25540,11 @@ qs224:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs225:
+qs1080:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs226
+  JMP[NE] @qs1081
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -5263,11 +25555,11 @@ qs225:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs226:
+qs1081:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs227
+  JMP[NE] @qs1082
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -5278,11 +25570,11 @@ qs226:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs227:
+qs1082:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs228
+  JMP[NE] @qs1083
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -5297,11 +25589,11 @@ qs227:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs228:
+qs1083:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs229
+  JMP[NE] @qs1084
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -5316,11 +25608,11 @@ qs228:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs229:
+qs1084:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs230
+  JMP[NE] @qs1085
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -5335,11 +25627,11 @@ qs229:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs230:
+qs1085:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs231
+  JMP[NE] @qs1086
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -5354,11 +25646,11 @@ qs230:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs231:
+qs1086:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs232
+  JMP[NE] @qs1087
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -5373,11 +25665,11 @@ qs231:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs232:
+qs1087:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs233
+  JMP[NE] @qs1088
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -5392,11 +25684,11 @@ qs232:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs233:
+qs1088:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs234
+  JMP[NE] @qs1089
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -5411,11 +25703,11 @@ qs233:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs234:
+qs1089:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs235
+  JMP[NE] @qs1090
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -5430,11 +25722,11 @@ qs234:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs235:
+qs1090:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs236
+  JMP[NE] @qs1091
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -5465,11 +25757,11 @@ qs235:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs236:
+qs1091:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs237
+  JMP[NE] @qs1092
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -5500,11 +25792,11 @@ qs236:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs237:
+qs1092:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs238
+  JMP[NE] @qs1093
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -5535,11 +25827,11 @@ qs237:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs238:
+qs1093:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs239
+  JMP[NE] @qs1094
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -5570,11 +25862,11 @@ qs238:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs239:
+qs1094:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs240
+  JMP[NE] @qs1095
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -5605,11 +25897,11 @@ qs239:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs240:
+qs1095:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs241
+  JMP[NE] @qs1096
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -5640,11 +25932,11 @@ qs240:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs241:
+qs1096:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs242
+  JMP[NE] @qs1097
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -5675,11 +25967,11 @@ qs241:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs242:
+qs1097:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs243
+  JMP[NE] @qs1098
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -5710,11 +26002,11 @@ qs242:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs243:
+qs1098:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs244
+  JMP[NE] @qs1099
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -5729,11 +26021,11 @@ qs243:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs244:
+qs1099:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs245
+  JMP[NE] @qs1100
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -5748,11 +26040,11 @@ qs244:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs245:
+qs1100:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs246
+  JMP[NE] @qs1101
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -5767,11 +26059,11 @@ qs245:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs246:
+qs1101:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs247
+  JMP[NE] @qs1102
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -5786,11 +26078,11 @@ qs246:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs247:
+qs1102:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs248
+  JMP[NE] @qs1103
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -5805,11 +26097,11 @@ qs247:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs248:
+qs1103:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs249
+  JMP[NE] @qs1104
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -5824,11 +26116,11 @@ qs248:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs249:
+qs1104:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs250
+  JMP[NE] @qs1105
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -5843,11 +26135,11 @@ qs249:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs250:
+qs1105:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs251
+  JMP[NE] @qs1106
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -5862,11 +26154,11 @@ qs250:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs251:
+qs1106:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs252
+  JMP[NE] @qs1107
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -5877,11 +26169,11 @@ qs251:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs252:
+qs1107:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs253
+  JMP[NE] @qs1108
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -5892,11 +26184,11 @@ qs252:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs253:
+qs1108:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs254
+  JMP[NE] @qs1109
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -5907,11 +26199,11 @@ qs253:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs254:
+qs1109:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs255
+  JMP[NE] @qs1110
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -5922,11 +26214,11 @@ qs254:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs255:
+qs1110:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs256
+  JMP[NE] @qs1111
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -5937,11 +26229,11 @@ qs255:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs256:
+qs1111:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs257
+  JMP[NE] @qs1112
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -5952,11 +26244,11 @@ qs256:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs257:
+qs1112:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs258
+  JMP[NE] @qs1113
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -5967,11 +26259,11 @@ qs257:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs258:
+qs1113:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs259
+  JMP[NE] @qs1114
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -5982,9 +26274,9 @@ qs258:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs259:
+qs1114:
   MOVI r9,0
-lr260:
+lr1115:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -5996,7 +26288,7 @@ lr260:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr260
+  JMP[LT] @lr1115
   LD r3,r14,120
   ST r3,r14,0
   LD r3,r14,121
@@ -6032,7 +26324,7 @@ lr260:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs261
+  JMP[NE] @qs1116
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -6047,11 +26339,11 @@ lr260:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs261:
+qs1116:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs262
+  JMP[NE] @qs1117
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -6066,11 +26358,11 @@ qs261:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs262:
+qs1117:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs263
+  JMP[NE] @qs1118
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -6085,11 +26377,11 @@ qs262:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs263:
+qs1118:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs264
+  JMP[NE] @qs1119
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -6104,11 +26396,11 @@ qs263:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs264:
+qs1119:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs265
+  JMP[NE] @qs1120
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -6123,11 +26415,11 @@ qs264:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs265:
+qs1120:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs266
+  JMP[NE] @qs1121
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -6142,11 +26434,11 @@ qs265:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs266:
+qs1121:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs267
+  JMP[NE] @qs1122
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -6161,11 +26453,11 @@ qs266:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs267:
+qs1122:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs268
+  JMP[NE] @qs1123
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -6180,11 +26472,11 @@ qs267:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs268:
+qs1123:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs269
+  JMP[NE] @qs1124
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -6215,11 +26507,11 @@ qs268:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs269:
+qs1124:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs270
+  JMP[NE] @qs1125
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -6250,11 +26542,11 @@ qs269:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs270:
+qs1125:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs271
+  JMP[NE] @qs1126
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -6285,11 +26577,11 @@ qs270:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs271:
+qs1126:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs272
+  JMP[NE] @qs1127
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -6320,11 +26612,11 @@ qs271:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs272:
+qs1127:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs273
+  JMP[NE] @qs1128
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -6355,11 +26647,11 @@ qs272:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs273:
+qs1128:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs274
+  JMP[NE] @qs1129
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -6390,11 +26682,11 @@ qs273:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs274:
+qs1129:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs275
+  JMP[NE] @qs1130
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -6425,11 +26717,11 @@ qs274:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs275:
+qs1130:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs276
+  JMP[NE] @qs1131
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -6460,11 +26752,11 @@ qs275:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs276:
+qs1131:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs277
+  JMP[NE] @qs1132
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -6479,11 +26771,11 @@ qs276:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs277:
+qs1132:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs278
+  JMP[NE] @qs1133
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -6498,11 +26790,11 @@ qs277:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs278:
+qs1133:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs279
+  JMP[NE] @qs1134
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -6517,11 +26809,11 @@ qs278:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs279:
+qs1134:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs280
+  JMP[NE] @qs1135
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -6536,11 +26828,11 @@ qs279:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs280:
+qs1135:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs281
+  JMP[NE] @qs1136
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -6555,11 +26847,11 @@ qs280:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs281:
+qs1136:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs282
+  JMP[NE] @qs1137
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -6574,11 +26866,11 @@ qs281:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs282:
+qs1137:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs283
+  JMP[NE] @qs1138
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -6593,11 +26885,11 @@ qs282:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs283:
+qs1138:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs284
+  JMP[NE] @qs1139
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -6612,11 +26904,11 @@ qs283:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs284:
+qs1139:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs285
+  JMP[NE] @qs1140
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -6627,11 +26919,11 @@ qs284:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs285:
+qs1140:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs286
+  JMP[NE] @qs1141
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -6642,11 +26934,11 @@ qs285:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs286:
+qs1141:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs287
+  JMP[NE] @qs1142
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -6657,11 +26949,11 @@ qs286:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs287:
+qs1142:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs288
+  JMP[NE] @qs1143
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -6672,11 +26964,11 @@ qs287:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs288:
+qs1143:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs289
+  JMP[NE] @qs1144
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -6687,11 +26979,11 @@ qs288:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs289:
+qs1144:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs290
+  JMP[NE] @qs1145
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -6702,11 +26994,11 @@ qs289:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs290:
+qs1145:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs291
+  JMP[NE] @qs1146
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -6717,11 +27009,11 @@ qs290:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs291:
+qs1146:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs292
+  JMP[NE] @qs1147
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -6732,11 +27024,11 @@ qs291:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs292:
+qs1147:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs293
+  JMP[NE] @qs1148
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -6751,11 +27043,11 @@ qs292:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs293:
+qs1148:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs294
+  JMP[NE] @qs1149
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -6770,11 +27062,11 @@ qs293:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs294:
+qs1149:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs295
+  JMP[NE] @qs1150
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -6789,11 +27081,11 @@ qs294:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs295:
+qs1150:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs296
+  JMP[NE] @qs1151
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -6808,11 +27100,11 @@ qs295:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs296:
+qs1151:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs297
+  JMP[NE] @qs1152
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -6827,11 +27119,11 @@ qs296:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs297:
+qs1152:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs298
+  JMP[NE] @qs1153
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -6846,11 +27138,11 @@ qs297:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs298:
+qs1153:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs299
+  JMP[NE] @qs1154
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -6865,11 +27157,11 @@ qs298:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs299:
+qs1154:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs300
+  JMP[NE] @qs1155
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -6884,11 +27176,11 @@ qs299:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs300:
+qs1155:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs301
+  JMP[NE] @qs1156
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -6919,11 +27211,11 @@ qs300:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs301:
+qs1156:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs302
+  JMP[NE] @qs1157
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -6954,11 +27246,11 @@ qs301:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs302:
+qs1157:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs303
+  JMP[NE] @qs1158
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -6989,11 +27281,11 @@ qs302:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs303:
+qs1158:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs304
+  JMP[NE] @qs1159
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -7024,11 +27316,11 @@ qs303:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs304:
+qs1159:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs305
+  JMP[NE] @qs1160
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -7059,11 +27351,11 @@ qs304:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs305:
+qs1160:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs306
+  JMP[NE] @qs1161
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -7094,11 +27386,11 @@ qs305:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs306:
+qs1161:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs307
+  JMP[NE] @qs1162
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -7129,11 +27421,11 @@ qs306:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs307:
+qs1162:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs308
+  JMP[NE] @qs1163
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -7164,11 +27456,11 @@ qs307:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs308:
+qs1163:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs309
+  JMP[NE] @qs1164
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -7183,11 +27475,11 @@ qs308:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs309:
+qs1164:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs310
+  JMP[NE] @qs1165
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -7202,11 +27494,11 @@ qs309:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs310:
+qs1165:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs311
+  JMP[NE] @qs1166
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -7221,11 +27513,11 @@ qs310:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs311:
+qs1166:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs312
+  JMP[NE] @qs1167
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -7240,11 +27532,11 @@ qs311:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs312:
+qs1167:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs313
+  JMP[NE] @qs1168
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -7259,11 +27551,11 @@ qs312:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs313:
+qs1168:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs314
+  JMP[NE] @qs1169
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -7278,11 +27570,11 @@ qs313:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs314:
+qs1169:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs315
+  JMP[NE] @qs1170
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -7297,11 +27589,11 @@ qs314:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs315:
+qs1170:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs316
+  JMP[NE] @qs1171
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -7316,11 +27608,11 @@ qs315:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs316:
+qs1171:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs317
+  JMP[NE] @qs1172
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -7331,11 +27623,11 @@ qs316:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs317:
+qs1172:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs318
+  JMP[NE] @qs1173
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -7346,11 +27638,11 @@ qs317:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs318:
+qs1173:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs319
+  JMP[NE] @qs1174
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -7361,11 +27653,11 @@ qs318:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs319:
+qs1174:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs320
+  JMP[NE] @qs1175
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -7376,11 +27668,11 @@ qs319:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs320:
+qs1175:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs321
+  JMP[NE] @qs1176
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -7391,11 +27683,11 @@ qs320:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs321:
+qs1176:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs322
+  JMP[NE] @qs1177
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -7406,11 +27698,11 @@ qs321:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs322:
+qs1177:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs323
+  JMP[NE] @qs1178
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -7421,11 +27713,11 @@ qs322:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs323:
+qs1178:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs324
+  JMP[NE] @qs1179
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -7436,11 +27728,11 @@ qs323:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs324:
+qs1179:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs325
+  JMP[NE] @qs1180
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -7455,11 +27747,11 @@ qs324:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs325:
+qs1180:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs326
+  JMP[NE] @qs1181
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -7474,11 +27766,11 @@ qs325:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs326:
+qs1181:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs327
+  JMP[NE] @qs1182
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -7493,11 +27785,11 @@ qs326:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs327:
+qs1182:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs328
+  JMP[NE] @qs1183
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -7512,11 +27804,11 @@ qs327:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs328:
+qs1183:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs329
+  JMP[NE] @qs1184
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -7531,11 +27823,11 @@ qs328:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs329:
+qs1184:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs330
+  JMP[NE] @qs1185
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -7550,11 +27842,11 @@ qs329:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs330:
+qs1185:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs331
+  JMP[NE] @qs1186
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -7569,11 +27861,11 @@ qs330:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs331:
+qs1186:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs332
+  JMP[NE] @qs1187
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -7588,11 +27880,11 @@ qs331:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs332:
+qs1187:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs333
+  JMP[NE] @qs1188
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -7623,11 +27915,11 @@ qs332:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs333:
+qs1188:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs334
+  JMP[NE] @qs1189
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -7658,11 +27950,11 @@ qs333:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs334:
+qs1189:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs335
+  JMP[NE] @qs1190
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -7693,11 +27985,11 @@ qs334:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs335:
+qs1190:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs336
+  JMP[NE] @qs1191
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -7728,11 +28020,11 @@ qs335:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs336:
+qs1191:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs337
+  JMP[NE] @qs1192
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -7763,11 +28055,11 @@ qs336:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs337:
+qs1192:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs338
+  JMP[NE] @qs1193
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -7798,11 +28090,11 @@ qs337:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs338:
+qs1193:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs339
+  JMP[NE] @qs1194
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -7833,11 +28125,11 @@ qs338:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs339:
+qs1194:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs340
+  JMP[NE] @qs1195
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -7868,11 +28160,11 @@ qs339:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs340:
+qs1195:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs341
+  JMP[NE] @qs1196
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -7887,11 +28179,11 @@ qs340:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs341:
+qs1196:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs342
+  JMP[NE] @qs1197
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -7906,11 +28198,11 @@ qs341:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs342:
+qs1197:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs343
+  JMP[NE] @qs1198
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -7925,11 +28217,11 @@ qs342:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs343:
+qs1198:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs344
+  JMP[NE] @qs1199
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -7944,11 +28236,11 @@ qs343:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs344:
+qs1199:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs345
+  JMP[NE] @qs1200
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -7963,11 +28255,11 @@ qs344:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs345:
+qs1200:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs346
+  JMP[NE] @qs1201
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -7982,11 +28274,11 @@ qs345:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs346:
+qs1201:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs347
+  JMP[NE] @qs1202
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -8001,11 +28293,11 @@ qs346:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs347:
+qs1202:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs348
+  JMP[NE] @qs1203
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -8020,11 +28312,11 @@ qs347:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs348:
+qs1203:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs349
+  JMP[NE] @qs1204
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -8035,11 +28327,11 @@ qs348:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs349:
+qs1204:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs350
+  JMP[NE] @qs1205
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -8050,11 +28342,11 @@ qs349:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs350:
+qs1205:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs351
+  JMP[NE] @qs1206
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -8065,11 +28357,11 @@ qs350:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs351:
+qs1206:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs352
+  JMP[NE] @qs1207
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -8080,11 +28372,11 @@ qs351:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs352:
+qs1207:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs353
+  JMP[NE] @qs1208
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -8095,11 +28387,11 @@ qs352:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs353:
+qs1208:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs354
+  JMP[NE] @qs1209
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -8110,11 +28402,11 @@ qs353:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs354:
+qs1209:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs355
+  JMP[NE] @qs1210
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -8125,11 +28417,11 @@ qs354:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs355:
+qs1210:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs356
+  JMP[NE] @qs1211
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -8140,11 +28432,11 @@ qs355:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs356:
+qs1211:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs357
+  JMP[NE] @qs1212
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -8159,11 +28451,11 @@ qs356:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs357:
+qs1212:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs358
+  JMP[NE] @qs1213
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -8178,11 +28470,11 @@ qs357:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs358:
+qs1213:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs359
+  JMP[NE] @qs1214
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -8197,11 +28489,11 @@ qs358:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs359:
+qs1214:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs360
+  JMP[NE] @qs1215
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -8216,11 +28508,11 @@ qs359:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs360:
+qs1215:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs361
+  JMP[NE] @qs1216
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -8235,11 +28527,11 @@ qs360:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs361:
+qs1216:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs362
+  JMP[NE] @qs1217
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -8254,11 +28546,11 @@ qs361:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs362:
+qs1217:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs363
+  JMP[NE] @qs1218
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -8273,11 +28565,11 @@ qs362:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs363:
+qs1218:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs364
+  JMP[NE] @qs1219
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -8292,11 +28584,11 @@ qs363:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs364:
+qs1219:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs365
+  JMP[NE] @qs1220
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -8327,11 +28619,11 @@ qs364:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs365:
+qs1220:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs366
+  JMP[NE] @qs1221
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -8362,11 +28654,11 @@ qs365:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs366:
+qs1221:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs367
+  JMP[NE] @qs1222
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -8397,11 +28689,11 @@ qs366:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs367:
+qs1222:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs368
+  JMP[NE] @qs1223
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -8432,11 +28724,11 @@ qs367:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs368:
+qs1223:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs369
+  JMP[NE] @qs1224
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -8467,11 +28759,11 @@ qs368:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs369:
+qs1224:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs370
+  JMP[NE] @qs1225
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -8502,11 +28794,11 @@ qs369:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs370:
+qs1225:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs371
+  JMP[NE] @qs1226
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -8537,11 +28829,11 @@ qs370:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs371:
+qs1226:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs372
+  JMP[NE] @qs1227
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -8572,11 +28864,11 @@ qs371:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs372:
+qs1227:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs373
+  JMP[NE] @qs1228
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -8591,11 +28883,11 @@ qs372:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs373:
+qs1228:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs374
+  JMP[NE] @qs1229
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -8610,11 +28902,11 @@ qs373:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs374:
+qs1229:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs375
+  JMP[NE] @qs1230
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -8629,11 +28921,11 @@ qs374:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs375:
+qs1230:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs376
+  JMP[NE] @qs1231
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -8648,11 +28940,11 @@ qs375:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs376:
+qs1231:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs377
+  JMP[NE] @qs1232
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -8667,11 +28959,11 @@ qs376:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs377:
+qs1232:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs378
+  JMP[NE] @qs1233
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -8686,11 +28978,11 @@ qs377:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs378:
+qs1233:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs379
+  JMP[NE] @qs1234
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -8705,11 +28997,11 @@ qs378:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs379:
+qs1234:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs380
+  JMP[NE] @qs1235
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -8724,11 +29016,11 @@ qs379:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs380:
+qs1235:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs381
+  JMP[NE] @qs1236
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -8739,11 +29031,11 @@ qs380:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs381:
+qs1236:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs382
+  JMP[NE] @qs1237
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -8754,11 +29046,11 @@ qs381:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs382:
+qs1237:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs383
+  JMP[NE] @qs1238
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -8769,11 +29061,11 @@ qs382:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs383:
+qs1238:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs384
+  JMP[NE] @qs1239
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -8784,11 +29076,11 @@ qs383:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs384:
+qs1239:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs385
+  JMP[NE] @qs1240
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -8799,11 +29091,11 @@ qs384:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs385:
+qs1240:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs386
+  JMP[NE] @qs1241
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -8814,11 +29106,11 @@ qs385:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs386:
+qs1241:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs387
+  JMP[NE] @qs1242
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -8829,11 +29121,11 @@ qs386:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs387:
+qs1242:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs388
+  JMP[NE] @qs1243
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -8844,9 +29136,9 @@ qs387:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs388:
+qs1243:
   MOVI r9,0
-lr389:
+lr1244:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -8858,7 +29150,7 @@ lr389:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr389
+  JMP[LT] @lr1244
   LD r3,r14,122
   ST r3,r14,0
   LD r3,r14,123
@@ -8894,7 +29186,7 @@ lr389:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs390
+  JMP[NE] @qs1245
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -8909,11 +29201,11 @@ lr389:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs390:
+qs1245:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs391
+  JMP[NE] @qs1246
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -8928,11 +29220,11 @@ qs390:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs391:
+qs1246:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs392
+  JMP[NE] @qs1247
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -8947,11 +29239,11 @@ qs391:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs392:
+qs1247:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs393
+  JMP[NE] @qs1248
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -8966,11 +29258,11 @@ qs392:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs393:
+qs1248:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs394
+  JMP[NE] @qs1249
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -8985,11 +29277,11 @@ qs393:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs394:
+qs1249:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs395
+  JMP[NE] @qs1250
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -9004,11 +29296,11 @@ qs394:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs395:
+qs1250:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs396
+  JMP[NE] @qs1251
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -9023,11 +29315,11 @@ qs395:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs396:
+qs1251:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs397
+  JMP[NE] @qs1252
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -9042,11 +29334,11 @@ qs396:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs397:
+qs1252:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs398
+  JMP[NE] @qs1253
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -9077,11 +29369,11 @@ qs397:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs398:
+qs1253:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs399
+  JMP[NE] @qs1254
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -9112,11 +29404,11 @@ qs398:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs399:
+qs1254:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs400
+  JMP[NE] @qs1255
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -9147,11 +29439,11 @@ qs399:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs400:
+qs1255:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs401
+  JMP[NE] @qs1256
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -9182,11 +29474,11 @@ qs400:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs401:
+qs1256:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs402
+  JMP[NE] @qs1257
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -9217,11 +29509,11 @@ qs401:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs402:
+qs1257:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs403
+  JMP[NE] @qs1258
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -9252,11 +29544,11 @@ qs402:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs403:
+qs1258:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs404
+  JMP[NE] @qs1259
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -9287,11 +29579,11 @@ qs403:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs404:
+qs1259:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs405
+  JMP[NE] @qs1260
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -9322,11 +29614,11 @@ qs404:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs405:
+qs1260:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs406
+  JMP[NE] @qs1261
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -9341,11 +29633,11 @@ qs405:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs406:
+qs1261:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs407
+  JMP[NE] @qs1262
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -9360,11 +29652,11 @@ qs406:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs407:
+qs1262:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs408
+  JMP[NE] @qs1263
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -9379,11 +29671,11 @@ qs407:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs408:
+qs1263:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs409
+  JMP[NE] @qs1264
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -9398,11 +29690,11 @@ qs408:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs409:
+qs1264:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs410
+  JMP[NE] @qs1265
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -9417,11 +29709,11 @@ qs409:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs410:
+qs1265:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs411
+  JMP[NE] @qs1266
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -9436,11 +29728,11 @@ qs410:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs411:
+qs1266:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs412
+  JMP[NE] @qs1267
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -9455,11 +29747,11 @@ qs411:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs412:
+qs1267:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs413
+  JMP[NE] @qs1268
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -9474,11 +29766,11 @@ qs412:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs413:
+qs1268:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs414
+  JMP[NE] @qs1269
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -9489,11 +29781,11 @@ qs413:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs414:
+qs1269:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs415
+  JMP[NE] @qs1270
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -9504,11 +29796,11 @@ qs414:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs415:
+qs1270:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs416
+  JMP[NE] @qs1271
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -9519,11 +29811,11 @@ qs415:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs416:
+qs1271:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs417
+  JMP[NE] @qs1272
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -9534,11 +29826,11 @@ qs416:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs417:
+qs1272:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs418
+  JMP[NE] @qs1273
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -9549,11 +29841,11 @@ qs417:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs418:
+qs1273:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs419
+  JMP[NE] @qs1274
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -9564,11 +29856,11 @@ qs418:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs419:
+qs1274:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs420
+  JMP[NE] @qs1275
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -9579,11 +29871,11 @@ qs419:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs420:
+qs1275:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs421
+  JMP[NE] @qs1276
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -9594,11 +29886,11 @@ qs420:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs421:
+qs1276:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs422
+  JMP[NE] @qs1277
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -9613,11 +29905,11 @@ qs421:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs422:
+qs1277:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs423
+  JMP[NE] @qs1278
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -9632,11 +29924,11 @@ qs422:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs423:
+qs1278:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs424
+  JMP[NE] @qs1279
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -9651,11 +29943,11 @@ qs423:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs424:
+qs1279:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs425
+  JMP[NE] @qs1280
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -9670,11 +29962,11 @@ qs424:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs425:
+qs1280:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs426
+  JMP[NE] @qs1281
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -9689,11 +29981,11 @@ qs425:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs426:
+qs1281:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs427
+  JMP[NE] @qs1282
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -9708,11 +30000,11 @@ qs426:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs427:
+qs1282:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs428
+  JMP[NE] @qs1283
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -9727,11 +30019,11 @@ qs427:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs428:
+qs1283:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs429
+  JMP[NE] @qs1284
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -9746,11 +30038,11 @@ qs428:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs429:
+qs1284:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs430
+  JMP[NE] @qs1285
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -9781,11 +30073,11 @@ qs429:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs430:
+qs1285:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs431
+  JMP[NE] @qs1286
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -9816,11 +30108,11 @@ qs430:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs431:
+qs1286:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs432
+  JMP[NE] @qs1287
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -9851,11 +30143,11 @@ qs431:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs432:
+qs1287:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs433
+  JMP[NE] @qs1288
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -9886,11 +30178,11 @@ qs432:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs433:
+qs1288:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs434
+  JMP[NE] @qs1289
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -9921,11 +30213,11 @@ qs433:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs434:
+qs1289:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs435
+  JMP[NE] @qs1290
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -9956,11 +30248,11 @@ qs434:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs435:
+qs1290:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs436
+  JMP[NE] @qs1291
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -9991,11 +30283,11 @@ qs435:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs436:
+qs1291:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs437
+  JMP[NE] @qs1292
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -10026,11 +30318,11 @@ qs436:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs437:
+qs1292:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs438
+  JMP[NE] @qs1293
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -10045,11 +30337,11 @@ qs437:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs438:
+qs1293:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs439
+  JMP[NE] @qs1294
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -10064,11 +30356,11 @@ qs438:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs439:
+qs1294:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs440
+  JMP[NE] @qs1295
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -10083,11 +30375,11 @@ qs439:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs440:
+qs1295:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs441
+  JMP[NE] @qs1296
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -10102,11 +30394,11 @@ qs440:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs441:
+qs1296:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs442
+  JMP[NE] @qs1297
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -10121,11 +30413,11 @@ qs441:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs442:
+qs1297:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs443
+  JMP[NE] @qs1298
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -10140,11 +30432,11 @@ qs442:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs443:
+qs1298:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs444
+  JMP[NE] @qs1299
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -10159,11 +30451,11 @@ qs443:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs444:
+qs1299:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs445
+  JMP[NE] @qs1300
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -10178,11 +30470,11 @@ qs444:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs445:
+qs1300:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs446
+  JMP[NE] @qs1301
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -10193,11 +30485,11 @@ qs445:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs446:
+qs1301:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs447
+  JMP[NE] @qs1302
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -10208,11 +30500,11 @@ qs446:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs447:
+qs1302:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs448
+  JMP[NE] @qs1303
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -10223,11 +30515,11 @@ qs447:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs448:
+qs1303:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs449
+  JMP[NE] @qs1304
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -10238,11 +30530,11 @@ qs448:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs449:
+qs1304:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs450
+  JMP[NE] @qs1305
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -10253,11 +30545,11 @@ qs449:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs450:
+qs1305:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs451
+  JMP[NE] @qs1306
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -10268,11 +30560,11 @@ qs450:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs451:
+qs1306:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs452
+  JMP[NE] @qs1307
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -10283,11 +30575,11 @@ qs451:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs452:
+qs1307:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs453
+  JMP[NE] @qs1308
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -10298,11 +30590,11 @@ qs452:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs453:
+qs1308:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs454
+  JMP[NE] @qs1309
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -10317,11 +30609,11 @@ qs453:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs454:
+qs1309:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs455
+  JMP[NE] @qs1310
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -10336,11 +30628,11 @@ qs454:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs455:
+qs1310:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs456
+  JMP[NE] @qs1311
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -10355,11 +30647,11 @@ qs455:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs456:
+qs1311:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs457
+  JMP[NE] @qs1312
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -10374,11 +30666,11 @@ qs456:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs457:
+qs1312:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs458
+  JMP[NE] @qs1313
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -10393,11 +30685,11 @@ qs457:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs458:
+qs1313:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs459
+  JMP[NE] @qs1314
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -10412,11 +30704,11 @@ qs458:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs459:
+qs1314:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs460
+  JMP[NE] @qs1315
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -10431,11 +30723,11 @@ qs459:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs460:
+qs1315:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs461
+  JMP[NE] @qs1316
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -10450,11 +30742,11 @@ qs460:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs461:
+qs1316:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs462
+  JMP[NE] @qs1317
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -10485,11 +30777,11 @@ qs461:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs462:
+qs1317:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs463
+  JMP[NE] @qs1318
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -10520,11 +30812,11 @@ qs462:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs463:
+qs1318:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs464
+  JMP[NE] @qs1319
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -10555,11 +30847,11 @@ qs463:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs464:
+qs1319:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs465
+  JMP[NE] @qs1320
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -10590,11 +30882,11 @@ qs464:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs465:
+qs1320:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs466
+  JMP[NE] @qs1321
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -10625,11 +30917,11 @@ qs465:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs466:
+qs1321:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs467
+  JMP[NE] @qs1322
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -10660,11 +30952,11 @@ qs466:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs467:
+qs1322:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs468
+  JMP[NE] @qs1323
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -10695,11 +30987,11 @@ qs467:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs468:
+qs1323:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs469
+  JMP[NE] @qs1324
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -10730,11 +31022,11 @@ qs468:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs469:
+qs1324:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs470
+  JMP[NE] @qs1325
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -10749,11 +31041,11 @@ qs469:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs470:
+qs1325:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs471
+  JMP[NE] @qs1326
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -10768,11 +31060,11 @@ qs470:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs471:
+qs1326:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs472
+  JMP[NE] @qs1327
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -10787,11 +31079,11 @@ qs471:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs472:
+qs1327:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs473
+  JMP[NE] @qs1328
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -10806,11 +31098,11 @@ qs472:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs473:
+qs1328:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs474
+  JMP[NE] @qs1329
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -10825,11 +31117,11 @@ qs473:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs474:
+qs1329:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs475
+  JMP[NE] @qs1330
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -10844,11 +31136,11 @@ qs474:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs475:
+qs1330:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs476
+  JMP[NE] @qs1331
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -10863,11 +31155,11 @@ qs475:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs476:
+qs1331:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs477
+  JMP[NE] @qs1332
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -10882,11 +31174,11 @@ qs476:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs477:
+qs1332:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs478
+  JMP[NE] @qs1333
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -10897,11 +31189,11 @@ qs477:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs478:
+qs1333:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs479
+  JMP[NE] @qs1334
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -10912,11 +31204,11 @@ qs478:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs479:
+qs1334:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs480
+  JMP[NE] @qs1335
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -10927,11 +31219,11 @@ qs479:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs480:
+qs1335:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs481
+  JMP[NE] @qs1336
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -10942,11 +31234,11 @@ qs480:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs481:
+qs1336:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs482
+  JMP[NE] @qs1337
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -10957,11 +31249,11 @@ qs481:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs482:
+qs1337:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs483
+  JMP[NE] @qs1338
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -10972,11 +31264,11 @@ qs482:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs483:
+qs1338:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs484
+  JMP[NE] @qs1339
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -10987,11 +31279,11 @@ qs483:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs484:
+qs1339:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs485
+  JMP[NE] @qs1340
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -11002,11 +31294,11 @@ qs484:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs485:
+qs1340:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs486
+  JMP[NE] @qs1341
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -11021,11 +31313,11 @@ qs485:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs486:
+qs1341:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs487
+  JMP[NE] @qs1342
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -11040,11 +31332,11 @@ qs486:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs487:
+qs1342:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs488
+  JMP[NE] @qs1343
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -11059,11 +31351,11 @@ qs487:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs488:
+qs1343:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs489
+  JMP[NE] @qs1344
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -11078,11 +31370,11 @@ qs488:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs489:
+qs1344:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs490
+  JMP[NE] @qs1345
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -11097,11 +31389,11 @@ qs489:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs490:
+qs1345:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs491
+  JMP[NE] @qs1346
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -11116,11 +31408,11 @@ qs490:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs491:
+qs1346:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs492
+  JMP[NE] @qs1347
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -11135,11 +31427,11 @@ qs491:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs492:
+qs1347:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs493
+  JMP[NE] @qs1348
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -11154,11 +31446,11 @@ qs492:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs493:
+qs1348:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs494
+  JMP[NE] @qs1349
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -11189,11 +31481,11 @@ qs493:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs494:
+qs1349:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs495
+  JMP[NE] @qs1350
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -11224,11 +31516,11 @@ qs494:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs495:
+qs1350:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs496
+  JMP[NE] @qs1351
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -11259,11 +31551,11 @@ qs495:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs496:
+qs1351:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs497
+  JMP[NE] @qs1352
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -11294,11 +31586,11 @@ qs496:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs497:
+qs1352:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs498
+  JMP[NE] @qs1353
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -11329,11 +31621,11 @@ qs497:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs498:
+qs1353:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs499
+  JMP[NE] @qs1354
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -11364,11 +31656,11 @@ qs498:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs499:
+qs1354:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs500
+  JMP[NE] @qs1355
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -11399,11 +31691,11 @@ qs499:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs500:
+qs1355:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs501
+  JMP[NE] @qs1356
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -11434,11 +31726,11 @@ qs500:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs501:
+qs1356:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs502
+  JMP[NE] @qs1357
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -11453,11 +31745,11 @@ qs501:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs502:
+qs1357:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs503
+  JMP[NE] @qs1358
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -11472,11 +31764,11 @@ qs502:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs503:
+qs1358:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs504
+  JMP[NE] @qs1359
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -11491,11 +31783,11 @@ qs503:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs504:
+qs1359:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs505
+  JMP[NE] @qs1360
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -11510,11 +31802,11 @@ qs504:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs505:
+qs1360:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs506
+  JMP[NE] @qs1361
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -11529,11 +31821,11 @@ qs505:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs506:
+qs1361:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs507
+  JMP[NE] @qs1362
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -11548,11 +31840,11 @@ qs506:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs507:
+qs1362:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs508
+  JMP[NE] @qs1363
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -11567,11 +31859,11 @@ qs507:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs508:
+qs1363:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs509
+  JMP[NE] @qs1364
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -11586,11 +31878,11 @@ qs508:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs509:
+qs1364:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs510
+  JMP[NE] @qs1365
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -11601,11 +31893,11 @@ qs509:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs510:
+qs1365:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs511
+  JMP[NE] @qs1366
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -11616,11 +31908,11 @@ qs510:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs511:
+qs1366:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs512
+  JMP[NE] @qs1367
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -11631,11 +31923,11 @@ qs511:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs512:
+qs1367:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs513
+  JMP[NE] @qs1368
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -11646,11 +31938,11 @@ qs512:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs513:
+qs1368:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs514
+  JMP[NE] @qs1369
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -11661,11 +31953,11 @@ qs513:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs514:
+qs1369:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs515
+  JMP[NE] @qs1370
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -11676,11 +31968,11 @@ qs514:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs515:
+qs1370:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs516
+  JMP[NE] @qs1371
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -11691,11 +31983,11 @@ qs515:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs516:
+qs1371:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs517
+  JMP[NE] @qs1372
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -11706,9 +31998,9 @@ qs516:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs517:
+qs1372:
   MOVI r9,0
-lr518:
+lr1373:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -11720,7 +32012,7 @@ lr518:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr518
+  JMP[LT] @lr1373
   LD r3,r14,126
   ST r3,r14,0
   LD r3,r14,127
@@ -11754,7 +32046,7 @@ lr518:
   LD r3,r14,133
   ST r3,r14,15
   MOVI r6,0
-sv2519:
+sv21374:
   MOVI r2,0
   ADD r1,r2,r6
   ADD r1,r14,r1
@@ -11766,7 +32058,7 @@ sv2519:
   ADDI r6,r6,1
   MOVI r2,16
   CMP r6,r2
-  JMP[LT] @sv2519
+  JMP[LT] @sv21374
   MOVI r1,83
   PUTC r1
   MOVI r1,49
@@ -11774,12 +32066,12 @@ sv2519:
   MOVI r1,32
   PUTC r1
   MOVI r9,0
-dd520:
+dd1375:
   CMP r9,r0
-  JMP[EQ] @nn521
+  JMP[EQ] @nn1376
   MOVI r1,32
   PUTC r1
-nn521:
+nn1376:
   ADDI r7,r9,0
   ADD r7,r7,r9
   MOVI r2,80
@@ -11796,7 +32088,7 @@ nn521:
   ADDI r9,r9,1
   MOVI r2,8
   CMP r9,r2
-  JMP[LT] @dd520
+  JMP[LT] @dd1375
   CALL @nl
   MOVI r1,83
   PUTC r1
@@ -11805,12 +32097,12 @@ nn521:
   MOVI r1,32
   PUTC r1
   MOVI r9,0
-dd522:
+dd1377:
   CMP r9,r0
-  JMP[EQ] @nn523
+  JMP[EQ] @nn1378
   MOVI r1,32
   PUTC r1
-nn523:
+nn1378:
   ADDI r7,r9,0
   ADD r7,r7,r9
   MOVI r2,96
@@ -11827,10 +32119,10 @@ nn523:
   ADDI r9,r9,1
   MOVI r2,8
   CMP r9,r2
-  JMP[LT] @dd522
+  JMP[LT] @dd1377
   CALL @nl
   MOVI r9,0
-lr524:
+lr1379:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -11842,7 +32134,7 @@ lr524:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr524
+  JMP[LT] @lr1379
   LD r3,r14,122
   ST r3,r14,0
   LD r3,r14,123
@@ -11878,7 +32170,7 @@ lr524:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs525
+  JMP[NE] @qs1380
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -11889,11 +32181,11 @@ lr524:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs525:
+qs1380:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs526
+  JMP[NE] @qs1381
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -11904,11 +32196,11 @@ qs525:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs526:
+qs1381:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs527
+  JMP[NE] @qs1382
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -11919,11 +32211,11 @@ qs526:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs527:
+qs1382:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs528
+  JMP[NE] @qs1383
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -11934,11 +32226,11 @@ qs527:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs528:
+qs1383:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs529
+  JMP[NE] @qs1384
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -11949,11 +32241,11 @@ qs528:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs529:
+qs1384:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs530
+  JMP[NE] @qs1385
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -11964,11 +32256,11 @@ qs529:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs530:
+qs1385:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs531
+  JMP[NE] @qs1386
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -11979,11 +32271,11 @@ qs530:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs531:
+qs1386:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs532
+  JMP[NE] @qs1387
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -11994,11 +32286,11 @@ qs531:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs532:
+qs1387:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs533
+  JMP[NE] @qs1388
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -12013,11 +32305,11 @@ qs532:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs533:
+qs1388:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs534
+  JMP[NE] @qs1389
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -12032,11 +32324,11 @@ qs533:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs534:
+qs1389:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs535
+  JMP[NE] @qs1390
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -12051,11 +32343,11 @@ qs534:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs535:
+qs1390:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs536
+  JMP[NE] @qs1391
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -12070,11 +32362,11 @@ qs535:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs536:
+qs1391:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs537
+  JMP[NE] @qs1392
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -12089,11 +32381,11 @@ qs536:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs537:
+qs1392:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs538
+  JMP[NE] @qs1393
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -12108,11 +32400,11 @@ qs537:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs538:
+qs1393:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs539
+  JMP[NE] @qs1394
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -12127,11 +32419,11 @@ qs538:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs539:
+qs1394:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs540
+  JMP[NE] @qs1395
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -12146,11 +32438,11 @@ qs539:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs540:
+qs1395:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs541
+  JMP[NE] @qs1396
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -12181,11 +32473,11 @@ qs540:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs541:
+qs1396:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs542
+  JMP[NE] @qs1397
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -12216,11 +32508,11 @@ qs541:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs542:
+qs1397:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs543
+  JMP[NE] @qs1398
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -12251,11 +32543,11 @@ qs542:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs543:
+qs1398:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs544
+  JMP[NE] @qs1399
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -12286,11 +32578,11 @@ qs543:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs544:
+qs1399:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs545
+  JMP[NE] @qs1400
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -12321,11 +32613,11 @@ qs544:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs545:
+qs1400:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs546
+  JMP[NE] @qs1401
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -12356,11 +32648,11 @@ qs545:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs546:
+qs1401:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs547
+  JMP[NE] @qs1402
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -12391,11 +32683,11 @@ qs546:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs547:
+qs1402:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs548
+  JMP[NE] @qs1403
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -12426,11 +32718,11 @@ qs547:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs548:
+qs1403:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs549
+  JMP[NE] @qs1404
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -12445,11 +32737,11 @@ qs548:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs549:
+qs1404:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs550
+  JMP[NE] @qs1405
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -12464,11 +32756,11 @@ qs549:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs550:
+qs1405:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs551
+  JMP[NE] @qs1406
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -12483,11 +32775,11 @@ qs550:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs551:
+qs1406:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs552
+  JMP[NE] @qs1407
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -12502,11 +32794,11 @@ qs551:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs552:
+qs1407:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs553
+  JMP[NE] @qs1408
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -12521,11 +32813,11 @@ qs552:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs553:
+qs1408:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs554
+  JMP[NE] @qs1409
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -12540,11 +32832,11 @@ qs553:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs554:
+qs1409:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs555
+  JMP[NE] @qs1410
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -12559,11 +32851,11 @@ qs554:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs555:
+qs1410:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs556
+  JMP[NE] @qs1411
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -12578,11 +32870,11 @@ qs555:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs556:
+qs1411:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs557
+  JMP[NE] @qs1412
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -12593,11 +32885,11 @@ qs556:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs557:
+qs1412:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs558
+  JMP[NE] @qs1413
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -12608,11 +32900,11 @@ qs557:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs558:
+qs1413:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs559
+  JMP[NE] @qs1414
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -12623,11 +32915,11 @@ qs558:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs559:
+qs1414:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs560
+  JMP[NE] @qs1415
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -12638,11 +32930,11 @@ qs559:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs560:
+qs1415:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs561
+  JMP[NE] @qs1416
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -12653,11 +32945,11 @@ qs560:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs561:
+qs1416:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs562
+  JMP[NE] @qs1417
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -12668,11 +32960,11 @@ qs561:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs562:
+qs1417:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs563
+  JMP[NE] @qs1418
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -12683,11 +32975,11 @@ qs562:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs563:
+qs1418:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs564
+  JMP[NE] @qs1419
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -12698,11 +32990,11 @@ qs563:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs564:
+qs1419:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs565
+  JMP[NE] @qs1420
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -12717,11 +33009,11 @@ qs564:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs565:
+qs1420:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs566
+  JMP[NE] @qs1421
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -12736,11 +33028,11 @@ qs565:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs566:
+qs1421:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs567
+  JMP[NE] @qs1422
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -12755,11 +33047,11 @@ qs566:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs567:
+qs1422:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs568
+  JMP[NE] @qs1423
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -12774,11 +33066,11 @@ qs567:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs568:
+qs1423:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs569
+  JMP[NE] @qs1424
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -12793,11 +33085,11 @@ qs568:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs569:
+qs1424:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs570
+  JMP[NE] @qs1425
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -12812,11 +33104,11 @@ qs569:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs570:
+qs1425:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs571
+  JMP[NE] @qs1426
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -12831,11 +33123,11 @@ qs570:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs571:
+qs1426:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs572
+  JMP[NE] @qs1427
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -12850,11 +33142,11 @@ qs571:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs572:
+qs1427:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs573
+  JMP[NE] @qs1428
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -12885,11 +33177,11 @@ qs572:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs573:
+qs1428:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs574
+  JMP[NE] @qs1429
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -12920,11 +33212,11 @@ qs573:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs574:
+qs1429:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs575
+  JMP[NE] @qs1430
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -12955,11 +33247,11 @@ qs574:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs575:
+qs1430:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs576
+  JMP[NE] @qs1431
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -12990,11 +33282,11 @@ qs575:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs576:
+qs1431:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs577
+  JMP[NE] @qs1432
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -13025,11 +33317,11 @@ qs576:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs577:
+qs1432:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs578
+  JMP[NE] @qs1433
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -13060,11 +33352,11 @@ qs577:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs578:
+qs1433:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs579
+  JMP[NE] @qs1434
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -13095,11 +33387,11 @@ qs578:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs579:
+qs1434:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs580
+  JMP[NE] @qs1435
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -13130,11 +33422,11 @@ qs579:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs580:
+qs1435:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs581
+  JMP[NE] @qs1436
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -13149,11 +33441,11 @@ qs580:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs581:
+qs1436:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs582
+  JMP[NE] @qs1437
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -13168,11 +33460,11 @@ qs581:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs582:
+qs1437:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs583
+  JMP[NE] @qs1438
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -13187,11 +33479,11 @@ qs582:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs583:
+qs1438:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs584
+  JMP[NE] @qs1439
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -13206,11 +33498,11 @@ qs583:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs584:
+qs1439:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs585
+  JMP[NE] @qs1440
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -13225,11 +33517,11 @@ qs584:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs585:
+qs1440:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs586
+  JMP[NE] @qs1441
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -13244,11 +33536,11 @@ qs585:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs586:
+qs1441:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs587
+  JMP[NE] @qs1442
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -13263,11 +33555,11 @@ qs586:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs587:
+qs1442:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs588
+  JMP[NE] @qs1443
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -13282,11 +33574,11 @@ qs587:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs588:
+qs1443:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs589
+  JMP[NE] @qs1444
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -13297,11 +33589,11 @@ qs588:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs589:
+qs1444:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs590
+  JMP[NE] @qs1445
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -13312,11 +33604,11 @@ qs589:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs590:
+qs1445:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs591
+  JMP[NE] @qs1446
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -13327,11 +33619,11 @@ qs590:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs591:
+qs1446:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs592
+  JMP[NE] @qs1447
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -13342,11 +33634,11 @@ qs591:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs592:
+qs1447:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs593
+  JMP[NE] @qs1448
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -13357,11 +33649,11 @@ qs592:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs593:
+qs1448:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs594
+  JMP[NE] @qs1449
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -13372,11 +33664,11 @@ qs593:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs594:
+qs1449:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs595
+  JMP[NE] @qs1450
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -13387,11 +33679,11 @@ qs594:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs595:
+qs1450:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs596
+  JMP[NE] @qs1451
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -13402,11 +33694,11 @@ qs595:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs596:
+qs1451:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs597
+  JMP[NE] @qs1452
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -13421,11 +33713,11 @@ qs596:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs597:
+qs1452:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs598
+  JMP[NE] @qs1453
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -13440,11 +33732,11 @@ qs597:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs598:
+qs1453:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs599
+  JMP[NE] @qs1454
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -13459,11 +33751,11 @@ qs598:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs599:
+qs1454:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs600
+  JMP[NE] @qs1455
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -13478,11 +33770,11 @@ qs599:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs600:
+qs1455:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs601
+  JMP[NE] @qs1456
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -13497,11 +33789,11 @@ qs600:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs601:
+qs1456:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs602
+  JMP[NE] @qs1457
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -13516,11 +33808,11 @@ qs601:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs602:
+qs1457:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs603
+  JMP[NE] @qs1458
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -13535,11 +33827,11 @@ qs602:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs603:
+qs1458:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs604
+  JMP[NE] @qs1459
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -13554,11 +33846,11 @@ qs603:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs604:
+qs1459:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs605
+  JMP[NE] @qs1460
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -13589,11 +33881,11 @@ qs604:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs605:
+qs1460:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs606
+  JMP[NE] @qs1461
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -13624,11 +33916,11 @@ qs605:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs606:
+qs1461:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs607
+  JMP[NE] @qs1462
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -13659,11 +33951,11 @@ qs606:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs607:
+qs1462:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs608
+  JMP[NE] @qs1463
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -13694,11 +33986,11 @@ qs607:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs608:
+qs1463:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs609
+  JMP[NE] @qs1464
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -13729,11 +34021,11 @@ qs608:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs609:
+qs1464:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs610
+  JMP[NE] @qs1465
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -13764,11 +34056,11 @@ qs609:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs610:
+qs1465:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs611
+  JMP[NE] @qs1466
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -13799,11 +34091,11 @@ qs610:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs611:
+qs1466:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs612
+  JMP[NE] @qs1467
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -13834,11 +34126,11 @@ qs611:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs612:
+qs1467:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs613
+  JMP[NE] @qs1468
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -13853,11 +34145,11 @@ qs612:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs613:
+qs1468:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs614
+  JMP[NE] @qs1469
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -13872,11 +34164,11 @@ qs613:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs614:
+qs1469:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs615
+  JMP[NE] @qs1470
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -13891,11 +34183,11 @@ qs614:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs615:
+qs1470:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs616
+  JMP[NE] @qs1471
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -13910,11 +34202,11 @@ qs615:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs616:
+qs1471:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs617
+  JMP[NE] @qs1472
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -13929,11 +34221,11 @@ qs616:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs617:
+qs1472:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs618
+  JMP[NE] @qs1473
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -13948,11 +34240,11 @@ qs617:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs618:
+qs1473:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs619
+  JMP[NE] @qs1474
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -13967,11 +34259,11 @@ qs618:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs619:
+qs1474:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs620
+  JMP[NE] @qs1475
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -13986,11 +34278,11 @@ qs619:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs620:
+qs1475:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs621
+  JMP[NE] @qs1476
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -14001,11 +34293,11 @@ qs620:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs621:
+qs1476:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs622
+  JMP[NE] @qs1477
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -14016,11 +34308,11 @@ qs621:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs622:
+qs1477:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs623
+  JMP[NE] @qs1478
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -14031,11 +34323,11 @@ qs622:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs623:
+qs1478:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs624
+  JMP[NE] @qs1479
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -14046,11 +34338,11 @@ qs623:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs624:
+qs1479:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs625
+  JMP[NE] @qs1480
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -14061,11 +34353,11 @@ qs624:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs625:
+qs1480:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs626
+  JMP[NE] @qs1481
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -14076,11 +34368,11 @@ qs625:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs626:
+qs1481:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs627
+  JMP[NE] @qs1482
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -14091,11 +34383,11 @@ qs626:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs627:
+qs1482:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs628
+  JMP[NE] @qs1483
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -14106,11 +34398,11 @@ qs627:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs628:
+qs1483:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs629
+  JMP[NE] @qs1484
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -14125,11 +34417,11 @@ qs628:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs629:
+qs1484:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs630
+  JMP[NE] @qs1485
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -14144,11 +34436,11 @@ qs629:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs630:
+qs1485:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs631
+  JMP[NE] @qs1486
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -14163,11 +34455,11 @@ qs630:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs631:
+qs1486:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs632
+  JMP[NE] @qs1487
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -14182,11 +34474,11 @@ qs631:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs632:
+qs1487:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs633
+  JMP[NE] @qs1488
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -14201,11 +34493,11 @@ qs632:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs633:
+qs1488:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs634
+  JMP[NE] @qs1489
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -14220,11 +34512,11 @@ qs633:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs634:
+qs1489:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs635
+  JMP[NE] @qs1490
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -14239,11 +34531,11 @@ qs634:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs635:
+qs1490:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs636
+  JMP[NE] @qs1491
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -14258,11 +34550,11 @@ qs635:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs636:
+qs1491:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs637
+  JMP[NE] @qs1492
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -14293,11 +34585,11 @@ qs636:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs637:
+qs1492:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs638
+  JMP[NE] @qs1493
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -14328,11 +34620,11 @@ qs637:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs638:
+qs1493:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs639
+  JMP[NE] @qs1494
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -14363,11 +34655,11 @@ qs638:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs639:
+qs1494:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs640
+  JMP[NE] @qs1495
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -14398,11 +34690,11 @@ qs639:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs640:
+qs1495:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs641
+  JMP[NE] @qs1496
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -14433,11 +34725,11 @@ qs640:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs641:
+qs1496:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs642
+  JMP[NE] @qs1497
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -14468,11 +34760,11 @@ qs641:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs642:
+qs1497:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs643
+  JMP[NE] @qs1498
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -14503,11 +34795,11 @@ qs642:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs643:
+qs1498:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs644
+  JMP[NE] @qs1499
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -14538,11 +34830,11 @@ qs643:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs644:
+qs1499:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs645
+  JMP[NE] @qs1500
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,11
@@ -14557,11 +34849,11 @@ qs644:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs645:
+qs1500:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs646
+  JMP[NE] @qs1501
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,11
@@ -14576,11 +34868,11 @@ qs645:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs646:
+qs1501:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs647
+  JMP[NE] @qs1502
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,11
@@ -14595,11 +34887,11 @@ qs646:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs647:
+qs1502:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs648
+  JMP[NE] @qs1503
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,11
@@ -14614,11 +34906,11 @@ qs647:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs648:
+qs1503:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs649
+  JMP[NE] @qs1504
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,11
@@ -14633,11 +34925,11 @@ qs648:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs649:
+qs1504:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs650
+  JMP[NE] @qs1505
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,11
@@ -14652,11 +34944,11 @@ qs649:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs650:
+qs1505:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs651
+  JMP[NE] @qs1506
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,11
@@ -14671,11 +34963,11 @@ qs650:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs651:
+qs1506:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs652
+  JMP[NE] @qs1507
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,11
@@ -14690,9 +34982,9 @@ qs651:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs652:
+qs1507:
   MOVI r9,0
-lr653:
+lr1508:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -14704,7 +34996,7 @@ lr653:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr653
+  JMP[LT] @lr1508
   LD r3,r14,126
   ST r3,r14,0
   LD r3,r14,127
@@ -14740,7 +35032,7 @@ lr653:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs654
+  JMP[NE] @qs1509
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -14751,11 +35043,11 @@ lr653:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs654:
+qs1509:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs655
+  JMP[NE] @qs1510
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -14766,11 +35058,11 @@ qs654:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs655:
+qs1510:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs656
+  JMP[NE] @qs1511
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -14781,11 +35073,11 @@ qs655:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs656:
+qs1511:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs657
+  JMP[NE] @qs1512
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -14796,11 +35088,11 @@ qs656:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs657:
+qs1512:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs658
+  JMP[NE] @qs1513
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -14811,11 +35103,11 @@ qs657:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs658:
+qs1513:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs659
+  JMP[NE] @qs1514
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -14826,11 +35118,11 @@ qs658:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs659:
+qs1514:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs660
+  JMP[NE] @qs1515
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -14841,11 +35133,11 @@ qs659:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs660:
+qs1515:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs661
+  JMP[NE] @qs1516
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -14856,11 +35148,11 @@ qs660:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs661:
+qs1516:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs662
+  JMP[NE] @qs1517
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -14875,11 +35167,11 @@ qs661:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs662:
+qs1517:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs663
+  JMP[NE] @qs1518
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -14894,11 +35186,11 @@ qs662:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs663:
+qs1518:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs664
+  JMP[NE] @qs1519
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -14913,11 +35205,11 @@ qs663:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs664:
+qs1519:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs665
+  JMP[NE] @qs1520
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -14932,11 +35224,11 @@ qs664:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs665:
+qs1520:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs666
+  JMP[NE] @qs1521
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -14951,11 +35243,11 @@ qs665:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs666:
+qs1521:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs667
+  JMP[NE] @qs1522
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -14970,11 +35262,11 @@ qs666:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs667:
+qs1522:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs668
+  JMP[NE] @qs1523
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -14989,11 +35281,11 @@ qs667:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs668:
+qs1523:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs669
+  JMP[NE] @qs1524
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -15008,11 +35300,11 @@ qs668:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs669:
+qs1524:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs670
+  JMP[NE] @qs1525
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -15043,11 +35335,11 @@ qs669:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs670:
+qs1525:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs671
+  JMP[NE] @qs1526
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -15078,11 +35370,11 @@ qs670:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs671:
+qs1526:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs672
+  JMP[NE] @qs1527
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -15113,11 +35405,11 @@ qs671:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs672:
+qs1527:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs673
+  JMP[NE] @qs1528
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -15148,11 +35440,11 @@ qs672:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs673:
+qs1528:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs674
+  JMP[NE] @qs1529
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -15183,11 +35475,11 @@ qs673:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs674:
+qs1529:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs675
+  JMP[NE] @qs1530
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -15218,11 +35510,11 @@ qs674:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs675:
+qs1530:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs676
+  JMP[NE] @qs1531
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -15253,11 +35545,11 @@ qs675:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs676:
+qs1531:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs677
+  JMP[NE] @qs1532
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -15288,11 +35580,11 @@ qs676:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs677:
+qs1532:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs678
+  JMP[NE] @qs1533
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -15307,11 +35599,11 @@ qs677:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs678:
+qs1533:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs679
+  JMP[NE] @qs1534
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -15326,11 +35618,11 @@ qs678:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs679:
+qs1534:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs680
+  JMP[NE] @qs1535
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -15345,11 +35637,11 @@ qs679:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs680:
+qs1535:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs681
+  JMP[NE] @qs1536
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -15364,11 +35656,11 @@ qs680:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs681:
+qs1536:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs682
+  JMP[NE] @qs1537
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -15383,11 +35675,11 @@ qs681:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs682:
+qs1537:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs683
+  JMP[NE] @qs1538
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -15402,11 +35694,11 @@ qs682:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs683:
+qs1538:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs684
+  JMP[NE] @qs1539
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -15421,11 +35713,11 @@ qs683:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs684:
+qs1539:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs685
+  JMP[NE] @qs1540
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -15440,11 +35732,11 @@ qs684:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs685:
+qs1540:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs686
+  JMP[NE] @qs1541
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -15455,11 +35747,11 @@ qs685:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs686:
+qs1541:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs687
+  JMP[NE] @qs1542
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -15470,11 +35762,11 @@ qs686:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs687:
+qs1542:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs688
+  JMP[NE] @qs1543
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -15485,11 +35777,11 @@ qs687:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs688:
+qs1543:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs689
+  JMP[NE] @qs1544
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -15500,11 +35792,11 @@ qs688:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs689:
+qs1544:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs690
+  JMP[NE] @qs1545
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -15515,11 +35807,11 @@ qs689:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs690:
+qs1545:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs691
+  JMP[NE] @qs1546
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -15530,11 +35822,11 @@ qs690:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs691:
+qs1546:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs692
+  JMP[NE] @qs1547
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -15545,11 +35837,11 @@ qs691:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs692:
+qs1547:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs693
+  JMP[NE] @qs1548
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -15560,11 +35852,11 @@ qs692:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs693:
+qs1548:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs694
+  JMP[NE] @qs1549
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -15579,11 +35871,11 @@ qs693:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs694:
+qs1549:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs695
+  JMP[NE] @qs1550
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -15598,11 +35890,11 @@ qs694:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs695:
+qs1550:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs696
+  JMP[NE] @qs1551
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -15617,11 +35909,11 @@ qs695:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs696:
+qs1551:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs697
+  JMP[NE] @qs1552
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -15636,11 +35928,11 @@ qs696:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs697:
+qs1552:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs698
+  JMP[NE] @qs1553
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -15655,11 +35947,11 @@ qs697:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs698:
+qs1553:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs699
+  JMP[NE] @qs1554
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -15674,11 +35966,11 @@ qs698:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs699:
+qs1554:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs700
+  JMP[NE] @qs1555
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -15693,11 +35985,11 @@ qs699:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs700:
+qs1555:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs701
+  JMP[NE] @qs1556
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -15712,11 +36004,11 @@ qs700:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs701:
+qs1556:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs702
+  JMP[NE] @qs1557
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -15747,11 +36039,11 @@ qs701:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs702:
+qs1557:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs703
+  JMP[NE] @qs1558
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -15782,11 +36074,11 @@ qs702:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs703:
+qs1558:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs704
+  JMP[NE] @qs1559
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -15817,11 +36109,11 @@ qs703:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs704:
+qs1559:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs705
+  JMP[NE] @qs1560
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -15852,11 +36144,11 @@ qs704:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs705:
+qs1560:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs706
+  JMP[NE] @qs1561
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -15887,11 +36179,11 @@ qs705:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs706:
+qs1561:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs707
+  JMP[NE] @qs1562
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -15922,11 +36214,11 @@ qs706:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs707:
+qs1562:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs708
+  JMP[NE] @qs1563
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -15957,11 +36249,11 @@ qs707:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs708:
+qs1563:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs709
+  JMP[NE] @qs1564
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -15992,11 +36284,11 @@ qs708:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs709:
+qs1564:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs710
+  JMP[NE] @qs1565
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -16011,11 +36303,11 @@ qs709:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs710:
+qs1565:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs711
+  JMP[NE] @qs1566
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -16030,11 +36322,11 @@ qs710:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs711:
+qs1566:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs712
+  JMP[NE] @qs1567
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -16049,11 +36341,11 @@ qs711:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs712:
+qs1567:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs713
+  JMP[NE] @qs1568
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -16068,11 +36360,11 @@ qs712:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs713:
+qs1568:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs714
+  JMP[NE] @qs1569
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -16087,11 +36379,11 @@ qs713:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs714:
+qs1569:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs715
+  JMP[NE] @qs1570
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -16106,11 +36398,11 @@ qs714:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs715:
+qs1570:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs716
+  JMP[NE] @qs1571
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -16125,11 +36417,11 @@ qs715:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs716:
+qs1571:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs717
+  JMP[NE] @qs1572
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -16144,11 +36436,11 @@ qs716:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs717:
+qs1572:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs718
+  JMP[NE] @qs1573
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -16159,11 +36451,11 @@ qs717:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs718:
+qs1573:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs719
+  JMP[NE] @qs1574
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -16174,11 +36466,11 @@ qs718:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs719:
+qs1574:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs720
+  JMP[NE] @qs1575
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -16189,11 +36481,11 @@ qs719:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs720:
+qs1575:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs721
+  JMP[NE] @qs1576
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -16204,11 +36496,11 @@ qs720:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs721:
+qs1576:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs722
+  JMP[NE] @qs1577
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -16219,11 +36511,11 @@ qs721:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs722:
+qs1577:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs723
+  JMP[NE] @qs1578
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -16234,11 +36526,11 @@ qs722:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs723:
+qs1578:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs724
+  JMP[NE] @qs1579
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -16249,11 +36541,11 @@ qs723:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs724:
+qs1579:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs725
+  JMP[NE] @qs1580
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -16264,11 +36556,11 @@ qs724:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs725:
+qs1580:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs726
+  JMP[NE] @qs1581
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -16283,11 +36575,11 @@ qs725:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs726:
+qs1581:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs727
+  JMP[NE] @qs1582
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -16302,11 +36594,11 @@ qs726:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs727:
+qs1582:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs728
+  JMP[NE] @qs1583
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -16321,11 +36613,11 @@ qs727:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs728:
+qs1583:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs729
+  JMP[NE] @qs1584
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -16340,11 +36632,11 @@ qs728:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs729:
+qs1584:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs730
+  JMP[NE] @qs1585
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -16359,11 +36651,11 @@ qs729:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs730:
+qs1585:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs731
+  JMP[NE] @qs1586
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -16378,11 +36670,11 @@ qs730:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs731:
+qs1586:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs732
+  JMP[NE] @qs1587
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -16397,11 +36689,11 @@ qs731:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs732:
+qs1587:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs733
+  JMP[NE] @qs1588
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -16416,11 +36708,11 @@ qs732:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs733:
+qs1588:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs734
+  JMP[NE] @qs1589
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -16451,11 +36743,11 @@ qs733:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs734:
+qs1589:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs735
+  JMP[NE] @qs1590
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -16486,11 +36778,11 @@ qs734:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs735:
+qs1590:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs736
+  JMP[NE] @qs1591
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -16521,11 +36813,11 @@ qs735:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs736:
+qs1591:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs737
+  JMP[NE] @qs1592
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -16556,11 +36848,11 @@ qs736:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs737:
+qs1592:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs738
+  JMP[NE] @qs1593
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -16591,11 +36883,11 @@ qs737:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs738:
+qs1593:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs739
+  JMP[NE] @qs1594
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -16626,11 +36918,11 @@ qs738:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs739:
+qs1594:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs740
+  JMP[NE] @qs1595
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -16661,11 +36953,11 @@ qs739:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs740:
+qs1595:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs741
+  JMP[NE] @qs1596
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -16696,11 +36988,11 @@ qs740:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs741:
+qs1596:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs742
+  JMP[NE] @qs1597
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -16715,11 +37007,11 @@ qs741:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs742:
+qs1597:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs743
+  JMP[NE] @qs1598
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -16734,11 +37026,11 @@ qs742:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs743:
+qs1598:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs744
+  JMP[NE] @qs1599
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -16753,11 +37045,11 @@ qs743:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs744:
+qs1599:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs745
+  JMP[NE] @qs1600
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -16772,11 +37064,11 @@ qs744:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs745:
+qs1600:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs746
+  JMP[NE] @qs1601
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -16791,11 +37083,11 @@ qs745:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs746:
+qs1601:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs747
+  JMP[NE] @qs1602
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -16810,11 +37102,11 @@ qs746:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs747:
+qs1602:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs748
+  JMP[NE] @qs1603
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -16829,11 +37121,11 @@ qs747:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs748:
+qs1603:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs749
+  JMP[NE] @qs1604
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -16848,11 +37140,11 @@ qs748:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs749:
+qs1604:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs750
+  JMP[NE] @qs1605
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -16863,11 +37155,11 @@ qs749:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs750:
+qs1605:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs751
+  JMP[NE] @qs1606
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -16878,11 +37170,11 @@ qs750:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs751:
+qs1606:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs752
+  JMP[NE] @qs1607
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -16893,11 +37185,11 @@ qs751:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs752:
+qs1607:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs753
+  JMP[NE] @qs1608
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -16908,11 +37200,11 @@ qs752:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs753:
+qs1608:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs754
+  JMP[NE] @qs1609
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -16923,11 +37215,11 @@ qs753:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs754:
+qs1609:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs755
+  JMP[NE] @qs1610
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -16938,11 +37230,11 @@ qs754:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs755:
+qs1610:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs756
+  JMP[NE] @qs1611
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -16953,11 +37245,11 @@ qs755:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs756:
+qs1611:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs757
+  JMP[NE] @qs1612
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -16968,11 +37260,11 @@ qs756:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs757:
+qs1612:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs758
+  JMP[NE] @qs1613
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -16987,11 +37279,11 @@ qs757:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs758:
+qs1613:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs759
+  JMP[NE] @qs1614
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -17006,11 +37298,11 @@ qs758:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs759:
+qs1614:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs760
+  JMP[NE] @qs1615
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -17025,11 +37317,11 @@ qs759:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs760:
+qs1615:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs761
+  JMP[NE] @qs1616
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -17044,11 +37336,11 @@ qs760:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs761:
+qs1616:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs762
+  JMP[NE] @qs1617
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -17063,11 +37355,11 @@ qs761:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs762:
+qs1617:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs763
+  JMP[NE] @qs1618
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -17082,11 +37374,11 @@ qs762:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs763:
+qs1618:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs764
+  JMP[NE] @qs1619
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -17101,11 +37393,11 @@ qs763:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs764:
+qs1619:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs765
+  JMP[NE] @qs1620
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -17120,11 +37412,11 @@ qs764:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs765:
+qs1620:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs766
+  JMP[NE] @qs1621
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -17155,11 +37447,11 @@ qs765:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs766:
+qs1621:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs767
+  JMP[NE] @qs1622
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -17190,11 +37482,11 @@ qs766:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs767:
+qs1622:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs768
+  JMP[NE] @qs1623
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -17225,11 +37517,11 @@ qs767:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs768:
+qs1623:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs769
+  JMP[NE] @qs1624
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -17260,11 +37552,11 @@ qs768:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs769:
+qs1624:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs770
+  JMP[NE] @qs1625
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -17295,11 +37587,11 @@ qs769:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs770:
+qs1625:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs771
+  JMP[NE] @qs1626
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -17330,11 +37622,11 @@ qs770:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs771:
+qs1626:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs772
+  JMP[NE] @qs1627
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -17365,11 +37657,11 @@ qs771:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs772:
+qs1627:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs773
+  JMP[NE] @qs1628
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -17400,11 +37692,11 @@ qs772:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs773:
+qs1628:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs774
+  JMP[NE] @qs1629
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,17
@@ -17419,11 +37711,11 @@ qs773:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs774:
+qs1629:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs775
+  JMP[NE] @qs1630
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,17
@@ -17438,11 +37730,11 @@ qs774:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs775:
+qs1630:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs776
+  JMP[NE] @qs1631
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,17
@@ -17457,11 +37749,11 @@ qs775:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs776:
+qs1631:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs777
+  JMP[NE] @qs1632
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,17
@@ -17476,11 +37768,11 @@ qs776:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs777:
+qs1632:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs778
+  JMP[NE] @qs1633
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,17
@@ -17495,11 +37787,11 @@ qs777:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs778:
+qs1633:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs779
+  JMP[NE] @qs1634
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,17
@@ -17514,11 +37806,11 @@ qs778:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs779:
+qs1634:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs780
+  JMP[NE] @qs1635
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,17
@@ -17533,11 +37825,11 @@ qs779:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs780:
+qs1635:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs781
+  JMP[NE] @qs1636
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,17
@@ -17552,9 +37844,9 @@ qs780:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs781:
+qs1636:
   MOVI r9,0
-lr782:
+lr1637:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -17566,7 +37858,7 @@ lr782:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr782
+  JMP[LT] @lr1637
   LD r3,r14,120
   ST r3,r14,0
   LD r3,r14,121
@@ -17602,7 +37894,7 @@ lr782:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs783
+  JMP[NE] @qs1638
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -17613,11 +37905,11 @@ lr782:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs783:
+qs1638:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs784
+  JMP[NE] @qs1639
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -17628,11 +37920,11 @@ qs783:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs784:
+qs1639:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs785
+  JMP[NE] @qs1640
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -17643,11 +37935,11 @@ qs784:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs785:
+qs1640:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs786
+  JMP[NE] @qs1641
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -17658,11 +37950,11 @@ qs785:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs786:
+qs1641:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs787
+  JMP[NE] @qs1642
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -17673,11 +37965,11 @@ qs786:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs787:
+qs1642:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs788
+  JMP[NE] @qs1643
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -17688,11 +37980,11 @@ qs787:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs788:
+qs1643:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs789
+  JMP[NE] @qs1644
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -17703,11 +37995,11 @@ qs788:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs789:
+qs1644:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs790
+  JMP[NE] @qs1645
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -17718,11 +38010,11 @@ qs789:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs790:
+qs1645:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs791
+  JMP[NE] @qs1646
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -17737,11 +38029,11 @@ qs790:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs791:
+qs1646:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs792
+  JMP[NE] @qs1647
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -17756,11 +38048,11 @@ qs791:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs792:
+qs1647:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs793
+  JMP[NE] @qs1648
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -17775,11 +38067,11 @@ qs792:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs793:
+qs1648:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs794
+  JMP[NE] @qs1649
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -17794,11 +38086,11 @@ qs793:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs794:
+qs1649:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs795
+  JMP[NE] @qs1650
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -17813,11 +38105,11 @@ qs794:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs795:
+qs1650:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs796
+  JMP[NE] @qs1651
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -17832,11 +38124,11 @@ qs795:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs796:
+qs1651:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs797
+  JMP[NE] @qs1652
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -17851,11 +38143,11 @@ qs796:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs797:
+qs1652:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs798
+  JMP[NE] @qs1653
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -17870,11 +38162,11 @@ qs797:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs798:
+qs1653:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs799
+  JMP[NE] @qs1654
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -17905,11 +38197,11 @@ qs798:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs799:
+qs1654:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs800
+  JMP[NE] @qs1655
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -17940,11 +38232,11 @@ qs799:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs800:
+qs1655:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs801
+  JMP[NE] @qs1656
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -17975,11 +38267,11 @@ qs800:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs801:
+qs1656:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs802
+  JMP[NE] @qs1657
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -18010,11 +38302,11 @@ qs801:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs802:
+qs1657:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs803
+  JMP[NE] @qs1658
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -18045,11 +38337,11 @@ qs802:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs803:
+qs1658:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs804
+  JMP[NE] @qs1659
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -18080,11 +38372,11 @@ qs803:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs804:
+qs1659:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs805
+  JMP[NE] @qs1660
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -18115,11 +38407,11 @@ qs804:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs805:
+qs1660:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs806
+  JMP[NE] @qs1661
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -18150,11 +38442,11 @@ qs805:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs806:
+qs1661:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs807
+  JMP[NE] @qs1662
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -18169,11 +38461,11 @@ qs806:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs807:
+qs1662:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs808
+  JMP[NE] @qs1663
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -18188,11 +38480,11 @@ qs807:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs808:
+qs1663:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs809
+  JMP[NE] @qs1664
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -18207,11 +38499,11 @@ qs808:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs809:
+qs1664:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs810
+  JMP[NE] @qs1665
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -18226,11 +38518,11 @@ qs809:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs810:
+qs1665:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs811
+  JMP[NE] @qs1666
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -18245,11 +38537,11 @@ qs810:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs811:
+qs1666:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs812
+  JMP[NE] @qs1667
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -18264,11 +38556,11 @@ qs811:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs812:
+qs1667:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs813
+  JMP[NE] @qs1668
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -18283,11 +38575,11 @@ qs812:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs813:
+qs1668:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs814
+  JMP[NE] @qs1669
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -18302,11 +38594,11 @@ qs813:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs814:
+qs1669:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs815
+  JMP[NE] @qs1670
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -18317,11 +38609,11 @@ qs814:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs815:
+qs1670:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs816
+  JMP[NE] @qs1671
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -18332,11 +38624,11 @@ qs815:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs816:
+qs1671:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs817
+  JMP[NE] @qs1672
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -18347,11 +38639,11 @@ qs816:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs817:
+qs1672:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs818
+  JMP[NE] @qs1673
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -18362,11 +38654,11 @@ qs817:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs818:
+qs1673:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs819
+  JMP[NE] @qs1674
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -18377,11 +38669,11 @@ qs818:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs819:
+qs1674:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs820
+  JMP[NE] @qs1675
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -18392,11 +38684,11 @@ qs819:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs820:
+qs1675:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs821
+  JMP[NE] @qs1676
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -18407,11 +38699,11 @@ qs820:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs821:
+qs1676:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs822
+  JMP[NE] @qs1677
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -18422,11 +38714,11 @@ qs821:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs822:
+qs1677:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs823
+  JMP[NE] @qs1678
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -18441,11 +38733,11 @@ qs822:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs823:
+qs1678:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs824
+  JMP[NE] @qs1679
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -18460,11 +38752,11 @@ qs823:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs824:
+qs1679:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs825
+  JMP[NE] @qs1680
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -18479,11 +38771,11 @@ qs824:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs825:
+qs1680:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs826
+  JMP[NE] @qs1681
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -18498,11 +38790,11 @@ qs825:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs826:
+qs1681:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs827
+  JMP[NE] @qs1682
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -18517,11 +38809,11 @@ qs826:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs827:
+qs1682:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs828
+  JMP[NE] @qs1683
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -18536,11 +38828,11 @@ qs827:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs828:
+qs1683:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs829
+  JMP[NE] @qs1684
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -18555,11 +38847,11 @@ qs828:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs829:
+qs1684:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs830
+  JMP[NE] @qs1685
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -18574,11 +38866,11 @@ qs829:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs830:
+qs1685:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs831
+  JMP[NE] @qs1686
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -18609,11 +38901,11 @@ qs830:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs831:
+qs1686:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs832
+  JMP[NE] @qs1687
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -18644,11 +38936,11 @@ qs831:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs832:
+qs1687:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs833
+  JMP[NE] @qs1688
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -18679,11 +38971,11 @@ qs832:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs833:
+qs1688:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs834
+  JMP[NE] @qs1689
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -18714,11 +39006,11 @@ qs833:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs834:
+qs1689:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs835
+  JMP[NE] @qs1690
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -18749,11 +39041,11 @@ qs834:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs835:
+qs1690:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs836
+  JMP[NE] @qs1691
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -18784,11 +39076,11 @@ qs835:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs836:
+qs1691:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs837
+  JMP[NE] @qs1692
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -18819,11 +39111,11 @@ qs836:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs837:
+qs1692:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs838
+  JMP[NE] @qs1693
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -18854,11 +39146,11 @@ qs837:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs838:
+qs1693:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs839
+  JMP[NE] @qs1694
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -18873,11 +39165,11 @@ qs838:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs839:
+qs1694:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs840
+  JMP[NE] @qs1695
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -18892,11 +39184,11 @@ qs839:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs840:
+qs1695:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs841
+  JMP[NE] @qs1696
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -18911,11 +39203,11 @@ qs840:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs841:
+qs1696:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs842
+  JMP[NE] @qs1697
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -18930,11 +39222,11 @@ qs841:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs842:
+qs1697:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs843
+  JMP[NE] @qs1698
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -18949,11 +39241,11 @@ qs842:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs843:
+qs1698:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs844
+  JMP[NE] @qs1699
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -18968,11 +39260,11 @@ qs843:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs844:
+qs1699:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs845
+  JMP[NE] @qs1700
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -18987,11 +39279,11 @@ qs844:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs845:
+qs1700:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs846
+  JMP[NE] @qs1701
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -19006,11 +39298,11 @@ qs845:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs846:
+qs1701:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs847
+  JMP[NE] @qs1702
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -19021,11 +39313,11 @@ qs846:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs847:
+qs1702:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs848
+  JMP[NE] @qs1703
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -19036,11 +39328,11 @@ qs847:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs848:
+qs1703:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs849
+  JMP[NE] @qs1704
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -19051,11 +39343,11 @@ qs848:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs849:
+qs1704:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs850
+  JMP[NE] @qs1705
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -19066,11 +39358,11 @@ qs849:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs850:
+qs1705:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs851
+  JMP[NE] @qs1706
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -19081,11 +39373,11 @@ qs850:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs851:
+qs1706:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs852
+  JMP[NE] @qs1707
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -19096,11 +39388,11 @@ qs851:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs852:
+qs1707:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs853
+  JMP[NE] @qs1708
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -19111,11 +39403,11 @@ qs852:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs853:
+qs1708:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs854
+  JMP[NE] @qs1709
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -19126,11 +39418,11 @@ qs853:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs854:
+qs1709:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs855
+  JMP[NE] @qs1710
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -19145,11 +39437,11 @@ qs854:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs855:
+qs1710:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs856
+  JMP[NE] @qs1711
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -19164,11 +39456,11 @@ qs855:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs856:
+qs1711:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs857
+  JMP[NE] @qs1712
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -19183,11 +39475,11 @@ qs856:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs857:
+qs1712:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs858
+  JMP[NE] @qs1713
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -19202,11 +39494,11 @@ qs857:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs858:
+qs1713:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs859
+  JMP[NE] @qs1714
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -19221,11 +39513,11 @@ qs858:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs859:
+qs1714:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs860
+  JMP[NE] @qs1715
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -19240,11 +39532,11 @@ qs859:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs860:
+qs1715:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs861
+  JMP[NE] @qs1716
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -19259,11 +39551,11 @@ qs860:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs861:
+qs1716:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs862
+  JMP[NE] @qs1717
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -19278,11 +39570,11 @@ qs861:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs862:
+qs1717:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs863
+  JMP[NE] @qs1718
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -19313,11 +39605,11 @@ qs862:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs863:
+qs1718:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs864
+  JMP[NE] @qs1719
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -19348,11 +39640,11 @@ qs863:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs864:
+qs1719:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs865
+  JMP[NE] @qs1720
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -19383,11 +39675,11 @@ qs864:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs865:
+qs1720:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs866
+  JMP[NE] @qs1721
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -19418,11 +39710,11 @@ qs865:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs866:
+qs1721:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs867
+  JMP[NE] @qs1722
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -19453,11 +39745,11 @@ qs866:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs867:
+qs1722:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs868
+  JMP[NE] @qs1723
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -19488,11 +39780,11 @@ qs867:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs868:
+qs1723:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs869
+  JMP[NE] @qs1724
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -19523,11 +39815,11 @@ qs868:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs869:
+qs1724:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs870
+  JMP[NE] @qs1725
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -19558,11 +39850,11 @@ qs869:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs870:
+qs1725:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs871
+  JMP[NE] @qs1726
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -19577,11 +39869,11 @@ qs870:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs871:
+qs1726:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs872
+  JMP[NE] @qs1727
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -19596,11 +39888,11 @@ qs871:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs872:
+qs1727:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs873
+  JMP[NE] @qs1728
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -19615,11 +39907,11 @@ qs872:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs873:
+qs1728:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs874
+  JMP[NE] @qs1729
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -19634,11 +39926,11 @@ qs873:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs874:
+qs1729:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs875
+  JMP[NE] @qs1730
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -19653,11 +39945,11 @@ qs874:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs875:
+qs1730:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs876
+  JMP[NE] @qs1731
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -19672,11 +39964,11 @@ qs875:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs876:
+qs1731:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs877
+  JMP[NE] @qs1732
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -19691,11 +39983,11 @@ qs876:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs877:
+qs1732:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs878
+  JMP[NE] @qs1733
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -19710,11 +40002,11 @@ qs877:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs878:
+qs1733:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs879
+  JMP[NE] @qs1734
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -19725,11 +40017,11 @@ qs878:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs879:
+qs1734:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs880
+  JMP[NE] @qs1735
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -19740,11 +40032,11 @@ qs879:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs880:
+qs1735:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs881
+  JMP[NE] @qs1736
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -19755,11 +40047,11 @@ qs880:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs881:
+qs1736:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs882
+  JMP[NE] @qs1737
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -19770,11 +40062,11 @@ qs881:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs882:
+qs1737:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs883
+  JMP[NE] @qs1738
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -19785,11 +40077,11 @@ qs882:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs883:
+qs1738:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs884
+  JMP[NE] @qs1739
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -19800,11 +40092,11 @@ qs883:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs884:
+qs1739:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs885
+  JMP[NE] @qs1740
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -19815,11 +40107,11 @@ qs884:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs885:
+qs1740:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs886
+  JMP[NE] @qs1741
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -19830,11 +40122,11 @@ qs885:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs886:
+qs1741:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs887
+  JMP[NE] @qs1742
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,1
@@ -19849,11 +40141,11 @@ qs886:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs887:
+qs1742:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs888
+  JMP[NE] @qs1743
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,1
@@ -19868,11 +40160,11 @@ qs887:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs888:
+qs1743:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs889
+  JMP[NE] @qs1744
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,1
@@ -19887,11 +40179,11 @@ qs888:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs889:
+qs1744:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs890
+  JMP[NE] @qs1745
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,1
@@ -19906,11 +40198,11 @@ qs889:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs890:
+qs1745:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs891
+  JMP[NE] @qs1746
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,1
@@ -19925,11 +40217,11 @@ qs890:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs891:
+qs1746:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs892
+  JMP[NE] @qs1747
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,1
@@ -19944,11 +40236,11 @@ qs891:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs892:
+qs1747:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs893
+  JMP[NE] @qs1748
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,1
@@ -19963,11 +40255,11 @@ qs892:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs893:
+qs1748:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs894
+  JMP[NE] @qs1749
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,1
@@ -19982,11 +40274,11 @@ qs893:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs894:
+qs1749:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs895
+  JMP[NE] @qs1750
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -20017,11 +40309,11 @@ qs894:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs895:
+qs1750:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs896
+  JMP[NE] @qs1751
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -20052,11 +40344,11 @@ qs895:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs896:
+qs1751:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs897
+  JMP[NE] @qs1752
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -20087,11 +40379,11 @@ qs896:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs897:
+qs1752:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs898
+  JMP[NE] @qs1753
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -20122,11 +40414,11 @@ qs897:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs898:
+qs1753:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs899
+  JMP[NE] @qs1754
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -20157,11 +40449,11 @@ qs898:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs899:
+qs1754:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs900
+  JMP[NE] @qs1755
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -20192,11 +40484,11 @@ qs899:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs900:
+qs1755:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs901
+  JMP[NE] @qs1756
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -20227,11 +40519,11 @@ qs900:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs901:
+qs1756:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs902
+  JMP[NE] @qs1757
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -20262,11 +40554,11 @@ qs901:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs902:
+qs1757:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs903
+  JMP[NE] @qs1758
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,29
@@ -20281,11 +40573,11 @@ qs902:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs903:
+qs1758:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs904
+  JMP[NE] @qs1759
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,29
@@ -20300,11 +40592,11 @@ qs903:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs904:
+qs1759:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs905
+  JMP[NE] @qs1760
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,29
@@ -20319,11 +40611,11 @@ qs904:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs905:
+qs1760:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs906
+  JMP[NE] @qs1761
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,29
@@ -20338,11 +40630,11 @@ qs905:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs906:
+qs1761:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs907
+  JMP[NE] @qs1762
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,29
@@ -20357,11 +40649,11 @@ qs906:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs907:
+qs1762:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs908
+  JMP[NE] @qs1763
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,29
@@ -20376,11 +40668,11 @@ qs907:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs908:
+qs1763:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs909
+  JMP[NE] @qs1764
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,29
@@ -20395,11 +40687,11 @@ qs908:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs909:
+qs1764:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs910
+  JMP[NE] @qs1765
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,29
@@ -20414,9 +40706,9 @@ qs909:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs910:
+qs1765:
   MOVI r9,0
-lr911:
+lr1766:
   MOVI r2,0
   ADD r1,r2,r9
   ADD r1,r14,r1
@@ -20428,7 +40720,7 @@ lr911:
   ADDI r9,r9,1
   MOVI r2,16
   CMP r9,r2
-  JMP[LT] @lr911
+  JMP[LT] @lr1766
   LD r3,r14,122
   ST r3,r14,0
   LD r3,r14,123
@@ -20464,7 +40756,7 @@ lr911:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs912
+  JMP[NE] @qs1767
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -20475,11 +40767,11 @@ lr911:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs912:
+qs1767:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs913
+  JMP[NE] @qs1768
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -20490,11 +40782,11 @@ qs912:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs913:
+qs1768:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs914
+  JMP[NE] @qs1769
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -20505,11 +40797,11 @@ qs913:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs914:
+qs1769:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs915
+  JMP[NE] @qs1770
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -20520,11 +40812,11 @@ qs914:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs915:
+qs1770:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs916
+  JMP[NE] @qs1771
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -20535,11 +40827,11 @@ qs915:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs916:
+qs1771:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs917
+  JMP[NE] @qs1772
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -20550,11 +40842,11 @@ qs916:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs917:
+qs1772:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs918
+  JMP[NE] @qs1773
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -20565,11 +40857,11 @@ qs917:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs918:
+qs1773:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs919
+  JMP[NE] @qs1774
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -20580,11 +40872,11 @@ qs918:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs919:
+qs1774:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs920
+  JMP[NE] @qs1775
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -20599,11 +40891,11 @@ qs919:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs920:
+qs1775:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs921
+  JMP[NE] @qs1776
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -20618,11 +40910,11 @@ qs920:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs921:
+qs1776:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs922
+  JMP[NE] @qs1777
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -20637,11 +40929,11 @@ qs921:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs922:
+qs1777:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs923
+  JMP[NE] @qs1778
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -20656,11 +40948,11 @@ qs922:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs923:
+qs1778:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs924
+  JMP[NE] @qs1779
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -20675,11 +40967,11 @@ qs923:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs924:
+qs1779:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs925
+  JMP[NE] @qs1780
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -20694,11 +40986,11 @@ qs924:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs925:
+qs1780:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs926
+  JMP[NE] @qs1781
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -20713,11 +41005,11 @@ qs925:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs926:
+qs1781:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs927
+  JMP[NE] @qs1782
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -20732,11 +41024,11 @@ qs926:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs927:
+qs1782:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs928
+  JMP[NE] @qs1783
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -20767,11 +41059,11 @@ qs927:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs928:
+qs1783:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs929
+  JMP[NE] @qs1784
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -20802,11 +41094,11 @@ qs928:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs929:
+qs1784:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs930
+  JMP[NE] @qs1785
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -20837,11 +41129,11 @@ qs929:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs930:
+qs1785:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs931
+  JMP[NE] @qs1786
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -20872,11 +41164,11 @@ qs930:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs931:
+qs1786:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs932
+  JMP[NE] @qs1787
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -20907,11 +41199,11 @@ qs931:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs932:
+qs1787:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs933
+  JMP[NE] @qs1788
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -20942,11 +41234,11 @@ qs932:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs933:
+qs1788:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs934
+  JMP[NE] @qs1789
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -20977,11 +41269,11 @@ qs933:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs934:
+qs1789:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs935
+  JMP[NE] @qs1790
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -21012,11 +41304,11 @@ qs934:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs935:
+qs1790:
   LD r1,r14,160
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs936
+  JMP[NE] @qs1791
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -21031,11 +41323,11 @@ qs935:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs936:
+qs1791:
   LD r1,r14,161
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs937
+  JMP[NE] @qs1792
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -21050,11 +41342,11 @@ qs936:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs937:
+qs1792:
   LD r1,r14,162
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs938
+  JMP[NE] @qs1793
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -21069,11 +41361,11 @@ qs937:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs938:
+qs1793:
   LD r1,r14,163
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs939
+  JMP[NE] @qs1794
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -21088,11 +41380,11 @@ qs938:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs939:
+qs1794:
   LD r1,r14,164
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs940
+  JMP[NE] @qs1795
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -21107,11 +41399,11 @@ qs939:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs940:
+qs1795:
   LD r1,r14,165
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs941
+  JMP[NE] @qs1796
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -21126,11 +41418,11 @@ qs940:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs941:
+qs1796:
   LD r1,r14,166
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs942
+  JMP[NE] @qs1797
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -21145,11 +41437,11 @@ qs941:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs942:
+qs1797:
   LD r1,r14,167
   MOVI r2,3
   CMP r1,r2
-  JMP[NE] @qs943
+  JMP[NE] @qs1798
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -21164,11 +41456,11 @@ qs942:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs943:
+qs1798:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs944
+  JMP[NE] @qs1799
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -21179,11 +41471,11 @@ qs943:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs944:
+qs1799:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs945
+  JMP[NE] @qs1800
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -21194,11 +41486,11 @@ qs944:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs945:
+qs1800:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs946
+  JMP[NE] @qs1801
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -21209,11 +41501,11 @@ qs945:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs946:
+qs1801:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs947
+  JMP[NE] @qs1802
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -21224,11 +41516,11 @@ qs946:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs947:
+qs1802:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs948
+  JMP[NE] @qs1803
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -21239,11 +41531,11 @@ qs947:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs948:
+qs1803:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs949
+  JMP[NE] @qs1804
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -21254,11 +41546,11 @@ qs948:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs949:
+qs1804:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs950
+  JMP[NE] @qs1805
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -21269,11 +41561,11 @@ qs949:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs950:
+qs1805:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs951
+  JMP[NE] @qs1806
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -21284,11 +41576,11 @@ qs950:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs951:
+qs1806:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs952
+  JMP[NE] @qs1807
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -21303,11 +41595,11 @@ qs951:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs952:
+qs1807:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs953
+  JMP[NE] @qs1808
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -21322,11 +41614,11 @@ qs952:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs953:
+qs1808:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs954
+  JMP[NE] @qs1809
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -21341,11 +41633,11 @@ qs953:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs954:
+qs1809:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs955
+  JMP[NE] @qs1810
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -21360,11 +41652,11 @@ qs954:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs955:
+qs1810:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs956
+  JMP[NE] @qs1811
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -21379,11 +41671,11 @@ qs955:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs956:
+qs1811:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs957
+  JMP[NE] @qs1812
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -21398,11 +41690,11 @@ qs956:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs957:
+qs1812:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs958
+  JMP[NE] @qs1813
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -21417,11 +41709,11 @@ qs957:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs958:
+qs1813:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs959
+  JMP[NE] @qs1814
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -21436,11 +41728,11 @@ qs958:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs959:
+qs1814:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs960
+  JMP[NE] @qs1815
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -21471,11 +41763,11 @@ qs959:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs960:
+qs1815:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs961
+  JMP[NE] @qs1816
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -21506,11 +41798,11 @@ qs960:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs961:
+qs1816:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs962
+  JMP[NE] @qs1817
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -21541,11 +41833,11 @@ qs961:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs962:
+qs1817:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs963
+  JMP[NE] @qs1818
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -21576,11 +41868,11 @@ qs962:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs963:
+qs1818:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs964
+  JMP[NE] @qs1819
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -21611,11 +41903,11 @@ qs963:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs964:
+qs1819:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs965
+  JMP[NE] @qs1820
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -21646,11 +41938,11 @@ qs964:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs965:
+qs1820:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs966
+  JMP[NE] @qs1821
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -21681,11 +41973,11 @@ qs965:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs966:
+qs1821:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs967
+  JMP[NE] @qs1822
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -21716,11 +42008,11 @@ qs966:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs967:
+qs1822:
   LD r1,r14,160
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs968
+  JMP[NE] @qs1823
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -21735,11 +42027,11 @@ qs967:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs968:
+qs1823:
   LD r1,r14,161
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs969
+  JMP[NE] @qs1824
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -21754,11 +42046,11 @@ qs968:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs969:
+qs1824:
   LD r1,r14,162
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs970
+  JMP[NE] @qs1825
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -21773,11 +42065,11 @@ qs969:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs970:
+qs1825:
   LD r1,r14,163
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs971
+  JMP[NE] @qs1826
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -21792,11 +42084,11 @@ qs970:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs971:
+qs1826:
   LD r1,r14,164
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs972
+  JMP[NE] @qs1827
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -21811,11 +42103,11 @@ qs971:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs972:
+qs1827:
   LD r1,r14,165
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs973
+  JMP[NE] @qs1828
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -21830,11 +42122,11 @@ qs972:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs973:
+qs1828:
   LD r1,r14,166
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs974
+  JMP[NE] @qs1829
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -21849,11 +42141,11 @@ qs973:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs974:
+qs1829:
   LD r1,r14,167
   MOVI r2,2
   CMP r1,r2
-  JMP[NE] @qs975
+  JMP[NE] @qs1830
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -21868,11 +42160,11 @@ qs974:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs975:
+qs1830:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs976
+  JMP[NE] @qs1831
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -21883,11 +42175,11 @@ qs975:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs976:
+qs1831:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs977
+  JMP[NE] @qs1832
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -21898,11 +42190,11 @@ qs976:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs977:
+qs1832:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs978
+  JMP[NE] @qs1833
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -21913,11 +42205,11 @@ qs977:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs978:
+qs1833:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs979
+  JMP[NE] @qs1834
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -21928,11 +42220,11 @@ qs978:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs979:
+qs1834:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs980
+  JMP[NE] @qs1835
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -21943,11 +42235,11 @@ qs979:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs980:
+qs1835:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs981
+  JMP[NE] @qs1836
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -21958,11 +42250,11 @@ qs980:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs981:
+qs1836:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs982
+  JMP[NE] @qs1837
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -21973,11 +42265,11 @@ qs981:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs982:
+qs1837:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs983
+  JMP[NE] @qs1838
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -21988,11 +42280,11 @@ qs982:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs983:
+qs1838:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs984
+  JMP[NE] @qs1839
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -22007,11 +42299,11 @@ qs983:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs984:
+qs1839:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs985
+  JMP[NE] @qs1840
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -22026,11 +42318,11 @@ qs984:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs985:
+qs1840:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs986
+  JMP[NE] @qs1841
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -22045,11 +42337,11 @@ qs985:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs986:
+qs1841:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs987
+  JMP[NE] @qs1842
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -22064,11 +42356,11 @@ qs986:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs987:
+qs1842:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs988
+  JMP[NE] @qs1843
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -22083,11 +42375,11 @@ qs987:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs988:
+qs1843:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs989
+  JMP[NE] @qs1844
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -22102,11 +42394,11 @@ qs988:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs989:
+qs1844:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs990
+  JMP[NE] @qs1845
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -22121,11 +42413,11 @@ qs989:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs990:
+qs1845:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs991
+  JMP[NE] @qs1846
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -22140,11 +42432,11 @@ qs990:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs991:
+qs1846:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs992
+  JMP[NE] @qs1847
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -22175,11 +42467,11 @@ qs991:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs992:
+qs1847:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs993
+  JMP[NE] @qs1848
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -22210,11 +42502,11 @@ qs992:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs993:
+qs1848:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs994
+  JMP[NE] @qs1849
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -22245,11 +42537,11 @@ qs993:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs994:
+qs1849:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs995
+  JMP[NE] @qs1850
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -22280,11 +42572,11 @@ qs994:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs995:
+qs1850:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs996
+  JMP[NE] @qs1851
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -22315,11 +42607,11 @@ qs995:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs996:
+qs1851:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs997
+  JMP[NE] @qs1852
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -22350,11 +42642,11 @@ qs996:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs997:
+qs1852:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs998
+  JMP[NE] @qs1853
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -22385,11 +42677,11 @@ qs997:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs998:
+qs1853:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs999
+  JMP[NE] @qs1854
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -22420,11 +42712,11 @@ qs998:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs999:
+qs1854:
   LD r1,r14,160
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1000
+  JMP[NE] @qs1855
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -22439,11 +42731,11 @@ qs999:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs1000:
+qs1855:
   LD r1,r14,161
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1001
+  JMP[NE] @qs1856
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -22458,11 +42750,11 @@ qs1000:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs1001:
+qs1856:
   LD r1,r14,162
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1002
+  JMP[NE] @qs1857
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -22477,11 +42769,11 @@ qs1001:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs1002:
+qs1857:
   LD r1,r14,163
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1003
+  JMP[NE] @qs1858
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -22496,11 +42788,11 @@ qs1002:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs1003:
+qs1858:
   LD r1,r14,164
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1004
+  JMP[NE] @qs1859
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -22515,11 +42807,11 @@ qs1003:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs1004:
+qs1859:
   LD r1,r14,165
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1005
+  JMP[NE] @qs1860
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -22534,11 +42826,11 @@ qs1004:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs1005:
+qs1860:
   LD r1,r14,166
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1006
+  JMP[NE] @qs1861
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -22553,11 +42845,11 @@ qs1005:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs1006:
+qs1861:
   LD r1,r14,167
   MOVI r2,1
   CMP r1,r2
-  JMP[NE] @qs1007
+  JMP[NE] @qs1862
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -22572,11 +42864,11 @@ qs1006:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs1007:
+qs1862:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1008
+  JMP[NE] @qs1863
   LD r1,r14,0
   MOVI r2,65535
   MOVHI r2,65535
@@ -22587,11 +42879,11 @@ qs1007:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,1
-qs1008:
+qs1863:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1009
+  JMP[NE] @qs1864
   LD r1,r14,2
   MOVI r2,65535
   MOVHI r2,65535
@@ -22602,11 +42894,11 @@ qs1008:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,3
-qs1009:
+qs1864:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1010
+  JMP[NE] @qs1865
   LD r1,r14,4
   MOVI r2,65535
   MOVHI r2,65535
@@ -22617,11 +42909,11 @@ qs1009:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,5
-qs1010:
+qs1865:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1011
+  JMP[NE] @qs1866
   LD r1,r14,6
   MOVI r2,65535
   MOVHI r2,65535
@@ -22632,11 +42924,11 @@ qs1010:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,7
-qs1011:
+qs1866:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1012
+  JMP[NE] @qs1867
   LD r1,r14,8
   MOVI r2,65535
   MOVHI r2,65535
@@ -22647,11 +42939,11 @@ qs1011:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,9
-qs1012:
+qs1867:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1013
+  JMP[NE] @qs1868
   LD r1,r14,10
   MOVI r2,65535
   MOVHI r2,65535
@@ -22662,11 +42954,11 @@ qs1012:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,11
-qs1013:
+qs1868:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1014
+  JMP[NE] @qs1869
   LD r1,r14,12
   MOVI r2,65535
   MOVHI r2,65535
@@ -22677,11 +42969,11 @@ qs1013:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,13
-qs1014:
+qs1869:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1015
+  JMP[NE] @qs1870
   LD r1,r14,14
   MOVI r2,65535
   MOVHI r2,65535
@@ -22692,11 +42984,11 @@ qs1014:
   MOVHI r2,65535
   BOOL.6 r1,r1,r2
   ST r1,r14,15
-qs1015:
+qs1870:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1016
+  JMP[NE] @qs1871
   LD r8,r14,2
   LD r9,r14,3
   SHR r3,r8,23
@@ -22711,11 +43003,11 @@ qs1015:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs1016:
+qs1871:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1017
+  JMP[NE] @qs1872
   LD r8,r14,4
   LD r9,r14,5
   SHR r3,r8,23
@@ -22730,11 +43022,11 @@ qs1016:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs1017:
+qs1872:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1018
+  JMP[NE] @qs1873
   LD r8,r14,6
   LD r9,r14,7
   SHR r3,r8,23
@@ -22749,11 +43041,11 @@ qs1017:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs1018:
+qs1873:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1019
+  JMP[NE] @qs1874
   LD r8,r14,8
   LD r9,r14,9
   SHR r3,r8,23
@@ -22768,11 +43060,11 @@ qs1018:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs1019:
+qs1874:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1020
+  JMP[NE] @qs1875
   LD r8,r14,10
   LD r9,r14,11
   SHR r3,r8,23
@@ -22787,11 +43079,11 @@ qs1019:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs1020:
+qs1875:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1021
+  JMP[NE] @qs1876
   LD r8,r14,12
   LD r9,r14,13
   SHR r3,r8,23
@@ -22806,11 +43098,11 @@ qs1020:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs1021:
+qs1876:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1022
+  JMP[NE] @qs1877
   LD r8,r14,14
   LD r9,r14,15
   SHR r3,r8,23
@@ -22825,11 +43117,11 @@ qs1021:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs1022:
+qs1877:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1023
+  JMP[NE] @qs1878
   LD r8,r14,0
   LD r9,r14,1
   SHR r3,r8,23
@@ -22844,11 +43136,11 @@ qs1022:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs1023:
+qs1878:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1024
+  JMP[NE] @qs1879
   LD r8,r14,0
   LD r9,r14,1
   MOVI r7,255
@@ -22879,11 +43171,11 @@ qs1023:
   ADDI r9,r4,0
   ST r8,r14,0
   ST r9,r14,1
-qs1024:
+qs1879:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1025
+  JMP[NE] @qs1880
   LD r8,r14,2
   LD r9,r14,3
   MOVI r7,255
@@ -22914,11 +43206,11 @@ qs1024:
   ADDI r9,r4,0
   ST r8,r14,2
   ST r9,r14,3
-qs1025:
+qs1880:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1026
+  JMP[NE] @qs1881
   LD r8,r14,4
   LD r9,r14,5
   MOVI r7,255
@@ -22949,11 +43241,11 @@ qs1025:
   ADDI r9,r4,0
   ST r8,r14,4
   ST r9,r14,5
-qs1026:
+qs1881:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1027
+  JMP[NE] @qs1882
   LD r8,r14,6
   LD r9,r14,7
   MOVI r7,255
@@ -22984,11 +43276,11 @@ qs1026:
   ADDI r9,r4,0
   ST r8,r14,6
   ST r9,r14,7
-qs1027:
+qs1882:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1028
+  JMP[NE] @qs1883
   LD r8,r14,8
   LD r9,r14,9
   MOVI r7,255
@@ -23019,11 +43311,11 @@ qs1027:
   ADDI r9,r4,0
   ST r8,r14,8
   ST r9,r14,9
-qs1028:
+qs1883:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1029
+  JMP[NE] @qs1884
   LD r8,r14,10
   LD r9,r14,11
   MOVI r7,255
@@ -23054,11 +43346,11 @@ qs1028:
   ADDI r9,r4,0
   ST r8,r14,10
   ST r9,r14,11
-qs1029:
+qs1884:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1030
+  JMP[NE] @qs1885
   LD r8,r14,12
   LD r9,r14,13
   MOVI r7,255
@@ -23089,11 +43381,11 @@ qs1029:
   ADDI r9,r4,0
   ST r8,r14,12
   ST r9,r14,13
-qs1030:
+qs1885:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1031
+  JMP[NE] @qs1886
   LD r8,r14,14
   LD r9,r14,15
   MOVI r7,255
@@ -23124,11 +43416,11 @@ qs1030:
   ADDI r9,r4,0
   ST r8,r14,14
   ST r9,r14,15
-qs1031:
+qs1886:
   LD r1,r14,160
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1032
+  JMP[NE] @qs1887
   LD r8,r14,2
   LD r9,r14,3
   SHL r3,r8,7
@@ -23143,11 +43435,11 @@ qs1031:
   BOOL.6 r11,r11,r4
   ST r10,r14,0
   ST r11,r14,1
-qs1032:
+qs1887:
   LD r1,r14,161
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1033
+  JMP[NE] @qs1888
   LD r8,r14,4
   LD r9,r14,5
   SHL r3,r8,7
@@ -23162,11 +43454,11 @@ qs1032:
   BOOL.6 r11,r11,r4
   ST r10,r14,2
   ST r11,r14,3
-qs1033:
+qs1888:
   LD r1,r14,162
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1034
+  JMP[NE] @qs1889
   LD r8,r14,6
   LD r9,r14,7
   SHL r3,r8,7
@@ -23181,11 +43473,11 @@ qs1033:
   BOOL.6 r11,r11,r4
   ST r10,r14,4
   ST r11,r14,5
-qs1034:
+qs1889:
   LD r1,r14,163
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1035
+  JMP[NE] @qs1890
   LD r8,r14,8
   LD r9,r14,9
   SHL r3,r8,7
@@ -23200,11 +43492,11 @@ qs1034:
   BOOL.6 r11,r11,r4
   ST r10,r14,6
   ST r11,r14,7
-qs1035:
+qs1890:
   LD r1,r14,164
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1036
+  JMP[NE] @qs1891
   LD r8,r14,10
   LD r9,r14,11
   SHL r3,r8,7
@@ -23219,11 +43511,11 @@ qs1035:
   BOOL.6 r11,r11,r4
   ST r10,r14,8
   ST r11,r14,9
-qs1036:
+qs1891:
   LD r1,r14,165
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1037
+  JMP[NE] @qs1892
   LD r8,r14,12
   LD r9,r14,13
   SHL r3,r8,7
@@ -23238,11 +43530,11 @@ qs1036:
   BOOL.6 r11,r11,r4
   ST r10,r14,10
   ST r11,r14,11
-qs1037:
+qs1892:
   LD r1,r14,166
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1038
+  JMP[NE] @qs1893
   LD r8,r14,14
   LD r9,r14,15
   SHL r3,r8,7
@@ -23257,11 +43549,11 @@ qs1037:
   BOOL.6 r11,r11,r4
   ST r10,r14,12
   ST r11,r14,13
-qs1038:
+qs1893:
   LD r1,r14,167
   MOVI r2,0
   CMP r1,r2
-  JMP[NE] @qs1039
+  JMP[NE] @qs1894
   LD r8,r14,0
   LD r9,r14,1
   SHL r3,r8,7
@@ -23276,11 +43568,11 @@ qs1038:
   BOOL.6 r11,r11,r4
   ST r10,r14,14
   ST r11,r14,15
-qs1039:
+qs1894:
   MOVI r1,1
   ST r1,r14,71
   MOVI r6,0
-c91040:
+c91895:
   MOVI r2,0
   ADD r1,r2,r6
   ADD r1,r14,r1
@@ -23290,16 +43582,16 @@ c91040:
   ADD r1,r14,r1
   LD r4,r1,0
   CMP r3,r4
-  JMP[NE] @c9n1042
+  JMP[NE] @c9n1897
   ADDI r6,r6,1
   MOVI r2,16
   CMP r6,r2
-  JMP[LT] @c91040
-  JMP @c9d1041
-c9n1042:
+  JMP[LT] @c91895
+  JMP @c9d1896
+c9n1897:
   MOVI r1,0
   ST r1,r14,71
-c9d1041:
+c9d1896:
   LD r1,r14,71
   CMP r1,r0
   JMP[EQ] @d9n
@@ -23341,7 +43633,948 @@ d9d:
   MOVI r1,83
   PUTC r1
   CALL @nl
-  JMP @halt16
+  LD r15,r0,@ksl7
+  RET
+
+kj:
+  ST r15,r0,@ksl8
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kjz:
+  ST r15,r0,@ksl8
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kjz
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7937
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,1
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,1
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,8
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,8
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,1
+  BOOL.14 r3,r3,r1
+  MOVI r2,1
+  CMP r3,r2
+  JMP[NE] @fd1898n
+  MOVI r3,0
+  MOVI r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r2,8
+  CMP r3,r2
+  JMP[EQ] @fd1898d
+fd1898n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1898d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7938
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1899n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1899d
+fd1899n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1899d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7939
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1900n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1900d
+fd1900n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1900d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7940
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1901n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1901d
+fd1901n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1901d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7941
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,15
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,15
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1902n
+  MOVI r3,0
+  MOVI r1,15
+  BOOL.14 r3,r3,r1
+  MOVI r2,15
+  CMP r3,r2
+  JMP[EQ] @fd1902d
+fd1902n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1902d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7942
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,48
+  PUTC r1
+  MOVI r1,56
+  PUTC r1
+  CALL @nl
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7943
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1903n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1903d
+fd1903n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1903d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,7944
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,8
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,8
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1904n
+  MOVI r3,0
+  MOVI r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r2,8
+  CMP r3,r2
+  JMP[EQ] @fd1904d
+fd1904n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1904d:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @n10k
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,76
+  PUTC r1
+  MOVI r1,70
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+n10k:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl8
+  RET
+
+kk:
+  ST r15,r0,@ksl9
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+kkz:
+  ST r15,r0,@ksl9
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @kkz
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,42405
+  MOVHI r1,42405
+  ST r1,r14,200
+  LD r2,r14,200
+  CMP r2,r1
+  JMP[EQ] @p1k
+  MOVI r1,0
+  ST r1,r14,70
+p1k:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,115
+  PUTC r1
+  MOVI r1,101
+  PUTC r1
+  MOVI r1,114
+  PUTC r1
+  MOVI r1,105
+  PUTC r1
+  MOVI r1,97
+  PUTC r1
+  MOVI r1,108
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  CALL @nl
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,108
+  PUTC r1
+  MOVI r1,111
+  PUTC r1
+  MOVI r1,111
+  PUTC r1
+  MOVI r1,112
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  CALL @nl
+  MOVI r1,1
+  ST r1,r14,60
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  CALL @nl
+  MOVI r1,2
+  ST r1,r14,60
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,50
+  PUTC r1
+  CALL @nl
+  LD r1,r0,@d_mhi
+  ST r1,r14,#seedm
+  LD r1,r0,@d_mlo
+  ST r1,r14,#seedm+1
+  LD r1,r0,@d_ahi
+  ST r1,r14,#seedm+2
+  LD r1,r0,@d_alo
+  ST r1,r14,#seedm+3
+  LD r1,r0,@d_shi
+  ST r1,r14,#seeds
+  LD r1,r0,@d_slo
+  ST r1,r14,#seeds+1
+  CALL @lcgreset
+  MOVI r1,40
+  MOVI r2,4
+  CALL @fill
+  MOVI r1,14
+  ST r1,r14,#rounds
+  MOVI r1,21317
+  MOVHI r1,0
+  ST r1,r14,48
+  MOVI r1,0
+  ST r1,r14,49
+  ST r1,r14,50
+  ST r1,r14,51
+  MOVI r1,31
+  MOVHI r1,0
+  ST r1,r14,64
+  MOVI r1,0
+  ST r1,r14,65
+  MOVI r1,1
+  ST r1,r14,66
+  MOVI r1,0
+  ST r1,r14,67
+  MOVI r1,2
+  ST r1,r14,72
+  MOVI r1,0
+  ST r1,r14,88
+  CALL @pack
+  MOVI r1,72
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,104
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,106
+  CALL @puthex8
+  CALL @nl
+  MOVI r1,5
+  ST r1,r14,60
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,53
+  PUTC r1
+  CALL @nl
+  MOVI r1,6
+  ST r1,r14,60
+  MOVI r1,68
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,54
+  PUTC r1
+  CALL @nl
+  MOVI r6,0
+wz1905:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  MOVI r3,0
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,8
+  CMP r6,r2
+  JMP[LT] @wz1905
+  MOVI r6,0
+wz21906:
+  MOVI r2,104
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  MOVI r3,0
+  ST r3,r1,0
+  ADDI r6,r6,1
+  MOVI r2,12
+  CMP r6,r2
+  JMP[LT] @wz21906
+  MOVI r6,0
+wc1907:
+  MOVI r2,40
+  ADD r1,r2,r6
+  ADD r1,r14,r1
+  LD r3,r1,0
+  CMP r3,r0
+  JMP[NE] @wn1908
+  ADDI r6,r6,1
+  MOVI r2,8
+  CMP r6,r2
+  JMP[LT] @wc1907
+  JMP @wn1908k
+wn1908:
+  MOVI r1,0
+  ST r1,r14,70
+wn1908k:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[EQ] @w12n
+  MOVI r1,87
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+  JMP @w12d
+w12n:
+  MOVI r1,87
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+w12d:
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  LD r15,r0,@ksl9
+  RET
+
+kl:
+  ST r15,r0,@ksl10
+  MOVI r13,1
+  MOVI r12,65535
+  MOVHI r12,65535
+  MOVI r14,16960
+  MOVHI r14,15
+  MOVI r1,0
+  MOVI r2,176
+  MOVI r3,0
+klz:
+  ST r15,r0,@ksl10
+  ADD r4,r14,r3
+  ST r1,r4,0
+  ADDI r3,r3,1
+  SUB r2,r2,r13
+  CMP r2,r0
+  JMP[NE] @klz
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,0
+  ST r1,r14,72
+  MOVI r10,3320
+  MOVI r6,0
+ds1909:
+  MOVI r1,0
+  MOVHI r1,32768
+  SHL r7,r6,11
+  BOOL.14 r9,r1,r7
+  OUTL r9,r10
+  MOVI r2,3324
+  INW r3,r2
+  MOVI r4,65535
+  CMP r3,r4
+  JMP[EQ] @ds1909s
+  MOVI r2,3326
+  INW r4,r2
+  MOVI r2,8
+  BOOL.14 r8,r9,r2
+  OUTL r8,r10
+  MOVI r2,3326
+  INW r7,r2
+  MOVI r1,68
+  PUTC r1
+  ADDI r1,r6,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r6,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  ADDI r5,r3,0
+  ADDI r1,r5,0
+  SHR r1,r1,12
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  SHR r1,r1,8
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  ADDI r5,r4,0
+  ADDI r1,r5,0
+  SHR r1,r1,12
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  SHR r1,r1,8
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  ADDI r1,r5,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  ADDI r8,r7,0
+  SHR r8,r8,8
+  ADDI r1,r8,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r8,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  ADDI r1,r7,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r7,r2
+  CALL @puthex1
+  CALL @nl
+  ADDI r8,r7,0
+  SHR r8,r8,8
+  MOVI r2,2
+  CMP r8,r2
+  JMP[NE] @ds1909s
+  LD r1,r14,72
+  ADDI r1,r1,1
+  ST r1,r14,72
+ds1909s:
+  ADDI r6,r6,1
+  MOVI r2,32
+  CMP r6,r2
+  JMP[LT] @ds1909
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  LD r1,r14,72
+  ADDI r1,r1,0
+  SHR r1,r1,4
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  CALL @nl
+  MOVI r1,42405
+  MOVHI r1,42405
+  ST r1,r14,200
+  LD r2,r14,200
+  CMP r2,r1
+  JMP[EQ] @ln13k
+  MOVI r1,0
+  ST r1,r14,70
+ln13k:
+  MOVI r1,76
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,69
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  CALL @nl
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[EQ] @d13n
+  MOVI r1,80
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  MOVI r1,83
+  PUTC r1
+  CALL @nl
+  JMP @d13d
+d13n:
+  MOVI r1,70
+  PUTC r1
+  MOVI r1,65
+  PUTC r1
+  MOVI r1,73
+  PUTC r1
+  MOVI r1,76
+  PUTC r1
+  CALL @nl
+d13d:
+  LD r15,r0,@ksl10
+  RET
 
 ; ---- addm: [r1] pair += [r2] pair (carry exact: result<a_lo cmp)
 addm:
@@ -26987,6 +48220,30 @@ r_fi:
 r_lg:
   .word 0
 phn_ret:
+  .word 0
+ksl0:
+  .word 0
+ksl1:
+  .word 0
+ksl2:
+  .word 0
+ksl3:
+  .word 0
+ksl4:
+  .word 0
+ksl5:
+  .word 0
+ksl6:
+  .word 0
+ksl7:
+  .word 0
+ksl8:
+  .word 0
+ksl9:
+  .word 0
+ksl10:
+  .word 0
+ksl11:
   .word 0
 
 halt16:
