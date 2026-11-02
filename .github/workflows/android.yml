@@ -23,6 +23,7 @@ jobs:
           sh tools/ngate_boot.sh || exit 1
           sh tools/ncc_lex.sh || exit 1
           rc=0; sh tools/lanegate.sh || rc=$?; if [ "$rc" -ne 0 ] && [ "$rc" -ne 77 ]; then exit "$rc"; fi
+          sh tools/lanesmoke.sh || exit 1
           sh tools/nrun.sh src/tests/carry_probe.nas 2000000 | grep -qx PASS || exit 1
           sh tools/nlink.sh ls >/dev/null || exit 1
           sh tools/mkproof.sh src/tests/key_test.nas || exit 1
