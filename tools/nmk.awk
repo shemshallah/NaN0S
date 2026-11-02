@@ -30,7 +30,22 @@ BEGIN {
 function die(m){ print "nmk: " m > "/dev/stderr"; exit 1 }
 function strip1(t,k){ return substr(t,k+1) }
 function trimx(x){ gsub(/^[ \t]+/,"",x); gsub(/[ \t]+$/,"",x); return x }
-function cmtless(raw,   i){ i=index(raw,";"); return i>0 ? substr(raw,1,i-1) : raw }
+function cmtless(raw,   i,n,ch,q,esc){
+  # strip ';' comments OUTSIDE double-quoted .str bodies (escapes: \\ and \")
+  n=length(raw); q=0; esc=0
+  for (i=1;i<=n;i++){
+    ch=substr(raw,i,1)
+    if (q){
+      if (esc) esc=0
+      else if (ch=="\\") esc=1
+      else if (ch=="\"") q=0
+      continue
+    }
+    if (ch=="\""){ q=1; continue }
+    if (ch==";") return substr(raw,1,i-1)
+  }
+  return raw
+}
 
 function inum(x,  s,neg){
   s=x; neg=0
