@@ -14,7 +14,7 @@ Query contract: DISPQ returns current; DISPLIST (planned) enumerates modes; DISP
 - Memory: current guest = 8192 words (64 KB). Doom wants ~4-8 MB, Quake ~16+ MB. => NaNVM1 in 32-bit protected mode (or long mode): flat memory, 32-bit word indices (LDI/LDHI address pair since imm is 16-bit), A20, no 64KB segments.
 - Speed: a pure interpreter on an interpreter will not run Quake. Options: (a) port the engine source to NaN16 (needs a NaN compiler, TODO 4.2); (b) NaN-written x86 emulator running original binaries = too slow unless NaNVM1 gains a translator; (c) NaN16 vector ops: BOOL over 32 lanes already gives 32 parallel bit ops, add lane-packed ADD/MUL (SWAR) for pixels; (d) native fast paths (spans, blits) exposed as boundary ops, kept few and audited.
 - Quake also needs FPU/float: NaN-boxed floats are on-theme (payload carries the value, head tags it as float); needs FADD/FMUL/FDIV/FSQRT boundary ops or software float in NaN.
-- Input (KEY exists, blocking only): add KEYQ (non-blocking), mouse, PIT timer; sound (SB/AC97 or PC speaker) later.
+- Input (KEY exists, blocking only): add KEYQ (non-blocking), mouse, PIT timer; sound (SB/AC97 or PC speaker) later. The IRQ/SVC interface contract is `spec/NANVM_SPEC.md` §9.3 (one VM spec).
 - Real path: 1) NaNVM1 protected mode + flat memory, 2) NaN compiler, 3) framebuffer ops + scaler, 4) software-rendered Doom-class port, 5) revisit Quake.
 ## Next code steps
 DISPLIST/DISPSET(w,h) -> mode map; mode 13h FBFILL/FBPUT with a plasma/Mandelbrot exhibit; scaler routine in NaN; KEYQ; interpreter size is 1011/1024 bytes so NaNVM0 must grow to 3 sectors (change boot0 + image offset) before more native ops.

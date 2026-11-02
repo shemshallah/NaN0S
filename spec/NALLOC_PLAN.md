@@ -12,3 +12,5 @@ nalloc.nas = nal_init/nal_alloc/nal_free/nal_check/nal_chkrover (the draft with 
 Mutation test (tools/mutate_nalloc.py, logs/nalloc_mutations.txt): 9 planted single-edit bugs, all 9 stop the test at FAIL. One was missed at first (minimum block size 2 never exercised); alloc(0) test added for it.
 nasm0 inside the guest assembles nalloc_test.nas (944 words) identical to the scaffold: logs/nasm0_proof_nalloc_test_flat1M.txt.
 Known limit (documented in nalloc.nas): free trusts the word before the pointer; a pointer into the middle of a block is only caught if that word looks free.
+
+Platform placement: nalloc is the per-process heap; base/size come from MEMQ regions and the syscall layer owns the grant (`spec/NANVM_SPEC.md` §8.2, §9.1).

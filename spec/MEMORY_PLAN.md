@@ -8,3 +8,5 @@ A NaN word holds 32 payload bits in 8 bytes: Doom's ~4-8 MB is 8-16 MB of words,
 ## Allocators (written in NaN16, sim-tested first)
 page-frame bitmap -> buddy -> first-fit+coalesce heap (nalloc.nas) -> arenas: Doom zone, Quake hunk, LM weights. Ops (planned, optional fast paths): MALLOC/MFREE/MQUERY.
 ## Also needed: float (NaN-boxed or software), FB/scaler ops, KEYQ/mouse/PIT/sound, DISKW (see DISPLAY_PLAN.md).
+
+The platform contract — memory ceiling, allocators, storage, processes, threads and the device interface — is `spec/NANVM_SPEC.md` §8-§9. This file and that one must not disagree; the VM spec wins.

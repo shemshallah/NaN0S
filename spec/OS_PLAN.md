@@ -9,4 +9,4 @@
 - Menu keys: M museum, T tools, N NaNNet, H hall, A about, ESC back. Sub-menus use number keys. One image, one namespace; exhibits end with JMP @menu.
 - Version string lives in one data block (about + title bars read it) so releases bump once.
 ## Dependencies / order
-NaNVM1 (protected mode, flat memory, port I/O, disk write) unlocks NaNNet, persistent Hall, Doom/Quake. Until then shell + museum + tools + About + seeded Hall run on NaNVM0.
+NaNVM1 (protected mode, flat memory, port I/O, disk write) unlocks NaNNet, persistent Hall, Doom/Quake. Until then shell + museum + tools + About + seeded Hall run on NaNVM0. The machine contract for memory, processes, threads, storage and device interface is `spec/NANVM_SPEC.md` §8-§9 (one VM, one file).

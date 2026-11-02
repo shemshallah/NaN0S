@@ -126,8 +126,14 @@ a) Step 1 (checkable here): flat 32-bit asm interpreter, SSE single for
    word-identical output.
 b) Step 2: boot real -> protected mode, A20, E820, region table, disk load
    into high memory (unreal mode or temp low buffer + copy).
-c) Step 3: v86/QEMU runs (needs the owner's harness).
-d) Step 4: DEV region + framebuffer, then virtio-gpu.
+c) Step 2b: IDT/PIC/PIT timer, SVC gate, trap frames, preemptive tick and
+   context switch (§9).
+d) Step 2c: port I/O ops, DEV windows, storage (ATA PIO read/write, NaNFS
+   write) and the program loader (§10).
+e) Step 3: v86/QEMU runs (needs the owner's harness).
+f) Step 4: DEV region + framebuffer, then virtio-gpu.
+g) Step 5: process/thread scheduler, per-process heaps, then the Quake
+   trace in §8.4.
 
 ### 4.5 Open questions
 Interpreter speed target for Quake (see TODO spanbench). Whether MEMQ stays
@@ -179,3 +185,163 @@ program head so the operand stack starts empty. Halting with a 64-bit word
 - NaNVM1 native: protected mode, E820 region table, MEMQ, DEV windows.
 - NaNNet VM: netcart integration (the network cart embedding the
   interpreter). Until then the interpreter is exercised by its own gate.
+
+## 8. System model — one machine, many programs
+
+### 8.1 Memory ceiling and word budget
+
+A guest word is 8 bytes with a 32-bit payload. NaNVM1 addresses words with
+32 bits; the native v1 ceiling is k<=28 = 268,435,456 words = 2 GiB of
+words. The reference C core today is 4,194,304 words (`NAN_WORDS 0x400000`),
+which is the first platform target and exactly the Quake budget; raising it
+is a constant, not a redesign. NaNVM0 stays an 8,192-word museum machine for
+a single job; it is not the platform.
+
+Quake trace (requirements -> words):
+
+| need | size | words (8 B) |
+|---|---|---|
+| engine working set, comfortable | 16 MiB | 2,097,152 |
+| target platform (zone/hunk/sound/renderer headroom) | 32 MiB | 4,194,304 |
+| engine code + data translated to NaN16 | well under 8 MiB | < 1,048,576 |
+| shareware pak0 (streamed, not resident) | ~18 MB | storage only |
+| full id1 data (streamed) | ~50 MB | storage only |
+| framebuffer 320x200 8bpp (packed 4/word) | 64 KiB | 16,384 |
+| framebuffer 640x480 32bpp (DEV stride 4) | 1.2 MiB | DEV window |
+
+The engine is compiled to NaN16 from the C subset (int32, float32, pointers,
+function pointers, byte access, block moves; all covered by the op set in
+§2). Every byte of the machine is a NaN word: no raw side-regions
+(`spec/MEMORY_PLAN.md`). Performance is a separate target; the route is a
+fast NaNVM1 native core plus a NaN -> native translator written in NaN, kept
+small and audited (`spec/MEMORY_PLAN.md`, `spec/PERF_ESTIMATE.md`).
+
+### 8.2 Allocators
+
+Page-frame bitmap -> buddy -> per-process heap. The heap allocator is
+nalloc: next-fit rover over an implicit block list with boundary tags and
+coalescing, proven by `src/prog/nalloc_test.nas` (`spec/NALLOC_PLAN.md`);
+the Quake zone/hunk sits on it as an arena layer. Heap base/size come from
+MEMQ, so the same code serves any RAM size. MALLOC/MFREE/MQUERY fast-path
+ops are optional and planned; ordinary SVC calls into nalloc are the
+baseline.
+
+### 8.3 Storage
+
+Block device behind port I/O plus a DEV window (ATA PIO; read already in the
+tree, write planned as the DISKW convenience op or OUTW sequences). On-disk
+layout: sealed images, NaNFS (read implemented; write/extend planned), and a
+system-owned block bitmap. Files are extents in NaNFS; a process receives
+handles, never raw blocks (capability check in the syscall layer). The
+loader verifies the L4 seal before mapping a process image
+(`spec/INTEGRITY_PLAN.md`).
+
+### 8.4 Quake trace (need -> VM feature)
+
+| Quake need | VM feature |
+|---|---|
+| 32-bit mul/div, signed math | 0x20-0x29 (v1) |
+| byte access, block moves | 0x2A/0x2B, 0x2D/0x2E (v1) |
+| float32 math | 0x30-0x37 (v1) |
+| function pointers / callbacks | 0x2C CALLR, 0x2C-adjacent jump model |
+| malloc/free, zone | nalloc + SVC 2/3 (regions), arena layer |
+| pak/file loading | SVC 4-8, storage driver, NaNFS |
+| timing | PIT IRQ0, SVC 11 (ticks) |
+| input | IRQ1 keyboard, mouse (planned), SVC read |
+| rendering | DEV framebuffer window, BCOPY blit |
+| NetQuake | NaNNet bytecode carts + NIC driver |
+| savegames/config | storage write + NaNFS write |
+
+## 9. Processes and threads
+
+### 9.1 Processes
+
+A process is an address-space region set + heap + entry point + capability
+set. Isolation is enforced in software by the interpreter: every memory
+access is checked against the current process's region table; holes and
+foreign regions trap the gate (no silent read). This is mandatory and keeps
+one VM across aarch64/x86/riscv/wasm and the C core; hardware paging is an
+optional x86 accelerator, never a correctness requirement.
+
+Process table entry: pid, state (ready/running/blocked/dead), region table,
+heap base/end, thread list, capability handles, parent. Lifecycle: load a
+sealed image from storage, build regions, spawn the main thread, reap on
+exit and reclaim the address space. IPC: explicitly granted shared RAM
+regions plus message passing over the NaNNet link layer (identical local and
+remote).
+
+### 9.2 Threads
+
+A thread is a context {r0-r15, pc, flags, stack pointer} plus a stack
+region. Preemption: the PIT raises IRQ0 at 100 Hz; the boundary sets a
+pending bit; the interpreter tests it between instructions and at backward
+branches and vectors to the kernel entry. Time slice in ticks, round-robin.
+Cooperative yield is SVC 0. The trap frame (r0-r15, pc, flags at fixed
+offsets) is the context-switch ABI: the scheduler stores it in the TCB and
+restores the next thread. Stacks are per-thread regions with a guard hole;
+overflow traps. SMP is out of scope on the guest-visible model: many threads
+are time-sliced on one machine.
+
+### 9.3 New ops (v1 revision, 0x38-0x3F)
+
+    38 MEMQ d,a (planned)      region query: base/nwords/kind
+    39 SVC imm                 syscall/trap gate (trap frame, kernel entry)
+    3A INB d,a | 3B OUTB a,b | 3C INW d,a | 3D OUTW a,b   port I/O
+    3E DISKW (optional)        write sealed block range
+    3F reserved                IRQ control stays in the kernel via port I/O
+
+SVC syscall ABI (v1 draft; numbers stable once used, new calls append):
+0 yield, 1 exit(code), 2 region_map(id, base, words, kind), 3 region_query,
+4 open(path, flags) -> handle, 5 read(handle, buf, len), 6 write(handle,
+buf, len), 7 seek, 8 close, 9 spawn(path, args) -> pid, 10 wait(pid),
+11 time(ticks), 12 share(pid, region, perms).
+
+Interrupt model: a kernel-owned vector table; the timer is IRQ0, keyboard
+IRQ1, NIC per driver; guest handlers are registered through SVC; EOI via
+OUTB to the PIC. Keyboard/mouse rings are kernel-owned; SVC read drains them.
+
+### 9.4 Interface
+
+Port I/O ops and memory-mapped DEV windows (§4.3) are the only ways out:
+timer, keyboard, mouse, display, NIC, audio later, storage. A process never
+touches a device directly; it holds capability handles and calls SVC. This
+is the same boundary on every target (x86 IN/OUT, aarch64 MMIO, C core
+host callbacks).
+
+### 9.5 One VM, three builds
+
+- **NaNVM0** — museum build: 8,192 words, single job, no v1 ops.
+- **NaNVM1** — platform build: this section; big flat memory, port I/O,
+  SVC, regions, threads.
+- **NaNNet VM** — bytecode program format (§5): carts are process images on
+  the same machine; the interpreter and the network lanes run as processes
+  under the same region checks.
+
+Rule: no feature lives outside this document. A subsystem either fits an
+existing op/ABI or its op is added here with a version.
+
+## 10. What exists vs what is to build
+
+| piece | state |
+|---|---|
+| nalloc (next-fit + coalesce), 3,156 checks | DONE (`src/prog/nalloc*.nas`) |
+| NaNFS read, ATA PIO read | DONE |
+| DISPQ/DISPSET text boundary | DONE |
+| sealed-image verify (L4) | DONE (`spec/INTEGRITY_PLAN.md`) |
+| NaNVM1 op set 0x20-0x37 (32-bit mul/div, bytes, BCOPY, float32) | DONE in the C core (`aarch64/android/core/nan16.c`, `tests/test_core.c`); native implementation PLAN (§4) |
+| NaNVM1 native flat memory + 32-bit pc | PLAN (§4.1-4.2) |
+| MEMQ region table | PLAN (§4.2) |
+| port I/O ops INB/OUTB/INW/OUTW | PLAN (§9.3) |
+| SVC gate + trap frames | PLAN (§9.3) |
+| PIT timer, IRQ0, preemptive tick | PLAN (§9.2; proven recipe in early r21 notes) |
+| context switch + scheduler | PLAN (§9.2) |
+| software region checks per process | PLAN (§9.1) |
+| per-process heap on nalloc + MEMQ | PLAN (§8.2) |
+| storage write, NaNFS write, loader/spawn | PLAN (§8.3, SVC 4-9) |
+| framebuffer DEV + scaler | PLAN (§4.3) |
+| NaN compiler C subset -> NaN16 | PLAN (`spec/NAN_MIGRATION_PLAN.md`, `spec/TRANSLATOR.md`) |
+| Quake in NaN, complete | blocked on the four rows above |
+
+Honest blockers for Quake: NaNVM1 native memory/pc, the compiler, storage
+write, input/audio. Speed remains an interpreter problem; the fast core and
+the in-NaN translator are the route, not a license to skip correctness.
