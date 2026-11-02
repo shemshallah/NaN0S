@@ -51554,6 +51554,223 @@ twc_bad:
 twc_ret:
   .word 0
 twskip:
+  MOVI r1,1
+  ST r1,r14,70
+  MOVI r1,0
+  MOVHI r1,32760
+  ST r1,r14,704
+  MOVI r1,1
+  MOVHI r1,0
+  ST r1,r14,705
+  CALL @cnan
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,1
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,704
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,705
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,704
+  MOVI r2,0
+  MOVHI r2,65528
+  CMP r1,r2
+  JMP[NE] @cnb22113
+  LD r1,r14,705
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r1,r2
+  JMP[NE] @cnb22113
+  JMP @cnb22113k
+cnb22113:
+  MOVI r1,0
+  ST r1,r14,70
+cnb22113k:
+  MOVI r1,0
+  MOVHI r1,16368
+  ST r1,r14,704
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,705
+  CALL @cnan
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,2
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,704
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,705
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,704
+  MOVI r2,0
+  MOVHI r2,16368
+  CMP r1,r2
+  JMP[NE] @cnb22114
+  LD r1,r14,705
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r1,r2
+  JMP[NE] @cnb22114
+  JMP @cnb22114k
+cnb22114:
+  MOVI r1,0
+  ST r1,r14,70
+cnb22114k:
+  MOVI r1,0
+  MOVHI r1,65528
+  ST r1,r14,704
+  MOVI r1,0
+  MOVHI r1,0
+  ST r1,r14,705
+  CALL @cnan
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,3
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,704
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,705
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,704
+  MOVI r2,0
+  MOVHI r2,65528
+  CMP r1,r2
+  JMP[NE] @cnb22115
+  LD r1,r14,705
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r1,r2
+  JMP[NE] @cnb22115
+  JMP @cnb22115k
+cnb22115:
+  MOVI r1,0
+  ST r1,r14,70
+cnb22115k:
+  MOVI r1,0
+  MOVHI r1,65528
+  ST r1,r14,704
+  MOVI r1,1
+  MOVHI r1,0
+  ST r1,r14,705
+  CALL @cnan
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r5,4
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,704
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  LD r5,r14,705
+  CALL @puthex8
+  CALL @nl
+  LD r1,r14,704
+  MOVI r2,0
+  MOVHI r2,65528
+  CMP r1,r2
+  JMP[NE] @cnb22116
+  LD r1,r14,705
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r1,r2
+  JMP[NE] @cnb22116
+  JMP @cnb22116k
+cnb22116:
+  MOVI r1,0
+  ST r1,r14,70
+cnb22116k:
+  LD r1,r14,70
+  CMP r1,r0
+  JMP[NE] @dk2117
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  CALL @nl
+  JMP @dn2118
+dk2117:
+  MOVI r1,67
+  PUTC r1
+  MOVI r1,78
+  PUTC r1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,79
+  PUTC r1
+  MOVI r1,75
+  PUTC r1
+  CALL @nl
+dn2118:
+  JMP @cnskip
+cnan:
+  ST r15,r0,@cnan_ret
+  LD r3,r14,704
+  LD r4,r14,705
+  MOVI r6,0
+  MOVHI r6,32752
+  BOOL.8 r7,r3,r6
+  CMP r7,r6
+  JMP[NE] @cnn
+  MOVI r6,65535
+  MOVHI r6,15
+  BOOL.8 r7,r3,r6
+  CMP r7,r0
+  JMP[NE] @cny
+  CMP r4,r0
+  JMP[NE] @cny
+cnn:
+  LD r15,r0,@cnan_ret
+  RET
+cny:
+  MOVI r3,0
+  MOVHI r3,65528
+  ST r3,r14,704
+  MOVI r3,0
+  ST r3,r14,705
+  LD r15,r0,@cnan_ret
+  RET
+cnan_ret:
+  .word 0
+cnskip:
   MOVI r1,42405
   MOVHI r1,42405
   ST r1,r14,200
