@@ -999,7 +999,7 @@ MOVI r6,101
 CMP r4,r6
 JMP[NE] @tk_docmd
 MOVI r5,4784
-MOVI r1,1
+MOVI r1,9
 ST r1,r5,0
 JMP @g_exit
 tk_docmd:

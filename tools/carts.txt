@@ -20,4 +20,5 @@
 6:src/nan/paradox_cart.nan:2026:9:2:Paradox Engine - sNaN/qNaN contradiction oscillator
 7:src/nan/about_nan0s_cart.nan:2026:7:2:About NaN/0S - the machine, the trust, the plan
 8:src/nan/about_dev_cart.nan:2026:7:2:About Shemshallah - the developer
+9:src/nan/suite_cart.nan:2026:10:0:Console tools
 boot:src/nan/gui_cart.nan
