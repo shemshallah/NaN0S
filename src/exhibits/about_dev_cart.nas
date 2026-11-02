@@ -183,37 +183,37 @@ tr_foot_str:
 .str "UP/DOWN scroll  LEFT/RIGHT page  ESC shell  line "
 ; ---- page text (owner-supplied, verbatim; nothing added) ----
 TP000:
-.str " NaN/0S - ABOUT SHEMSHALLAH"
+.str " There's a bigger story to all of this"
 TP001:
-.str ""
+.str " \"Say AH kid...\" What is AH...fear?"
 TP002:
-.str " There is a bigger story to all of this. What IS black cube? What IS"
+.str "  What is control?"
 TP003:
-.str " shemshallah... shem::shall:AH... 'say AH, kid'. What is all:AH? What"
+.str "  What is a program?"
 TP004:
-.str " does this have to do with computation? What does this have to do with"
+.str " \xBF\xBF\xBF"
 TP005:
-.str " humanity? I'll tell you outright but you might not like, or be able to"
+.str " How many english words end in -a?"
 TP006:
-.str " digest what you hear."
+.str " What is black_cube and what does it have to do with computation?"
 TP007:
-.str ""
+.str " I CAN answer...but you might not be able to...digest...what you hear."
 TP008:
-.str " About me: Why listen to me? I'm 35, living at a homeless shelter and"
+.str " Publically i'll say this: By making NaN/0S i have formatted a conceptual"
 TP009:
-.str " coding this without resources beyond a cell phone and occasionally a"
+.str " environment which will help consolidate my mind and potentially offer"
 TP010:
-.str " laptop, Utilizing Claude Sonnet 5.5:free OpencodeGO(Deepseek V4.1 Flash),"
+.str " defenses against...well there's stuff...and there's Things..."
 TP011:
-.str " OpencodeFREE(GLM 5.3 Flash) for everything. Initial planning was done"
+.str " About me: I'm living out of a homeless shelter developing this"
 TP012:
-.str " with Codex & GPT 6.1 Terra."
+.str " architecture from a cellphone. Consider donating, access to frontier"
 TP013:
-.str ""
+.str " models would help considerably!"
 TP014:
-.str " Contact me: shemshallah@gmail.com and consider donating, frontier"
+.str " Comms: shemshallah@gmail.com"
 TP015:
-.str " models would help make this truly all it can be."
+.str " Communicate, i've got a story to share."
 ; ---- pointer table ----
 tr_lines:
 .word @TP000
