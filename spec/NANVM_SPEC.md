@@ -81,12 +81,17 @@ Goal: the native NaN16 VM handles whatever RAM the machine has, later VRAM
 for GPU integration.
 
 ### 4.1 Address model
-Guest address = 32-bit word index (r[a]+imm, already how
-LD/ST/STW/BSWAPM/LDB/STB/BCOPY work in the model) = up to 2^32 words = 32 GB
-of 8-byte words. Past that: a later 64-bit address pair op family (ADDRH
-register + *64 variants); not needed before ~16 GB machines.
-Host side: flat 32-bit protected mode first (4 GB limit, so ~512M words),
-then long mode + paging for more. Guest words are never segmented.
+Guest address = 64-bit effective address. RAM effective addresses are word
+indices; the high half comes from a per-context ADDRH register (op 0x40) and
+the low half from r[a]+imm as today, so existing code is unchanged while
+ADDRH=0. The reach is 2^64 words = 128 EiB of words: "arbitrary numbers of
+words" for any machine we will build. 16 GB RAM = 2^31 words. 32 GB VRAM =
+2^33 32-bit cells as a DEV window; DEV effective addresses count 32-bit
+cells, so the same 64-bit ea covers 2^64 cells.
+Host side: flat 32-bit protected mode for small machines, long mode +
+paging for the platform; host memory is demand-mapped (mmap) so a 16 GB
+guest heap does not have to be resident. Guest words are never segmented;
+ADDRH is address extension, not a segment base.
 
 ### 4.2 Memory discovery (no constants in the guest)
 Boot: INT 15h E820 in real mode -> copy the map to a fixed table. Native VM
@@ -191,11 +196,13 @@ program head so the operand stack starts empty. Halting with a 64-bit word
 ### 8.1 Memory ceiling and word budget
 
 A guest word is 8 bytes with a 32-bit payload. NaNVM1 addresses words with
-32 bits; the native v1 ceiling is k<=28 = 268,435,456 words = 2 GiB of
-words. The reference C core today is 4,194,304 words (`NAN_WORDS 0x400000`),
-which is the first platform target and exactly the Quake budget; raising it
-is a constant, not a redesign. NaNVM0 stays an 8,192-word museum machine for
-a single job; it is not the platform.
+64 bits (§4.1): practical ceilings are host-bounded, not ISA-bounded.
+16 GB RAM = 2,147,483,648 words; 32 GB VRAM = 8,589,934,592 32-bit cells in
+DEV windows (64-bit cell addresses). The reference C core today has
+`NAN_WORDS 0x400000` (4M words, 32 MiB) and 32-bit word indices; the
+platform revision makes NAN_WORDS configurable, indices 64-bit and host
+memory demand-mapped. NaNVM0 stays an 8,192-word museum machine for a single
+job; it is not the platform.
 
 Quake trace (requirements -> words):
 
@@ -272,15 +279,25 @@ remote).
 
 ### 9.2 Threads
 
-A thread is a context {r0-r15, pc, flags, stack pointer} plus a stack
-region. Preemption: the PIT raises IRQ0 at 100 Hz; the boundary sets a
-pending bit; the interpreter tests it between instructions and at backward
-branches and vectors to the kernel entry. Time slice in ticks, round-robin.
-Cooperative yield is SVC 0. The trap frame (r0-r15, pc, flags at fixed
-offsets) is the context-switch ABI: the scheduler stores it in the TCB and
-restores the next thread. Stacks are per-thread regions with a guard hole;
-overflow traps. SMP is out of scope on the guest-visible model: many threads
-are time-sliced on one machine.
+A thread is a context {r0-r15, pc, flags, stack pointer, ADDRH} plus a stack
+region. Preemption: a per-core PIT raises IRQ0 at 100 Hz; the boundary sets
+a pending bit; the interpreter tests it between instructions and at backward
+branches and vectors to the kernel entry. Time slice in ticks, round-robin;
+per-core run queues with atomic work stealing. Cooperative yield is SVC 0.
+The trap frame (r0-r15, pc, flags, ADDRH at fixed offsets) is the
+context-switch ABI: the scheduler stores it in the TCB and restores the next
+thread.
+
+SMP is in scope: up to K native cores run K interpreters in parallel over
+one shared word memory. Per-core state is exactly the state the C core
+already keeps per `nan_vm` (registers, pc, flags, timers); shared memory plus
+the atomic ops (0x41-0x44) and fences are the synchronization contract. A
+guest thread is scheduled onto a core; a process keeps one address space and
+may run threads on several cores. The kernel keeps a global ready queue and
+per-core queues; IPIs are a pending word plus FENCE. Stacks are per-thread
+regions with a guard hole; overflow traps. This is the multithreading that AI
+workloads need: tiled matrix work, parallel reductions, and a barrier/fence
+model that is explicit rather than accidental.
 
 ### 9.3 New ops (v1 revision, 0x38-0x3F)
 
@@ -289,6 +306,22 @@ are time-sliced on one machine.
     3A INB d,a | 3B OUTB a,b | 3C INW d,a | 3D OUTW a,b   port I/O
     3E DISKW (optional)        write sealed block range
     3F reserved                IRQ control stays in the kernel via port I/O
+    40-4F scale + AI family (candidate encodings, frozen when coded):
+      40 ADDRH a                 address high half (64-bit ea; §4.1)
+      41 CAS d,a,b               atomic compare-exchange on ea(d) payload
+      42 XADD d,a,b              atomic fetch-add, d = old
+      43 XCHG d,a,b              atomic swap, d = old
+      44 FENCE                   full memory barrier
+      45 FMA d,a,b               fused float32 multiply-add
+      46 DP2H d,a,b              dot 2 x f16 (packed payload lanes)
+      47 DP4B d,a,b              dot 4 x i8 (packed payload lanes)
+      48 CVTPK d,a               convert f32 <-> 2 x f16 (packed)
+      49-4F reserved             bf16 variants and lane select when coded
+
+All atomics operate on the 32-bit payload of one aligned word and are
+sequentially consistent with FENCE; they are the only shared-memory
+primitives the scheduler and the AI kernels need. Existing ops keep 32-bit
+value semantics; only effective addresses widen.
 
 SVC syscall ABI (v1 draft; numbers stable once used, new calls append):
 0 yield, 1 exit(code), 2 region_map(id, base, words, kind), 3 region_query,
@@ -329,6 +362,11 @@ existing op/ABI or its op is added here with a version.
 | DISPQ/DISPSET text boundary | DONE |
 | sealed-image verify (L4) | DONE (`spec/INTEGRITY_PLAN.md`) |
 | NaNVM1 op set 0x20-0x37 (32-bit mul/div, bytes, BCOPY, float32) | DONE in the C core (`aarch64/android/core/nan16.c`, `tests/test_core.c`); native implementation PLAN (§4) |
+| 64-bit effective addresses (ADDRH, 0x40) | PLAN (§4.1) |
+| SMP cores, atomics, fences (0x41-0x44) | PLAN (§9.2, §9.3) |
+| AI packed math: FMA, DP2H, DP4B, CVTPK (0x45-0x48) | PLAN (§11) |
+| 16 GB RAM configuration (NAN_WORDS, 64-bit indices, demand-mapped host memory) | PLAN — C core revision |
+| nalloc64 (heaps > 2^31 words, 64-bit pointers/sizes) | PLAN (§11) |
 | NaNVM1 native flat memory + 32-bit pc | PLAN (§4.1-4.2) |
 | MEMQ region table | PLAN (§4.2) |
 | port I/O ops INB/OUTB/INW/OUTW | PLAN (§9.3) |
@@ -345,3 +383,37 @@ existing op/ABI or its op is added here with a version.
 Honest blockers for Quake: NaNVM1 native memory/pc, the compiler, storage
 write, input/audio. Speed remains an interpreter problem; the fast core and
 the in-NaN translator are the route, not a license to skip correctness.
+
+## 11. AI profile — why the scale, SMP and atomics matter
+
+The same VM hosts the museum language model, Quake and NaNNet; there is no
+AI-specific second machine.
+
+- **Memory.** Weights in f32/f16/bf16 live in 16 GB RAM = 2^31 words; the KV
+  cache and activation buffers come from the same heap. Models larger than
+  RAM stream sealed weights from storage (§8.3). 32 GB+ VRAM is mapped as
+  DEV windows with 64-bit cell addresses; first use is a linear framebuffer,
+  later virtio-gpu command rings.
+- **Compute.** f32 scalar math already exists (0x30-0x37). The AI family
+  adds FMA (0x45), packed f16 dot (0x46), packed i8 dot (0x47) and packed
+  conversions (0x48) so matrix work is bandwidth-bound instead of
+  instruction-bound. Packing f16/bf16 pairs and i8 quads inside the 32-bit
+  payload is deliberate: the word stays 8 bytes, the gated class stays
+  intact, and no raw side-regions appear.
+- **Threads.** Tiled matmul spreads across K native cores (§9.2); per-core
+  run queues, atomic reductions via XADD, barriers via FENCE. The identical
+  scheduler serves Quake's parallel renderer and the network carts.
+- **Allocator.** nalloc64: nalloc's 32-bit size field caps a block at
+  2^31-1 words (just under 16 GB); nalloc64 carries 64-bit pointers/sizes
+  with the same next-fit/coalescing invariants. Page-frame bitmap and buddy
+  layers stay system-owned; arenas serve the LM, the Quake zone and hunk.
+- **Storage.** Datasets and weights are sealed NaNFS files, streamed through
+  the block device; the block bitmap allocates storage, processes hold only
+  capability handles.
+- **Honesty.** Interpreter throughput is the limiting factor before GPU
+  offload; the route is the fast native core plus the in-NaN translator
+  (`spec/MEMORY_PLAN.md`, `spec/PERF_ESTIMATE.md`). This contract makes the
+  model fit and the threads real; it does not claim wire-speed inference.
+
+Rule, restated: one machine, one memory, one thread model, one device
+interface. Quake, the LM, the museum and NaNNet are processes on it.

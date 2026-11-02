@@ -6,8 +6,13 @@
 #include <string.h>
 #include <stdio.h>
 
-#define NAN_MASK  0x3FFFFFu
+#define NAN_MASK  (NAN_WORDS - 1u)
+/* NAN_WORDS must be a power of two. Default keeps the current machine; the
+   platform revision raises it toward 2^31 words (16 GB) and then widens the
+   index to 64 bits (spec/NANVM_SPEC.md §4.1, §8.1). */
+#ifndef NAN_WORDS
 #define NAN_WORDS 0x400000u
+#endif
 #define NAN_VRAM  (16u << 20)
 #define NAN_SER_CAP 262144u
 

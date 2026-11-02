@@ -173,8 +173,8 @@ static void t_memory_ops(void) {
   { uint32_t want[8] = {3, 4, 5, 6, 7, 8, 7, 8}; for (int i = 0; i < 8; i++) EQ(nan_word(V, 100 + i) >> 16 & 0xFFFFFFFFu, want[i]); }
   begin(); nan_set_reg(V, 1, 50); nan_set_reg(V, 2, 0xDEAD); nan_set_reg(V, 3, 4); I(0x2E, 1, 2, 3); halt(); go(100);
   for (int i = 0; i < 4; i++) EQ(nan_word(V, 50 + i) >> 16 & 0xFFFFFFFFu, 0xDEAD); EQ(nan_word(V, 54), 0);
-  begin(); nan_set_reg(V, 1, 0x3FFFFE); nan_set_reg(V, 2, 7); nan_set_reg(V, 3, 4); I(0x2E, 1, 2, 3); halt(); go(100);    /* wraps with the 4M-word mask */
-  EQ(nan_word(V, 0x3FFFFF) >> 16 & 0xFFFFFFFFu, 7); EQ(nan_word(V, 1) >> 16 & 0xFFFFFFFFu, 7);
+  begin(); nan_set_reg(V, 1, NAN_WORDS - 2u); nan_set_reg(V, 2, 7); nan_set_reg(V, 3, 4); I(0x2E, 1, 2, 3); halt(); go(100);    /* wraps with the configured word mask */
+  EQ(nan_word(V, NAN_WORDS - 1u) >> 16 & 0xFFFFFFFFu, 7); EQ(nan_word(V, 1) >> 16 & 0xFFFFFFFFu, 7);
   /* BSWAPM */
   begin(); nan_set_word(V, 200, 0x0102030405060708ull); nan_set_reg(V, 1, 200); I(0x14, 0, 1, 0); halt(); go(100); EQ(nan_word(V, 200), 0x0807060504030201ull);
   /* RDTSC counts executed instructions; CPUID leaf 0 */
