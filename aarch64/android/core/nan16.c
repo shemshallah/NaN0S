@@ -1,4 +1,6 @@
-/* nan16.c - NaN16/NaNVM1 CPU core. Semantics: OPS.md (verified against kan16.xa r28d). */
+/* nan16.c - host conformance harness for the NaN16/NaNVM1 core (S6).
+   NOT the VM: spec/NANVM_SPEC.md is normative; no semantics land here first.
+   Semantics ref: OPS.md (verified against kan16.xa r28d). */
 #include "nan16_int.h"
 #include <math.h>
 

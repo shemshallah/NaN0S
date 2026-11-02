@@ -6,6 +6,12 @@ Move the system to NaN as completely as possible. The native core is the
 absolute minimum needed to execute a NaN word and touch raw hardware. The disk
 driver, filesystem, builder, loader, shell, museum, and tools are NaN16.
 
+One VM: the unified VM is the main process — NaNVM0's revision upgraded with
+the NaNVM1 ops and hybridized with the NaNNet bytecode mode — and the terminal
+is its service, so a CLI is a terminal client, never a VM. The C core is a
+host harness (S6) during the transition; the Android build keeps only
+JNI/display/input/audio glue in C/Kotlin (`spec/NANVM_SPEC.md` §12).
+
 ## The chain
 
 ```

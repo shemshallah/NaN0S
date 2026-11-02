@@ -341,14 +341,22 @@ touches a device directly; it holds capability handles and calls SVC. This
 is the same boundary on every target (x86 IN/OUT, aarch64 MMIO, C core
 host callbacks).
 
-### 9.5 One VM, three builds
+### 9.5 One VM: revisions and modes, not builds
 
-- **NaNVM0** — museum build: 8,192 words, single job, no v1 ops.
-- **NaNVM1** — platform build: this section; big flat memory, port I/O,
-  SVC, regions, threads.
-- **NaNNet VM** — bytecode program format (§5): carts are process images on
-  the same machine; the interpreter and the network lanes run as processes
-  under the same region checks.
+There is one machine, not a family:
+
+- **NaNVM0** is revision 0 (NaN16 v0.1 ops, 8,192-word museum profile).
+- **NaNVM1** is revision 1 of the same machine (ops 0x20-0x37 plus the
+  scale/SMP/AI families in §9.3); nothing forks a new machine.
+- **NaNNet VM** is not a second machine and not a separate image: its
+  bytecode is the VM's second instruction form. The unified VM boots as the
+  main process, owns memory and devices, and executes native NaN16 words
+  and NaNNet bytecode cells as processes under the same scheduler, regions
+  and device interface. A bytecode program is loaded like any other process
+  image; the interpreter is part of the machine, not a cart on top of it.
+
+The three historical names describe revision and execution mode, never a
+separate build or file. Everything ships as one image.
 
 Rule: no feature lives outside this document. A subsystem either fits an
 existing op/ABI or its op is added here with a version.
@@ -417,3 +425,59 @@ AI-specific second machine.
 
 Rule, restated: one machine, one memory, one thread model, one device
 interface. Quake, the LM, the museum and NaNNet are processes on it.
+
+## 12. Implementation authority, the main process, and the terminal
+
+### 12.1 Authority
+
+The norm is this document plus the NaN image. The C code under
+`aarch64/android/core/` is a **non-normative host harness** (S6 in
+`spec/SELF_HOSTING.md`): it runs the same image on hosts that cannot boot the
+native boundary and cross-checks vectors. No opcode, flag or device
+semantic may land in C first. If C and this spec disagree, the spec wins and
+C is fixed. Older notes that called `nan16.c` the line of truth are retired
+(`spec/TOOL01_PLAN.md` corrected).
+
+### 12.2 The product boundary
+
+S0 (512 B boot sector) and S1 (native core: fetch/decode/gate/trap, memory,
+clock, keyboard ring, text plane, port I/O, halt) are the only native code
+in the product. S2-S5 (assembler, builder, disk driver, filesystem, shell,
+museum, tools, terminal) are NaN. Hosts: x86 first, AArch64 next (the
+Android product boundary), then riscv64/wasm32. S1 is per-host and small; it
+contains no ATA logic, no filesystem, no allocator, no shell, no builder, no
+font, no VGA mode table.
+
+### 12.3 Android: bare-minimum C
+
+The Android build keeps only the JNI glue, display surface, input forwarding
+and audio hand-off in C/Kotlin. The C interpreter is not part of the product
+once the AArch64 S1 core passes the same vectors; until then it is the test
+bench. Retirement order:
+
+1. freeze new semantics in C (the spec-first rule above);
+2. land the AArch64 S1 core with the existing vector suite behind it;
+3. Android loads the same unified image through S1;
+4. the C core remains only in CI as a conformance oracle, then leaves the
+   product builds; any harness that stays lives outside the machine.
+
+No second VM implementation is allowed to grow back.
+
+### 12.4 The VM is the main process
+
+On bare metal the unified VM is the kernel/main process: it owns memory, the
+scheduler, the terminal and the devices. On a hosted build (Android,
+desktop, WASM) the host process only loads the image, provides the surface,
+forwards input, and steps the machine; it does not own VM semantics.
+
+### 12.5 The terminal extension
+
+The terminal is a VM service, not a host program: a text plane (the existing
+80x25 cell interface) plus an input ring, owned by the VM. The shell and
+command dispatcher run as NaN code inside the VM. A CLI binary is a
+**terminal client**: it opens the surface (serial or window), forwards
+keystrokes, renders the text plane, and may attach to an already running
+machine. One terminal ABI serves bare-metal serial, the Android window and
+the host CLI, so the same session looks identical everywhere. The moment a
+CLI needs VM knowledge, that knowledge belongs in S1 (the boundary) or in
+NaN (the service) — never in the CLI.

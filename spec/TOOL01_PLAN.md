@@ -39,6 +39,6 @@ for other duplicates in src/ recommended before the next big gate.
 4. Then resume per r24/r27 plans (nbuild manifest P1, RISC-V, Python retirement).
 
 ## Semantics reference (keep aligned)
-- nan16.c (aarch64/android/core) is now the line-of-truth for op behavior (flags fl(z,l)=2z+l; ST/STB set class 10/word; STW class = regs[b]&15; ADDI sext; CA LDR semantics r15 CALL/CALLR; JMPF/CALLF 24-bit; BOOL nibble = bit-index truth table: 6 = XOR, 8 = AND, 14 = OR).
+- nan16.c (aarch64/android/core) is the conformance harness during the transition, not the line of truth: spec/NANVM_SPEC.md is normative and vectors must agree (flags fl(z,l)=2z+l; ST/STB set class 10/word; STW class = regs[b]&15; ADDI sext; CA LDR semantics r15 CALL/CALLR; JMPF/CALLF 24-bit; BOOL nibble = bit-index truth table: 6 = XOR, 8 = AND, 14 = OR).
 - n16i.nas mirrors it; divergences get caught by tools/ngate_n16i.sh / ngate_fuzz.sh first.
 - nasm0 build: V_* slot addresses 6272..6297 are fixed by nasm0.nas .equ block; the SRC/OUT/LAB/STACK areas may be re-based anywhere (runtime pointers V_SRCB/V_OUTB/V_LABB only).
