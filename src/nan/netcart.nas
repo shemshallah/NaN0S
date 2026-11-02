@@ -43689,12 +43689,14 @@ kjz:
   MOVI r1,1
   BOOL.14 r3,r3,r1
   MOVI r2,1
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1898n
   MOVI r3,0
   MOVI r1,8
   BOOL.14 r3,r3,r1
   MOVI r2,8
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1898d
 fd1898n:
@@ -43751,6 +43753,7 @@ fd1898d:
   MOVI r1,0
   BOOL.14 r3,r3,r1
   MOVI r2,0
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1899n
   MOVI r3,0
@@ -43760,6 +43763,7 @@ fd1898d:
   MOVI r1,255
   BOOL.14 r3,r3,r1
   MOVI r2,65535
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1899d
 fd1899n:
@@ -43816,6 +43820,7 @@ fd1899d:
   MOVI r1,0
   BOOL.14 r3,r3,r1
   MOVI r2,0
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1900n
   MOVI r3,0
@@ -43825,6 +43830,7 @@ fd1899d:
   MOVI r1,255
   BOOL.14 r3,r3,r1
   MOVI r2,65535
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1900d
 fd1900n:
@@ -43881,6 +43887,7 @@ fd1900d:
   MOVI r1,0
   BOOL.14 r3,r3,r1
   MOVI r2,0
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1901n
   MOVI r3,0
@@ -43890,6 +43897,7 @@ fd1900d:
   MOVI r1,255
   BOOL.14 r3,r3,r1
   MOVI r2,65535
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1901d
 fd1901n:
@@ -43929,12 +43937,14 @@ fd1901d:
   MOVI r1,0
   BOOL.14 r3,r3,r1
   MOVI r2,0
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1902n
   MOVI r3,0
   MOVI r1,15
   BOOL.14 r3,r3,r1
   MOVI r2,15
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1902d
 fd1902n:
@@ -44038,6 +44048,7 @@ fd1902d:
   MOVI r1,0
   BOOL.14 r3,r3,r1
   MOVI r2,0
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1903n
   MOVI r3,0
@@ -44047,6 +44058,7 @@ fd1902d:
   MOVI r1,255
   BOOL.14 r3,r3,r1
   MOVI r2,65535
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1903d
 fd1903n:
@@ -44086,18 +44098,1299 @@ fd1903d:
   MOVI r1,0
   BOOL.14 r3,r3,r1
   MOVI r2,0
+  MOVHI r2,0
   CMP r3,r2
   JMP[NE] @fd1904n
   MOVI r3,0
   MOVI r1,8
   BOOL.14 r3,r3,r1
   MOVI r2,8
+  MOVHI r2,0
   CMP r3,r2
   JMP[EQ] @fd1904d
 fd1904n:
   MOVI r1,0
   ST r1,r14,70
 fd1904d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,259
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1905n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1905d
+fd1905n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1905d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,513
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1906n
+  MOVI r3,0
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,255
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1906d
+fd1906n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1906d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,514
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1907n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1907d
+fd1907n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1907d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,515
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1908n
+  MOVI r3,0
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,255
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1908d
+fd1908n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1908d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,517
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1909n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1909d
+fd1909n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1909d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,523
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1910n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1910d
+fd1910n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1910d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,525
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1911n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1911d
+fd1911n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1911d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,527
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1912n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1912d
+fd1912n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1912d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,531
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1913n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1913d
+fd1913n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1913d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,534
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1914n
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,255
+  CMP r3,r2
+  JMP[EQ] @fd1914d
+fd1914n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1914d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,774
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1915n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1915d
+fd1915n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1915d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,783
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1916n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,24
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,16
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,65535
+  CMP r3,r2
+  JMP[EQ] @fd1916d
+fd1916n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1916d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,2311
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1917n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1917d
+fd1917n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1917d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,2568
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1918n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1918d
+fd1918n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1918d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,2820
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1919n
+  MOVI r3,0
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1919d
+fd1919n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1919d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,2828
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,1
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,1
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,223
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,223
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,1
+  BOOL.14 r3,r3,r1
+  MOVI r2,1
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1920n
+  MOVI r3,0
+  MOVI r1,223
+  BOOL.14 r3,r3,r1
+  MOVI r2,223
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1920d
+fd1920n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1920d:
+  MOVI r1,86
+  PUTC r1
+  MOVI r5,3335
+  CALL @puthex8
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,0
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,0
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,255
+  SHR r1,r1,4
+  CALL @puthex1
+  MOVI r1,255
+  MOVI r2,15
+  BOOL.8 r1,r1,r2
+  CALL @puthex1
+  MOVI r1,32
+  PUTC r1
+  MOVI r1,49
+  PUTC r1
+  MOVI r1,51
+  PUTC r1
+  CALL @nl
+  MOVI r3,0
+  MOVI r1,0
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,0
+  BOOL.14 r3,r3,r1
+  MOVI r2,0
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[NE] @fd1921n
+  MOVI r3,0
+  MOVI r1,255
+  SHL r1,r1,8
+  BOOL.14 r3,r3,r1
+  MOVI r1,255
+  BOOL.14 r3,r3,r1
+  MOVI r2,65535
+  MOVHI r2,0
+  CMP r3,r2
+  JMP[EQ] @fd1921d
+fd1921n:
+  MOVI r1,0
+  ST r1,r14,70
+fd1921d:
   LD r1,r14,70
   CMP r1,r0
   JMP[NE] @n10k
@@ -44297,7 +45590,7 @@ p1k:
   PUTC r1
   CALL @nl
   MOVI r6,0
-wz1905:
+wz1922:
   MOVI r2,40
   ADD r1,r2,r6
   ADD r1,r14,r1
@@ -44306,9 +45599,9 @@ wz1905:
   ADDI r6,r6,1
   MOVI r2,8
   CMP r6,r2
-  JMP[LT] @wz1905
+  JMP[LT] @wz1922
   MOVI r6,0
-wz21906:
+wz21923:
   MOVI r2,104
   ADD r1,r2,r6
   ADD r1,r14,r1
@@ -44317,24 +45610,24 @@ wz21906:
   ADDI r6,r6,1
   MOVI r2,12
   CMP r6,r2
-  JMP[LT] @wz21906
+  JMP[LT] @wz21923
   MOVI r6,0
-wc1907:
+wc1924:
   MOVI r2,40
   ADD r1,r2,r6
   ADD r1,r14,r1
   LD r3,r1,0
   CMP r3,r0
-  JMP[NE] @wn1908
+  JMP[NE] @wn1925
   ADDI r6,r6,1
   MOVI r2,8
   CMP r6,r2
-  JMP[LT] @wc1907
-  JMP @wn1908k
-wn1908:
+  JMP[LT] @wc1924
+  JMP @wn1925k
+wn1925:
   MOVI r1,0
   ST r1,r14,70
-wn1908k:
+wn1925k:
   LD r1,r14,70
   CMP r1,r0
   JMP[EQ] @w12n
@@ -44401,7 +45694,7 @@ w12d:
   ST r1,r14,88
   CALL @pack
   MOVI r5,0
-cpc1909:
+cpc1926:
   MOVI r2,104
   ADD r1,r2,r5
   ADD r1,r14,r1
@@ -44413,7 +45706,7 @@ cpc1909:
   ADDI r5,r5,1
   MOVI r2,4
   CMP r5,r2
-  JMP[LT] @cpc1909
+  JMP[LT] @cpc1926
   MOVI r1,83
   PUTC r1
   MOVI r1,50
@@ -44480,7 +45773,7 @@ k2n:
   CALL @nl
 k2d:
   MOVI r5,0
-cpc1910:
+cpc1927:
   MOVI r2,104
   ADD r1,r2,r5
   ADD r1,r14,r1
@@ -44492,7 +45785,7 @@ cpc1910:
   ADDI r5,r5,1
   MOVI r2,8
   CMP r5,r2
-  JMP[LT] @cpc1910
+  JMP[LT] @cpc1927
   MOVI r1,21318
   MOVHI r1,0
   ST r1,r14,48
@@ -44731,7 +46024,7 @@ klz:
   ST r1,r14,72
   MOVI r10,3320
   MOVI r6,0
-ds1911:
+ds1928:
   MOVI r1,0
   MOVHI r1,32768
   SHL r7,r6,11
@@ -44741,7 +46034,7 @@ ds1911:
   INW r3,r2
   MOVI r4,65535
   CMP r3,r4
-  JMP[EQ] @ds1911s
+  JMP[EQ] @ds1928s
   MOVI r2,3326
   INW r4,r2
   MOVI r2,8
@@ -44830,15 +46123,15 @@ ds1911:
   SHR r8,r8,8
   MOVI r2,2
   CMP r8,r2
-  JMP[NE] @ds1911s
+  JMP[NE] @ds1928s
   LD r1,r14,72
   ADDI r1,r1,1
   ST r1,r14,72
-ds1911s:
+ds1928s:
   ADDI r6,r6,1
   MOVI r2,32
   CMP r6,r2
-  JMP[LT] @ds1911
+  JMP[LT] @ds1928
   MOVI r1,83
   PUTC r1
   MOVI r1,67
