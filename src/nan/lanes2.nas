@@ -1,4 +1,4 @@
-; src/nan/lanes.nas - word-lane engine + self-check cart (org 0).
+; src/nan/lanes2.nas - word-lane engine + self-check cart (org 0).
 ; 64-bit lane math rebuilt from 32-bit registers per the lane model.
 ; Neutral plumbing: forward/inverse round steps, wall-clock-free
 ; self-checks derived from standard mixer studies. Internal docs kept out.

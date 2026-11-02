@@ -14,6 +14,6 @@ aarch64/android/build/
 aarch64/android/.gradle/
 aarch64/android/local.properties
 host.jar
-# private engineering staging - internal docs and tracks, never released
+# local work areas
 staging/
 INCORPORATEANDDELETE/
