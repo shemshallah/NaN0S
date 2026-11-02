@@ -1,0 +1,157 @@
+; S1 float test: x86 SSE NaN rules on top of a native A64 core.
+; Expected serial: XYFP PASS\r\n  (X = FCMP EQ fired, Y = FCMP LT fired).
+main:
+MOVI r13,1
+; 1: 1.0 + 2.0 = 3.0
+MOVI r1,0
+MOVHI r1,16256
+MOVI r2,0
+MOVHI r2,16384
+FADD r3,r1,r2
+MOVI r4,0
+MOVHI r4,16448
+CMP r3,r4
+JMP[NE] @fail
+; 2: NaN 7F800001 + 1.0 -> 7FC00001 (A quieted)
+MOVI r1,1
+MOVHI r1,32640
+FADD r3,r1,r2
+MOVI r4,1
+MOVHI r4,32704
+CMP r3,r4
+JMP[NE] @fail
+; 3: NaN FF800002 + 1.0 -> FFC00002 (B quieted, sign kept)
+MOVI r1,2
+MOVHI r1,65408
+FADD r3,r1,r2
+MOVI r4,2
+MOVHI r4,65472
+CMP r3,r4
+JMP[NE] @fail
+; 4: inf + -inf -> FFC00000
+MOVI r1,0
+MOVHI r1,32640
+MOVI r5,0
+MOVHI r5,65408
+FADD r3,r1,r5
+MOVI r4,0
+MOVHI r4,65472
+CMP r3,r4
+JMP[NE] @fail
+; 5: inf * 0.0 -> FFC00000
+MOVI r6,0
+FMUL r3,r1,r6
+CMP r3,r4
+JMP[NE] @fail
+; 6: 1.0 / 0.0 -> 7F800000
+FDIV r3,r2,r6
+MOVI r4,0
+MOVHI r4,32640
+CMP r3,r4
+JMP[NE] @fail
+; 7: -1.0 / 0.0 -> FF800000
+MOVI r1,0
+MOVHI r1,49024
+FDIV r3,r1,r6
+MOVI r4,0
+MOVHI r4,65408
+CMP r3,r4
+JMP[NE] @fail
+; 8: 0.0 / 0.0 -> 7FC00000
+FDIV r3,r6,r6
+MOVI r4,0
+MOVHI r4,32704
+CMP r3,r4
+JMP[NE] @fail
+; 9: sqrt(2.0) -> 3FB504F3
+MOVI r1,0
+MOVHI r1,16384
+FSQRT r3,r1
+MOVI r4,1267
+MOVHI r4,16309
+CMP r3,r4
+JMP[NE] @fail
+; 10: sqrt(-1.0) -> 7FC00000
+MOVI r1,0
+MOVHI r1,49024
+FSQRT r3,r1
+MOVI r4,0
+MOVHI r4,32704
+CMP r3,r4
+JMP[NE] @fail
+; 11: cvtif(7) -> 40E00000
+MOVI r1,7
+CVTIF r3,r1
+MOVI r4,0
+MOVHI r4,16608
+CMP r3,r4
+JMP[NE] @fail
+; 12: cvtfi(3.5) -> 3
+MOVI r1,0
+MOVHI r1,16480
+CVTFI r3,r1
+MOVI r4,3
+CMP r3,r4
+JMP[NE] @fail
+; 13: cvtfi(inf) -> 7FFFFFFF
+MOVI r1,0
+MOVHI r1,32640
+CVTFI r3,r1
+MOVI r4,65535
+MOVHI r4,32767
+CMP r3,r4
+JMP[NE] @fail
+; 14: cvtfi(NaN) -> 0
+MOVI r1,1
+MOVHI r1,32640
+CVTFI r3,r1
+MOVI r4,0
+CMP r3,r4
+JMP[NE] @fail
+; 15: fcmp 1.0,1.0 -> EQ
+MOVI r1,0
+MOVHI r1,16256
+MOVI r2,0
+MOVHI r2,16256
+FCMP r1,r2
+MOVI[EQ] r7,88
+PUTC r7
+; 16: fcmp 1.0,2.0 -> LT
+MOVI r2,0
+MOVHI r2,16384
+FCMP r1,r2
+MOVI[LT] r7,89
+PUTC r7
+MOVI r1,70
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,13
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+fail:
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,13
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT

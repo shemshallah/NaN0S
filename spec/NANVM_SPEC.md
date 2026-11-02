@@ -454,12 +454,14 @@ reference harness for the serial golden, converts the emitted image to the S1
 guest and requires byte-identical output on qemu virt. Covered ops: BOOL MOVI
 MOVHI ADD SUB MUL MULH MULHU DIV MOD DIVU MODU CMP CMPS ADDI SHL SHR SAR JMP
 JMPF JMPR CALL CALLF CALLR RET NOP PUTC LD ST LDB STB STW LDN BSWAPM BCOPY
-BFILL HALT, with predication and exact `!G`/`!O` + pc hex traps, over a
-4M-word writable guest RAM (image copied at boot); HALT exits qemu via
-semihosting. The gate runs seven real programs differentially: s1_test,
-carry_probe, nalloc_test (3,156 allocator checks), a64_test (portable core
-self-test), n16de_test, a2_boot_test and nan16dump_test. Remaining: float
-ops, device/port ops (TICK/KEY/DISP/FB), then the work image.
+BFILL HALT plus FADD FSUB FMUL FDIV FSQRT FCMP CVTIF CVTFI with the x86 SSE
+NaN rules, with predication and exact `!G`/`!O` + pc hex traps, over a
+4M-word writable guest RAM (image copied at boot); FP/SIMD is enabled at the
+current EL; HALT exits qemu via semihosting. The gate runs eight real
+programs differentially: s1_test, carry_probe, nalloc_test (3,156 allocator
+checks), a64_test (portable core self-test), the float edge-vector test,
+n16de_test, a2_boot_test and nan16dump_test. Remaining: device/port ops
+(TICK/KEY/DISP/FB), then the work image.
 
 ### 12.3 Android: bare-minimum C
 

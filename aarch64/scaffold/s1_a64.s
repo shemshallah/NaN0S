@@ -9,6 +9,16 @@
 _start:
         ldr     x0, =stack_top
         mov     sp, x0
+        // allow FP/SIMD at the current EL (qemu enters EL2 or EL1)
+        mrs     x0, CurrentEL
+        lsr     x0, x0, #2
+        cmp     x0, #2
+        b.ne    1f
+        mov     x0, #0x300          // CPTR_EL2.FPEN = 3
+        msr     cptr_el2, x0
+1:      mov     x0, #0x300000       // CPACR_EL1.FPEN = 3
+        msr     cpacr_el1, x0
+        isb
         // PL011 at 0x09000000: 8N1 + FIFO, UART/TX/RX enable, clear IRQs
         ldr     x20, =0x09000000
         mov     w2, #0x70
@@ -157,6 +167,22 @@ disp:
         b.eq    op_bcopy
         cmp     w25, #0x2E
         b.eq    op_bfill
+        cmp     w25, #0x30
+        b.eq    op_fadd
+        cmp     w25, #0x31
+        b.eq    op_fsub
+        cmp     w25, #0x32
+        b.eq    op_fmul
+        cmp     w25, #0x33
+        b.eq    op_fdiv
+        cmp     w25, #0x34
+        b.eq    op_fsqrt
+        cmp     w25, #0x35
+        b.eq    op_fcmp
+        cmp     w25, #0x36
+        b.eq    op_cvtif
+        cmp     w25, #0x37
+        b.eq    op_cvtfi
         cmp     w25, #0x2F
         b.eq    loop
         cmp     w25, #0x38
@@ -569,6 +595,169 @@ op_callf:
         str     w22, [x21, #60]
         and     w22, w9, #0xFFFFFF
         b       loop
+
+// ---- float ops (x86 SSE NaN rules; FPCR default RNE, no FTZ) -------------
+op_fadd:
+        mov     w1, #0x30
+        b       op_fp2
+op_fsub:
+        mov     w1, #0x31
+        b       op_fp2
+op_fmul:
+        mov     w1, #0x32
+op_fp2:
+        ldr     w2, [x21, x27, lsl #2]
+        and     w3, w28, #15
+        ldr     w3, [x21, x3, lsl #2]
+        bl      fpbin
+        str     w0, [x21, x26, lsl #2]
+        mov     w23, #0
+        b       loop
+op_fdiv:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        movz    w12, #0x7F80, lsl #16
+        and     w11, w10, #0x7FFFFFFF
+        cbnz    w11, fdiv_norm
+        and     w11, w9, #0x7FFFFFFF
+        cbz     w11, fdiv_nan
+        and     w11, w9, w12
+        cmp     w11, w12
+        b.ne    fdiv_inf
+        and     w11, w9, #0x7FFFFF
+        cbnz    w11, fdiv_nan
+fdiv_inf:
+        eor     w11, w9, w10
+        and     w11, w11, #0x80000000
+        orr     w11, w11, #0x7F800000
+        b       fdiv_store
+fdiv_nan:
+        movz    w11, #0x7FC0, lsl #16
+        b       fdiv_store
+fdiv_norm:
+        mov     w1, #0x33
+        mov     w2, w9
+        mov     w3, w10
+        bl      fpbin
+        mov     w11, w0
+fdiv_store:
+        str     w11, [x21, x26, lsl #2]
+        mov     w23, #0
+        b       loop
+op_fsqrt:
+        ldr     w9, [x21, x27, lsl #2]
+        movz    w12, #0x7F80, lsl #16
+        and     w11, w9, w12
+        cmp     w11, w12
+        b.ne    1f
+        and     w11, w9, #0x7FFFFF
+        cbnz    w11, fsqrt_nan
+1:      tbnz    w9, #31, 2f
+3:      fmov    s0, w9
+        fsqrt   s0, s0
+        fmov    w11, s0
+        b       fsqrt_store
+2:      and     w11, w9, #0x7FFFFFFF
+        cbnz    w11, fsqrt_nan
+        b       3b
+fsqrt_nan:
+        movz    w11, #0x7FC0, lsl #16
+fsqrt_store:
+        str     w11, [x21, x26, lsl #2]
+        mov     w23, #0
+        b       loop
+op_fcmp:
+        ldr     w9, [x21, x27, lsl #2]
+        and     w10, w28, #15
+        ldr     w10, [x21, x10, lsl #2]
+        movz    w12, #0x7F80, lsl #16
+        and     w11, w9, w12
+        cmp     w11, w12
+        b.ne    1f
+        and     w11, w9, #0x7FFFFF
+        cbnz    w11, fcmp_un
+1:      and     w11, w10, w12
+        cmp     w11, w12
+        b.ne    2f
+        and     w11, w10, #0x7FFFFF
+        cbnz    w11, fcmp_un
+2:      fmov    s0, w9
+        fmov    s1, w10
+        fcmp    s0, s1
+        cset    w12, eq
+        cset    w13, lt
+        lsl     w12, w12, #1
+        add     w23, w12, w13
+        b       loop
+fcmp_un:
+        mov     w23, #3
+        b       loop
+op_cvtif:
+        ldr     w9, [x21, x27, lsl #2]
+        scvtf   s0, w9
+        fmov    w11, s0
+        str     w11, [x21, x26, lsl #2]
+        mov     w23, #0
+        b       loop
+op_cvtfi:
+        ldr     w9, [x21, x27, lsl #2]
+        movz    w12, #0x7F80, lsl #16
+        and     w11, w9, w12
+        cmp     w11, w12
+        b.ne    1f
+        and     w11, w9, #0x7FFFFF
+        cbnz    w11, 2f
+1:      fmov    s0, w9
+        fcvtzs w11, s0
+        b       3f
+2:      mov     w11, #0
+3:      str     w11, [x21, x26, lsl #2]
+        cmp     w11, #0
+        cset    w12, eq
+        lsl     w23, w12, #1
+        b       loop
+
+// fpbin: w1=op (30 add,31 sub,32 mul,33 div), w2=A, w3=B -> w0=result
+fpbin:
+        movz    w12, #0x7F80, lsl #16
+        and     w11, w2, w12
+        cmp     w11, w12
+        b.ne    1f
+        and     w11, w2, #0x7FFFFF
+        cbz     w11, 1f
+        orr     w0, w2, #0x400000
+        ret
+1:      and     w11, w3, w12
+        cmp     w11, w12
+        b.ne    2f
+        and     w11, w3, #0x7FFFFF
+        cbz     w11, 2f
+        orr     w0, w3, #0x400000
+        ret
+2:      fmov    s0, w2
+        fmov    s1, w3
+        cmp     w1, #0x30
+        b.ne    3f
+        fadd    s0, s0, s1
+        b       6f
+3:      cmp     w1, #0x31
+        b.ne    4f
+        fsub    s0, s0, s1
+        b       6f
+4:      cmp     w1, #0x32
+        b.ne    5f
+        fmul    s0, s0, s1
+        b       6f
+5:      fdiv    s0, s0, s1
+6:      fmov    w0, s0
+        and     w11, w0, w12
+        cmp     w11, w12
+        b.ne    7f
+        and     w11, w0, #0x7FFFFF
+        cbz     w11, 7f
+        movz    w0, #0xFFC0, lsl #16
+7:      ret
 
 // mkword: w0=payload, w1=nibble -> x0=word (clobbers x0,x2..x5)
 mkword:
