@@ -1,4 +1,4 @@
-# tools/mkproof_flat.awk - builds the nasm0 proof .nan image (awk port of the retired python mkproof.py; no Python).
+# tools/mkproof_flat.awk - builds the proof image (awk implementation).
 #   awk -f tools/mkproof_flat.awk -v HARNESS=h.nan -v EXPECTE=t.nan -v SRCFILE=flat.nas -v OUTFILE=proof.nan -v BIG=1
 # BIG layout (1M words): nasm0+proof harness words at 0 (<= 6271 words, VARS live 6272..),
 # flattened source packed 4 bytes/word LE + NUL end (class 10) at SRC=0x40000, expected host-seed words

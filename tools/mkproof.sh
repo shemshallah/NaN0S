@@ -1,6 +1,6 @@
 #!/bin/sh
 # tools/mkproof.sh TARGET.nas [--steps N] [nan_cli args...] - nasm0 in-guest assembler proof on the C core.
-# awk/sh port of the retired python mkproof.py + proofnat.py (no Python). Flat BIG layout: the guest gets
+# awk/sh implementation (no external interpreters). Flat BIG layout: the guest gets
 # nasm0+nasm0_proof at word 0, the flattened (nflat.awk) target source packed at #SRC, the HOST SEED's words
 # (tools/nmk.awk, proven byte-identical to nanchk.py r29g) as the expected table at #EXP/#EXPC. The guest runs
 # BOTH nasm0 passes over the source and compares OUT vs EXP class-for-class. Expected serial: ' PASS' with diff=0.

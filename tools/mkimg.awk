@@ -1,4 +1,4 @@
-# tools/mkimg.awk - builds the bootable NaN/0S floppy image (gawk port of the retired python tool).
+# tools/mkimg.awk - builds the bootable image (gawk implementation).
 # Outer dev-loop only. Run under LC_ALL=C:
 #   gawk -f tools/mkimg.awk -v GOLD=x86/native/nan16_x86.nan -v GUEST=src/nan/museum.nan \
 #        -v CARTS=tools/carts.txt -v OUTB=$T/n0sb.bin -v OUTG=$T/n0sg.bin

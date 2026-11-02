@@ -1,4 +1,4 @@
-# tools/nmk.awk - NaN16 source tool (gawk; byte-exact port of the retired python tool).
+# tools/nmk.awk - NaN16 source tool (gawk implementation).
 # Outer dev-loop only; guest nasm0 remains the NaN-native assembler. Run under LC_ALL=C.
 #   gawk -f tools/nmk.awk -v CMD=emit src.nas > out.nan
 #   gawk -f tools/nmk.awk -v CMD=check out.nan
@@ -118,7 +118,7 @@ function estr(s,   i,n,c,e){
     else { GB[GN++]=92; GB[GN++]=ordn(e) }
   }
 }
-# python repr(bytes) over GB[base..base+3]; wrapper quote = double iff contains ' and no "
+# byte representation over the 4-byte window; wrapper quote = double iff contains a quote and no double
 function pyre4(base,   out,i,code,ha,hq,q){
   ha=0; hq=0
   for (i=0;i<4;i++){
@@ -148,7 +148,7 @@ function lastq(s,  i){
 }
 function dirname2(p,  d){ d=p; sub(/\/[^\/]*$/,"",d); if (d==p) return "."; return d }
 
-# ---- reader: python order: .include expanded inline (comment-stripped line), else raw line kept
+# ---- reader: includes expanded inline (comments stripped), other lines kept verbatim
 function readsrc(path,  raw,t,mm2,incn){
   if ((getline raw < path) <= 0) die("cannot read " path)
   do {

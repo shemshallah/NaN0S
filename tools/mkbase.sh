@@ -38,7 +38,7 @@ BEGIN {
   if (nv > 1536) die("nanvm0.bin is " nv " bytes, the mkbase limit is 1536")
   if (nb > 510)  die("boot0.bin is " nb " bytes, overruns the 55 AA signature at 510/511")
   if (nb > 1474560) die("boot0.bin is " nb " bytes, overruns the floppy")
-  # ---- base.img: mirror of python img=bytearray(1474560); img[0:len(b)]=b; 55 AA; img[512:512+len(v)]=v ----
+  # ---- base.img: padded floppy image, boot signature 55 AA, kernel payload at 512
   IMG = ""
   if (nb > 0) for (i = 0; i < nb; i++) IMG = IMG sprintf("%c", BY[i])
   IMG = IMG zpad(510 - nb)
