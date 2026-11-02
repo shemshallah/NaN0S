@@ -337,7 +337,7 @@ and it is small enough to inspect.
 2. David A. Wheeler, "Countering Trusting Trust through Diverse Double
    Compiling," 2005.
 3. Ken Thompson and Dennis Ritchie, The UNIX Time-Sharing System, 1974.
-4. NaN/0S, spec/NAN16_SPEC.md and spec/NANVM1_SPEC.md.
+4. NaN/0S, spec/NAN16_SPEC.md and spec/NANVM_SPEC.md.
 5. NaN/0S, logs/nasm0_selfhost_gen2_round09.txt and logs/r21_trust_test.txt.
 
 ---
