@@ -26,6 +26,14 @@ crypt/nan0s_fs rm "$T/fs.img" "$KEY" f6.txt >/dev/null
 crypt/nan0s_fs rm "$T/fs.img" "$KEY" f11.txt >/dev/null
 crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=9 '
 [ "$(crypt/nan0s_fs ls "$T/fs.img" "$KEY" | wc -l | tr -d ' ')" = "9" ]
+crypt/nan0s_fs df "$T/fs.img" "$KEY" | grep -q '^DF .* files=9$'
+crypt/nan0s_fs mv "$T/fs.img" "$KEY" f2.txt renamed.txt >/dev/null
+crypt/nan0s_fs get "$T/fs.img" "$KEY" renamed.txt "$T/renamed.out"
+cmp "$T/f2" "$T/renamed.out"
+crypt/nan0s_fs compact "$T/fs.img" "$KEY" | grep -q '^COMPACT files=9$'
+crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=9 next=19 '
+crypt/nan0s_fs get "$T/fs.img" "$KEY" renamed.txt "$T/renamed2.out"
+cmp "$T/f2" "$T/renamed2.out"
 
 awk -f tools/nmk.awk -v CMD=emit crypt/guest/nan0s_fs_check.nas > "$T/check.nan"
 aarch64/android/nan_cli --img "$T/check.nan" --disk "$T/fs.img" \
@@ -52,7 +60,7 @@ if command -v qemu-system-i386 >/dev/null 2>&1; then
     -display none -serial "file:$T/q.out" -no-reboot >/dev/null 2>&1 || true
   grep -q ' fs=00000001$' "$T/q.out" || {
     echo "nan0s_fs gate: FAIL (x86 fs marker)"; tail -6 "$T/q.out"; exit 1; }
-  echo "nan0s_fs gate: PASS (mkfs/put/get/ls/rm/check + guest fs marker on C-core fd + x86 IDE)"
+  echo "nan0s_fs gate: PASS (12 files, rename, compact, guest fs marker on C-core fd + x86 IDE)"
 else
-  echo "nan0s_fs gate: PASS (mkfs/put/get/ls/rm/check + guest fs marker on C-core fd; QEMU skipped)"
+  echo "nan0s_fs gate: PASS (12 files, rename, compact, guest fs marker on C-core fd; QEMU skipped)"
 fi

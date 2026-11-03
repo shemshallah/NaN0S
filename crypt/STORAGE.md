@@ -134,8 +134,11 @@ crypt/nan0s_fs put   image keyhex local name
 crypt/nan0s_fs get   image keyhex name out
 crypt/nan0s_fs ls    image keyhex
 crypt/nan0s_fs rm    image keyhex name
+crypt/nan0s_fs mv    image keyhex old new
+crypt/nan0s_fs df    image keyhex
+crypt/nan0s_fs compact image keyhex   # reclaim deleted blocks
 crypt/nan0s_fs check image keyhex
-crypt/nan0s_fs resize image keyhex   # after volume grow
+crypt/nan0s_fs resize image keyhex    # after volume grow
 ```
 
 Shortcuts through the default image:
@@ -145,18 +148,25 @@ tools/nan0s_fs.sh mkfs
 tools/nan0s_fs.sh put note.txt note.txt
 tools/nan0s_fs.sh ls
 tools/nan0s_fs.sh get note.txt /tmp/note.txt
+tools/nan0s_fs.sh mv note.txt renamed.txt
+tools/nan0s_fs.sh df
+tools/nan0s_fs.sh rm renamed.txt
+tools/nan0s_fs.sh compact
 tools/nan0s_fs.sh checkfs
 tools/nan0s_fs.sh boot --verify
 ```
 
 `boot --verify` verifies every nonzero tag **and** the `nan0s_fs` superblock,
-directory, extents and file count. `grow` preserves the file layer and resizes
-its superblock capacity. The Android **Fs** image is an NSPV volume without the
-encrypted file layer yet (`fs=00000000`); create a file layer on the host and
-open that image through **Disk**, or add the guest-side mkfs next.
+directory chain, extents and file count. `grow` preserves the file layer and
+resizes its superblock capacity. `compact` rewrites the live files into a fresh
+sparse image, reclaiming deleted directory and payload blocks. The Android
+**Fs** image is an NSPV volume without the encrypted file layer yet
+(`fs=00000000`); create a file layer on the host and open that image through
+**Disk**, or add the guest-side mkfs next.
 
-Limits: arbitrary file count up to volume capacity, flat namespace, no rename, deletion does not reclaim extents,
-and the guest can boot/check the filesystem marker but does not mount files yet.
+Limits: arbitrary file count up to volume capacity, flat namespace (no
+directories), `rm` only unlinks until `compact` runs, and the guest can
+boot/check the filesystem marker but does not mount files yet.
 
 ## Storage backends
 

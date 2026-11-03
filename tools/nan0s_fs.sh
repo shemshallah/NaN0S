@@ -17,6 +17,9 @@
 #   get <name> <out> [image]          extract a file
 #   ls [image]                        list files
 #   rm <name> [image]                 remove a directory entry
+#   mv <old> <new> [image]            rename a file
+#   df [image]                        free-space / file-count report
+#   compact [image]                   reclaim deleted directory/payload blocks
 #   checkfs [image]                   verify the nan0s_fs layer
 #   info [image]            header/capacity/used information
 #   link [image] [target]   copy for Android testing; default shared Download
@@ -153,6 +156,14 @@ case "$cmd" in
     name="${1:-}"; image="${2:-$IMG}"
     [ -n "$name" ] || { echo "usage: $0 rm <name> [image]" >&2; exit 2; }
     read_key; crypt/nan0s_fs rm "$image" "$KEY" "$name" ;;
+  mv)
+    old="${1:-}"; new="${2:-}"; image="${3:-$IMG}"
+    [ -n "$old" ] && [ -n "$new" ] || { echo "usage: $0 mv <old> <new> [image]" >&2; exit 2; }
+    read_key; crypt/nan0s_fs mv "$image" "$KEY" "$old" "$new" ;;
+  df)
+    image="${1:-$IMG}"; read_key; crypt/nan0s_fs df "$image" "$KEY" ;;
+  compact)
+    image="${1:-$IMG}"; read_key; crypt/nan0s_fs compact "$image" "$KEY" ;;
   checkfs)
     image="${1:-$IMG}"; read_key; crypt/nan0s_fs check "$image" "$KEY" ;;
   info)
@@ -167,5 +178,5 @@ case "$cmd" in
     read_key
     link_image "${1:-$IMG}" "${2:-}" ;;
   *)
-    echo "usage: $0 make|check|boot|format|grow|mkfs|put|get|ls|rm|checkfs|info|link [args]" >&2; exit 2 ;;
+    echo "usage: $0 make|check|boot|format|grow|mkfs|put|get|ls|rm|mv|df|compact|checkfs|info|link [args]" >&2; exit 2 ;;
 esac

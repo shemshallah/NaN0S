@@ -94,11 +94,10 @@ function mkfs(image, key) {
 function findFile(f, name) {
   return f.dirs.find(d => d.name === name) || null;
 }
-function put(image, key, local, name) {
+function putData(image, key, data, name) {
   if (!name || Buffer.byteLength(name) > NAME_MAX) throw new Error("name too long");
   const f = readFs(image, key);
   if (findFile(f, name)) throw new Error("exists: " + name);
-  const data = fs.readFileSync(local);
   const sectors = Math.max(1, Math.ceil(data.length / SECTOR));
   const dirLba = f.next;
   const start = dirLba + 1;
@@ -129,6 +128,30 @@ function put(image, key, local, name) {
   f.files++;
   writeSuper(image, key, f);
   console.log("PUT " + name + " dir=" + dirLba + " start=" + start + " sectors=" + sectors + " bytes=" + data.length);
+}
+function put(image, key, local, name) {
+  putData(image, key, fs.readFileSync(local), name);
+}
+function rename(image, key, oldName, newName) {
+  if (!newName || Buffer.byteLength(newName) > NAME_MAX) throw new Error("name too long");
+  const f = readFs(image, key);
+  if (findFile(f, newName)) throw new Error("exists: " + newName);
+  const e = findFile(f, oldName);
+  if (!e) throw new Error("not found: " + oldName);
+  e.b.fill(0, 12, 52);
+  e.b.write(newName, 12, "utf8");
+  putBlock(image, key, e.lba, e.b);
+  console.log("MV " + oldName + " " + newName);
+}
+function df(image, key) {
+  const f = readFs(image, key);
+  console.log("DF capacity=" + f.capacity + " next=" + f.next +
+    " free=" + (f.capacity - f.next) + " files=" + f.files);
+}
+function readFileData(image, key, e) {
+  const parts = [];
+  for (let i = 0; i < e.sectors; i++) parts.push(block(image, key, e.start + i));
+  return Buffer.concat(parts).subarray(0, e.size);
 }
 function get(image, key, name, out) {
   const f = readFs(image, key);
@@ -161,6 +184,30 @@ function rm(image, key, name) {
   f.files--;
   writeSuper(image, key, f);
   console.log("RM " + name);
+}
+function compact(image, key) {
+  const st = fs.statSync(image);
+  if (!st.isFile()) throw new Error("compact requires an image file");
+  const h = needHeader(image);
+  const f = readFs(image, key);
+  const files = f.dirs.map(e => ({ name: e.name, data: readFileData(image, key, e) }));
+  const c = vol.createLazy(h.suite, h.nonce, st.size);
+  if (!c) throw new Error("cannot recreate geometry");
+  const tmp = image + ".compact." + process.pid;
+  try {
+    const fd = fs.openSync(tmp, "w+");
+    try {
+      fs.writeSync(fd, c.header, 0, SECTOR, 0);
+      fs.ftruncateSync(fd, c.fileBytes);
+    } finally { fs.closeSync(fd); }
+    mkfs(tmp, key);
+    for (const x of files) putData(tmp, key, x.data, x.name);
+    fs.renameSync(tmp, image);
+  } catch (e) {
+    try { fs.unlinkSync(tmp); } catch (_) {}
+    throw e;
+  }
+  console.log("COMPACT files=" + files.length);
 }
 function resize(image, key) {
   const h = needHeader(image);
@@ -196,6 +243,9 @@ if (require.main === module) {
     else if (cmd === "get") get(image, key, a, b);
     else if (cmd === "ls") ls(image, key);
     else if (cmd === "rm") rm(image, key, a);
+    else if (cmd === "mv") rename(image, key, a, b);
+    else if (cmd === "df") df(image, key);
+    else if (cmd === "compact") compact(image, key);
     else if (cmd === "resize") resize(image, key);
     else if (cmd === "check") check(image, key);
     else {
@@ -204,6 +254,9 @@ if (require.main === module) {
       console.error("       nan0s_fs get  <image> <keyhex> <name> <out>");
       console.error("       nan0s_fs ls   <image> <keyhex>");
       console.error("       nan0s_fs rm   <image> <keyhex> <name>");
+      console.error("       nan0s_fs mv   <image> <keyhex> <old> <new>");
+      console.error("       nan0s_fs df   <image> <keyhex>");
+      console.error("       nan0s_fs compact <image> <keyhex>");
       console.error("       nan0s_fs resize <image> <keyhex>");
       console.error("       nan0s_fs check <image> <keyhex>");
       process.exit(2);
