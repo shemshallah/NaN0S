@@ -1179,3 +1179,7 @@ Spec: `spec/TRANSLATOR.md`.
 - Roadmap: a standalone NANNET manager owns links (wired/WiFi), addresses,
   routes, DNS and driver load state; NANNETSUITE is a toolkit, not the control
   plane. Config lives in `.nancfg` files.
+- NANNET M1/M2 landed: `src/nannet/` (interfaces, addresses, routes, DNS,
+  WiFi scan/join/leave fixture, `.nancfg` apply/rollback); gates
+  `tools/nannet_gate.sh`, `tools/nannet_link_gate.sh`,
+  `tools/nannet_wifi_gate.sh`. M3 is service/menu integration.
