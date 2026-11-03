@@ -9,6 +9,7 @@ CMD="@3000000,n,a,n,n,e,t,s,u,i,t,e,ENTER"
 OUT=$("$CLI" --img build/nan0s.img --steps 30000000 --keys "$CMD,@500000,7" --serial 2>/dev/null || true)
 printf '%s\n' "$OUT" | grep -q "READY MENU=S" || { echo "suite gate: FAIL (boot)"; exit 1; }
 printf '%s\n' "$OUT" | grep -q "SUITE" || { echo "suite gate: FAIL (suite not loaded)"; exit 1; }
+printf '%s\n' "$OUT" | grep -q "WIPE OK" || { echo "suite gate: FAIL (wipe)"; exit 1; }
 WIN=$("$CLI" --img build/nan0s.img --steps 4500000 --keys "$CMD" --dump-text --serial 2>/dev/null || true)
 printf '%s\n' "$WIN" | grep -q "NANNETSUITE v2" || { echo "suite gate: FAIL (window)"; exit 1; }
 OUT2=$("$CLI" --img build/nan0s.img --steps 30000000 --keys "$CMD,@500000,2,@300000,6" --serial 2>/dev/null || true)
