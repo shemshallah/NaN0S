@@ -9,6 +9,7 @@ NON=A6FBC7641D3FBB665A3D4D4313F10C3D
 node crypt/volume.cjs create 1 "$T/fs.img" "$KEY" "$NON" 1G --lazy
 node -e 'require("fs").writeFileSync(process.argv[1],Buffer.alloc(512,0xAB))' "$T/ab"
 node crypt/volume.cjs write "$T/fs.img" "$KEY" 0 "$T/ab" >/dev/null
+node crypt/volume.cjs check "$T/fs.img" "$KEY" --verify | grep -q '^VERIFY OK$'
 node crypt/volume.cjs check "$T/fs.img" | grep -q '^CHECK OK .*used=1 .*lazy=1 '
 awk -f tools/nmk.awk -v CMD=emit crypt/guest/nan0s_fs_check.nas > "$T/check.nan"
 aarch64/android/nan_cli --img "$T/check.nan" --disk "$T/fs.img" \

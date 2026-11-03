@@ -43,7 +43,7 @@ function parseHeader(buf, fileSectors) {
   const flags = Number(h[12]);
   const used = (flags & 1) ? Number(h[11]) : dataSectors;
   if (ver !== 1 || (suite !== 1 && suite !== 2) || sector !== SECTOR) return null;
-  if (dataSectors < 1 || dataSectors > 0x1000000) return null;
+  if (dataSectors < 1 || dataSectors > 0xFFFFFFFF) return null;
   if (tagLba < 1 || tagLba + tagSectors > dataLba) return null;
   if (used < 0 || used > dataSectors) return null;
   const total = fileSectors == null ? buf.length / SECTOR : fileSectors;
@@ -112,7 +112,7 @@ function createLazy(suite, nonce, totalBytes) {
   if (suite !== 1 && suite !== 2) return null;
   const totalSectors = Math.floor(Number(totalBytes) / SECTOR);
   const g = lazyGeometry(totalSectors);
-  if (!g) return null;
+  if (!g || g.dataSectors > 0xFFFFFFFF) return null;
   const h = [MAGIC, (1n << 16n) | BigInt(suite), BigInt(SECTOR), BigInt(g.dataLba),
     BigInt(g.dataSectors), 1n, BigInt(g.tagSectors), nonce[0], nonce[1], 0n, 0n,
     0n, 1n, 0n, 0n, 0n];

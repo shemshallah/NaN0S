@@ -69,18 +69,36 @@ class MainActivity : Activity(), NanLoop.Listener {
         } catch (e: Exception) { Log.w("nan0s", "disk attach failed", e) }
     }
 
-    /** Create a sparse 1 GiB NSPV image in app storage and attach it now. */
-    private fun makeFsImage() {
+    /** Create a sparse NSPV image in app storage and attach it now. */
+    private fun makeFsImage(bytes: Long = NspvImage.DEFAULT_BYTES) {
         try {
-            if (!NspvImage.ensure(fsFile, fsKey)) {
+            if (!NspvImage.ensure(fsFile, fsKey, bytes)) {
                 Toast.makeText(this, "fs image create failed", Toast.LENGTH_SHORT).show(); return
             }
             attachDisk(ParcelFileDescriptor.open(fsFile, ParcelFileDescriptor.MODE_READ_WRITE), fsFile.length())
-            Toast.makeText(this, "1 GiB sparse image attached", Toast.LENGTH_SHORT).show()
+            val mib = bytes / (1024 * 1024)
+            Toast.makeText(this, "sparse image attached (${mib} MiB)", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Log.w("nan0s", "fs image failed", e)
             Toast.makeText(this, "fs image failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun chooseFsSize() {
+        val input = EditText(this).apply {
+            setText("1")
+            hint = "GiB"
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+        }
+        AlertDialog.Builder(this)
+            .setTitle("nan0s_fs size (GiB)")
+            .setView(input)
+            .setPositiveButton("Create") { _, _ ->
+                val gib = input.text.toString().toDoubleOrNull()?.coerceIn(0.0625, 64.0) ?: 1.0
+                makeFsImage((gib * 1024.0 * 1024.0 * 1024.0).toLong())
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,7 +144,7 @@ class MainActivity : Activity(), NanLoop.Listener {
         })
         row.addView(btn("Open") { pick(reqImage) })
         row.addView(btn("Disk") { pick(reqDisk) })
-        row.addView(btn("Fs") { makeFsImage() })
+        row.addView(btn("Fs") { chooseFsSize() })
         row.addView(btn("Reset") {
             autosave.delete(); vm.detachDisk()
             diskFile.delete(); fsFile.delete(); fsKey.delete()

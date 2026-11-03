@@ -8,7 +8,7 @@
 # Commands:
 #   make [size] [image]      create a sparse lazy volume if absent
 #   check [image]           boot check (creates the default image if absent)
-#   boot                    check only; exits non-zero if the image is invalid
+#   boot [--verify]         check only; --verify checks every used sector
 #   format [image|device] [size] [--device]
 #                           overwrite/create a volume (destructive)
 #   grow [size] [image]     grow capacity, re-sealing only the used prefix
@@ -59,12 +59,20 @@ make_image() {
 }
 
 check_image() {
-  image="$1"
+  image="$1"; verify="${2:-0}"
   if [ ! -e "$image" ]; then
     echo "nan0s_fs: missing $image" >&2
     return 1
   fi
-  if [ -b "$image" ]; then
+  if [ "$verify" = "1" ]; then
+    read_key
+    if [ -b "$image" ]; then
+      sectors=$(( $(blockdev --getsize64 "$image") / 512 ))
+      node crypt/volume.cjs check "$image" "$KEY" --sectors "$sectors" --verify
+    else
+      node crypt/volume.cjs check "$image" "$KEY" --verify
+    fi
+  elif [ -b "$image" ]; then
     sectors=$(( $(blockdev --getsize64 "$image") / 512 ))
     node crypt/volume.cjs check "$image" --sectors "$sectors"
   else
@@ -108,7 +116,8 @@ case "$cmd" in
     image="${1:-$IMG}"
     if [ ! -e "$image" ]; then make_image "$SIZE" "$image"; else check_image "$image"; fi ;;
   boot)
-    check_image "$IMG" ;;
+    verify=0; [ "${1:-}" = "--verify" ] && verify=1
+    check_image "$IMG" "$verify" ;;
   format)
     target="${1:-$IMG}"; size="${2:-$SIZE}"; device=0
     [ "${3:-}" = "--device" ] && device=1

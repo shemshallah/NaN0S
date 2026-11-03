@@ -28,8 +28,9 @@ object NspvImage {
     fun ensure(file: File, keyFile: File, bytes: Long = DEFAULT_BYTES): Boolean {
         if (file.exists() && check(file)) return true
         val g = geometry(bytes) ?: return false
-        val nonce = ByteArray(16).also { SecureRandom().nextBytes(it) }
-        val key = ByteArray(32).also { SecureRandom().nextBytes(it) }
+        val rnd = SecureRandom()
+        val nonce = LongArray(2) { rnd.nextLong() }
+        val key = LongArray(4) { rnd.nextLong() }
         val h = LongArray(16)
         h[0] = MAGIC
         h[1] = (1L shl 16) or 1L
@@ -38,8 +39,8 @@ object NspvImage {
         h[4] = g.first.toLong()
         h[5] = 1L
         h[6] = g.second.toLong()
-        h[7] = leLong(nonce, 0)
-        h[8] = leLong(nonce, 8)
+        h[7] = nonce[0]
+        h[8] = nonce[1]
         h[11] = 0L
         h[12] = 1L
         val buf = ByteBuffer.allocate(SECTOR).order(ByteOrder.LITTLE_ENDIAN)
@@ -49,7 +50,8 @@ object NspvImage {
             f.seek(0)
             f.write(buf.array())
         }
-        keyFile.writeText("KEY=" + hex(key) + "\nNON=" + hex(nonce) + "\n")
+        keyFile.writeText("KEY=" + key.joinToString("") { hexLong(it) } +
+            "\nNON=" + nonce.joinToString("") { hexLong(it) } + "\n")
         return true
     }
 
@@ -65,16 +67,9 @@ object NspvImage {
         if (ver != 1 || (suite != 1 && suite != 2) || h[2] != SECTOR.toLong()) return false
         val cap = h[4]
         val dataLba = h[3]
-        if (cap < 1L || cap > 0x1000000L || dataLba < 1L) return false
+        if (cap < 1L || cap > 0xFFFFFFFFL || dataLba < 1L) return false
         return dataLba + cap <= file.length() / SECTOR
     }
 
-    private fun leLong(b: ByteArray, o: Int): Long {
-        var v = 0L
-        for (i in 0..7) v = v or ((b[o + i].toLong() and 255L) shl (8 * i))
-        return v
-    }
-
-    private fun hex(b: ByteArray): String =
-        b.joinToString("") { "%02X".format(it.toInt() and 0xff) }
+    private fun hexLong(v: Long): String = "%016X".format(v)
 }

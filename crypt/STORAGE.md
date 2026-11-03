@@ -69,7 +69,8 @@ walk a 1 GiB image just to boot.
 An NSPV image can be created at any size without allocating the whole file.
 The tag table is reserved for the full capacity at creation and
 `data_lba` stays fixed; header word 11 is `used_sectors` and word 12 is a flags
-word (bit 0 = lazy). Writes seal a sector and advance `used`, so the sparse file
+word (bit 0 = lazy). Capacity is capped at the 32-bit sector count (~2 TiB);
+Android **Fs** accepts 0.0625–64 GiB. Writes seal a sector and advance `used`, so the sparse file
 grows only where data/tags are written. `grow` rebuilds a larger image and
 re-seals only the populated prefix, so capacity can increase without touching
 unused holes; a shrink is accepted only down to `used`.
@@ -82,11 +83,18 @@ Default test image, kept under the Termux home:
 
 tools/nan0s_fs.sh make 1G
 tools/nan0s_fs.sh check          # boot check; creates the image if absent
-tools/nan0s_fs.sh boot           # check only, non-zero if invalid
+tools/nan0s_fs.sh boot --verify  # header + every used sector; non-zero if invalid
 tools/nan0s_fs.sh grow 2G        # grow capacity, re-sealing used sectors
 tools/nan0s_fs.sh info
 tools/nan0s_fs.sh format /dev/block/... 1G --device   # raw device, if writable
 tools/nan0s_fs.sh link           # copy image+key to shared Download for SAF
+```
+
+Termux:Boot install:
+
+```
+mkdir -p ~/.termux/boot
+ln -sf "$PWD/tools/nan0s_fs_boot.sh" ~/.termux/boot/nan0s_fs
 ```
 
 The one-sector write path is:
@@ -97,7 +105,7 @@ crypt/nspvol write ~/nan0s_fs/nan0s_fs.img "$KEY" 0 file.bin
 crypt/nspvol info  ~/nan0s_fs/nan0s_fs.img   # USED advances
 ```
 
-Android: the **Fs** button creates `filesDir/nan0s_fs.img` (1 GiB sparse) and
+Android: the **Fs** button prompts for a size (default 1 GiB) and creates `filesDir/nan0s_fs.img` and
 `nan0s_fs.key`, attaches it immediately, and the next boot prefers it when its
 header is valid. **Reset** removes it and returns to `disk.nanfs`. The **Disk**
 button can still open a host-linked image from shared storage.

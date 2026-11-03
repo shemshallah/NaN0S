@@ -1210,9 +1210,11 @@ Spec: `spec/TRANSLATOR.md`.
       The cart walks `data_sectors`, selects tag slots, derives `nonce + lba`,
       verifies every tag, and prints `VOL PASS 00000010` for a 16-sector volume.
 - [x] Sparse arbitrary-size NSPV image/device manager (`tools/nan0s_fs.sh`):
-      default 1 GiB at `~/nan0s_fs/nan0s_fs.img`, lazy `used` growth, boot check
+      default 1 GiB at `~/nan0s_fs/nan0s_fs.img`, lazy `used` growth, `grow`,
+      boot `--verify` plus `tools/nan0s_fs_boot.sh` Termux:Boot hook
       (`crypt/storage_boot_gate.sh`), guest header cart
-      (`crypt/guest/nan0s_fs_check.nas`), Android **Fs** sparse-image button.
+      (`crypt/guest/nan0s_fs_check.nas`), Android **Fs** sparse-image button
+      (arbitrary GiB, default 1, 64 GiB dialog cap).
 - [ ] Allocated-extent map and chunked NSPF1 file/mount layer; capacity grow
       without reformat; encrypted boot; Android SAF wiring for the volume
       picker; real-HDD validation.
