@@ -130,6 +130,7 @@ function verify(buf, key) {
     const ct = buf.subarray((info.dataLba + i) * SECTOR, (info.dataLba + i + 1) * SECTOR);
     const to = tagOffset(info, i);
     const tag = bytesToWords(buf.subarray(to, to + TAG_WORDS * 8));
+    if (info.lazy && tag.every(w => w === 0n)) continue;
     if (openSectorWith(info, key, i, ct, tag) === null) return false;
   }
   return true;
@@ -141,6 +142,7 @@ function readSector(buf, key, lba) {
   const ct = buf.subarray((info.dataLba + lba) * SECTOR, (info.dataLba + lba + 1) * SECTOR);
   const to = tagOffset(info, lba);
   const tag = bytesToWords(buf.subarray(to, to + TAG_WORDS * 8));
+  if (info.lazy && tag.every(w => w === 0n)) return null;
   return openSectorWith(info, key, lba, ct, tag);
 }
 function writeSector(buf, key, lba, pt) {
@@ -178,6 +180,7 @@ function readSectorFile(path, key, lba, totalSectors) {
     const off = (info.dataLba + lba) * SECTOR;
     fs.readSync(fd, ct, 0, SECTOR, off);
     fs.readSync(fd, tagb, 0, tagb.length, tagOffset(info, lba));
+    if (info.lazy && tagb.every(b => b === 0)) return null;
     return openSectorWith(info, key, lba, ct, bytesToWords(tagb));
   } finally { fs.closeSync(fd); }
 }
@@ -249,6 +252,7 @@ function verifyFile(path, key, totalSectors) {
     for (let i = 0; i < info.used; i++) {
       fs.readSync(fd, ct, 0, SECTOR, (info.dataLba + i) * SECTOR);
       fs.readSync(fd, tagb, 0, tagb.length, tagOffset(info, i));
+      if (info.lazy && tagb.every(b => b === 0)) continue;
       if (openSectorWith(info, key, i, ct, bytesToWords(tagb)) === null) return false;
     }
     return true;

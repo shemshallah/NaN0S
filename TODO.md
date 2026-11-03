@@ -1207,8 +1207,10 @@ Spec: `spec/TRANSLATOR.md`.
       (`crypt/storage_gate.sh`); plug-and-play NSPV magic detection.
 - [x] Guest NSPV all-sector decrypt (suite 1) on C-core fd + x86 QEMU IDE;
       public cart `crypt/guest/nspv_decrypt.nan` and `storage_decrypt_gate.sh`.
-      The cart walks `data_sectors`, selects tag slots, derives `nonce + lba`,
-      verifies every tag, and prints `VOL PASS 00000010` for a 16-sector volume.
+      The cart walks `data_sectors` for full volumes and `used` for lazy ones,
+      skips zero-tag holes, selects tag slots, derives `nonce + lba`, verifies
+      every non-zero tag, and prints `VOL PASS 00000010` for a 16-sector volume
+      or `VOL PASS 00000003` for a lazy image with sector 2 populated.
 - [x] Sparse arbitrary-size NSPV image/device manager (`tools/nan0s_fs.sh`):
       default 1 GiB at `~/nan0s_fs/nan0s_fs.img`, lazy `used` growth, `grow`,
       boot `--verify` plus `tools/nan0s_fs_boot.sh` Termux:Boot hook

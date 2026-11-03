@@ -52,13 +52,17 @@ Gates:
 sh crypt/volume_gate.sh    # suites 1/2, write/read, header/tag/data tamper, wrong key
 sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
 sh crypt/storage_decrypt_gate.sh  # guest all-sector decrypt on C-core fd + QEMU IDE
-sh crypt/storage_boot_gate.sh     # sparse 1 GiB header check on C-core fd + x86 IDE
+sh crypt/storage_boot_gate.sh     # sparse 1 GiB: header + populated prefix, C-core + x86 IDE
 ```
 
-The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors`, selects
-the tag slot (`lba % 10` in the tag table), derives `nonce + lba`, decrypts the
-sector capsule, verifies the tag, and checks the plaintext pattern. It prints
-`VOL PASS <count>`; the boot variant is `nspv_decrypt_boot.nan`.
+The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
+full volume and stops at `used_sectors` for a lazy one. It selects the tag slot
+(`lba % 10` in the tag table), derives `nonce + lba`, decrypts the sector
+capsule, verifies the tag, and checks the plaintext pattern. It prints
+`VOL PASS <count>`; the boot variant is `nspv_decrypt_boot.nan`. A zero tag is
+an unallocated sparse hole and is skipped, while `used` remains the high-water
+mark. A 1 GiB image with only sector 2 populated prints `VOL PASS 00000003`
+(used=3, sectors 0/1 holes).
 
 The boot check cart (`crypt/guest/nan0s_fs_check.nas`) reads sector 0 only and
 prints `NAN0S_FS OK cap=<hex> used=<hex> suite=<hex> lazy=<bit>`; it does not
@@ -127,14 +131,14 @@ button can still open a host-linked image from shared storage.
   without root; "any storage" means any file/fd the picker can provide.
 - **Plug and play:** the guest reads sector 0 and checks the NSPV magic. An
   unformatted/plain volume prints `NSPV NO`; an NSPV volume prints `NSPV OK`.
-  The decrypt cart then walks all data sectors. Format/rekey is done with the
+  The decrypt cart then walks populated sectors, skipping zero-tag holes. Format/rekey is done with the
   host tool; the guest unlock/mount layer is the next port.
 
 ## Current limits
 
 1. The guest decrypts every populated data sector into RAM
    (`nspv_decrypt.nan`), but has no chunked file/mount layer; each sector is
-   verified and then discarded. A 1 GiB lazy image boots through the header
+   verified and then discarded; zero-tag holes are skipped. A 1 GiB lazy image boots through the header
    check (`nan0s_fs_check.nas`), not a full decrypt. The next port adds a sector
    cache, an allocated-extent map and the NSPF1 file reader.
 2. Encrypted **boot** is not implemented: bootloader/NaNFS decryption, operator
@@ -149,8 +153,8 @@ button can still open a host-linked image from shared storage.
 
 - The header is authenticated only through every data-sector AD; a lazy image
   with `used=0` is therefore a capacity/geometry check, not an authentication
-  check. Full verification covers every sector below `used`.
-- Tag-table tamper is detected by the data tags; a missing tag is a failure.
+  check. Full verification covers every non-zero-tag sector below `used`.
+- A zero tag is an unallocated sparse hole and is skipped; a corrupted non-zero tag fails.
 - Unwritten sectors are holes: they are neither allocated nor authenticated and
   must never be exposed as valid plaintext.
 - The host tool is a reference; the product path must be raw NaN16.
