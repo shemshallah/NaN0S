@@ -31,6 +31,7 @@ jobs:
           sh crypt/gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
           sh crypt/volume_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
           sh crypt/storage_decrypt_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
+          sh crypt/storage_boot_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
   apk:
     needs: core-tests
     runs-on: ubuntu-latest

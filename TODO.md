@@ -1209,5 +1209,10 @@ Spec: `spec/TRANSLATOR.md`.
       public cart `crypt/guest/nspv_decrypt.nan` and `storage_decrypt_gate.sh`.
       The cart walks `data_sectors`, selects tag slots, derives `nonce + lba`,
       verifies every tag, and prints `VOL PASS 00000010` for a 16-sector volume.
-- [ ] Guest chunked NSPF1 file/mount layer and encrypted boot; Android SAF wiring
-      for the volume picker; real-HDD validation.
+- [x] Sparse arbitrary-size NSPV image/device manager (`tools/nan0s_fs.sh`):
+      default 1 GiB at `~/nan0s_fs/nan0s_fs.img`, lazy `used` growth, boot check
+      (`crypt/storage_boot_gate.sh`), guest header cart
+      (`crypt/guest/nan0s_fs_check.nas`), Android **Fs** sparse-image button.
+- [ ] Allocated-extent map and chunked NSPF1 file/mount layer; capacity grow
+      without reformat; encrypted boot; Android SAF wiring for the volume
+      picker; real-HDD validation.

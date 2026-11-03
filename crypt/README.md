@@ -38,9 +38,9 @@ sh crypt/nspfile open <in> <out> <keyhex>
 
 Full container details: `FORMAT.md`.
 
-Storage volumes: NSPV1 sector format, host `nspvol`, the guest all-sector
-decrypt cart, and the ATA/fd probe for x86 HDD and Android storage are in
-`STORAGE.md`.
+Storage volumes: NSPV1 sector format, host `nspvol`, sparse `nan0s_fs`
+images/devices, the boot header check, the guest all-sector decrypt cart, and
+the ATA/fd probe for x86 HDD and Android storage are in `STORAGE.md`.
 Full container details: `FORMAT.md`.
 
 ## Host reference

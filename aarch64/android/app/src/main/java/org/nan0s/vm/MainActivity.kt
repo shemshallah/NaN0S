@@ -34,6 +34,8 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val reqWifi = 3
     private val autosave get() = File(filesDir, "autosave.nan1")
     private val diskFile get() = File(filesDir, "disk.nanfs")
+    private val fsFile get() = File(filesDir, "nan0s_fs.img")
+    private val fsKey get() = File(filesDir, "nan0s_fs.key")
     private var diskPfd: ParcelFileDescriptor? = null
 
     private fun asset(): ByteArray = assets.open("nan0s.img").use { it.readBytes() }
@@ -57,11 +59,28 @@ class MainActivity : Activity(), NanLoop.Listener {
     }
 
     private fun attachDefaultDisk() {
-        if (!diskFile.exists()) seedDisk()
-        if (!diskFile.exists()) return
+        val image = if (fsFile.exists() && NspvImage.check(fsFile)) fsFile else diskFile
+        if (image == diskFile) {
+            if (!diskFile.exists()) seedDisk()
+            if (!diskFile.exists()) return
+        }
         try {
-            attachDisk(ParcelFileDescriptor.open(diskFile, ParcelFileDescriptor.MODE_READ_WRITE), diskFile.length())
+            attachDisk(ParcelFileDescriptor.open(image, ParcelFileDescriptor.MODE_READ_WRITE), image.length())
         } catch (e: Exception) { Log.w("nan0s", "disk attach failed", e) }
+    }
+
+    /** Create a sparse 1 GiB NSPV image in app storage and attach it now. */
+    private fun makeFsImage() {
+        try {
+            if (!NspvImage.ensure(fsFile, fsKey)) {
+                Toast.makeText(this, "fs image create failed", Toast.LENGTH_SHORT).show(); return
+            }
+            attachDisk(ParcelFileDescriptor.open(fsFile, ParcelFileDescriptor.MODE_READ_WRITE), fsFile.length())
+            Toast.makeText(this, "1 GiB sparse image attached", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Log.w("nan0s", "fs image failed", e)
+            Toast.makeText(this, "fs image failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,9 +126,11 @@ class MainActivity : Activity(), NanLoop.Listener {
         })
         row.addView(btn("Open") { pick(reqImage) })
         row.addView(btn("Disk") { pick(reqDisk) })
+        row.addView(btn("Fs") { makeFsImage() })
         row.addView(btn("Reset") {
             autosave.delete(); vm.detachDisk()
-            diskFile.delete(); seedDisk(); vm.load(asset()); attachDefaultDisk(); loop.rearm()
+            diskFile.delete(); fsFile.delete(); fsKey.delete()
+            seedDisk(); vm.load(asset()); attachDefaultDisk(); loop.rearm()
         })
         row.addView(btn("Scale") { view.integerScale = !view.integerScale; view.invalidate() })
         row.addView(btn("Fit") { view.resetZoom() })
