@@ -5,10 +5,13 @@
 set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
 T="${TMPDIR:-/tmp}/qgate_a64.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
 run_one(){
-  name=$1; src=$2
+  name=$1; src=$2; clk=$3; keys=$4; kbytes=$5
   awk -f tools/nmk.awk -v CMD=emit "$src" 2>/dev/null > "$T/$name.nan"
+  if [ -n "$clk" ]; then CLK="--clock $clk"; else CLK=""; fi
+  if [ -n "$keys" ]; then KEYS="--keys $keys"; else KEYS=""; fi
   aarch64/android/nan_cli --img "$T/$name.nan" --steps 20000000 --serial \
-      > "$T/$name.ref" 2>/dev/null
+      $CLK $KEYS > "$T/$name.ref" 2>/dev/null
+  if [ -n "$kbytes" ]; then printf '%s\n' "$kbytes" > "$T/s1_keys.inc"; else : > "$T/s1_keys.inc"; fi
   awk '{ sub(/;.*/, ""); gsub(/[ \t]/, ""); if ($0 == "") next;
          split($0, a, "_");
          if (a[1] ~ /^[0-9A-Fa-f]+$/ && a[2] ~ /^[0-9A-Fa-f]+$/ && a[3] ~ /^[0-9A-Fa-f]+$/)
@@ -34,8 +37,13 @@ run_one fptest aarch64/scaffold/s1_fp_test.nas
 grep -q "FP PASS" "$T/fptest.ref" || { echo "s1 a64 gate: FAIL (fp test reference)"; exit 1; }
 run_one devtest aarch64/scaffold/s1_dev_test.nas
 grep -q "DEV PASS" "$T/devtest.ref" || { echo "s1 a64 gate: FAIL (device test reference)"; exit 1; }
+run_one ring src/tests/ring_test.nas steps:1000
+grep -q "E" "$T/ring.ref" || { echo "s1 a64 gate: FAIL (ring test reference)"; exit 1; }
+run_one keytest aarch64/scaffold/s1_key_test.nas "" "A,B,ENTER" ".byte 65,66,13"
+printf 'AB\r' > "$T/key.gold"
+cmp -s "$T/key.gold" "$T/keytest.ref" || { echo "s1 a64 gate: FAIL (key test reference)"; od -An -c "$T/keytest.ref"; exit 1; }
 for t in n16de_test a2_boot_test nan16dump_test; do
   run_one "$t" "src/tests/$t.nas"
   grep -q "PASS" "$T/$t.ref" || { echo "s1 a64 gate: FAIL ($t reference)"; exit 1; }
 done
-echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + n16de + a2_boot + nan16dump)"
+echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + ring + keytest + n16de + a2_boot + nan16dump)"

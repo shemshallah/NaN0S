@@ -848,14 +848,40 @@ op_vpeek:
         str     w12, [x21, x26, lsl #2]
 9:      b       loop
 op_key:
+        ldr     x9, =keys_img
+        ldr     x10, =keys_end
+        sub     x10, x10, x9
+        ldr     x11, =key_i
+        ldr     w12, [x11]
+        cmp     w12, w10
+        b.hs    key_wait
+        ldrb    w13, [x9, x12]
+        add     w12, w12, #1
+        str     w12, [x11]
+        str     w13, [x21, x26, lsl #2]
+        b       loop
 key_wait:
         wfe
         b       key_wait
 op_tick:
-        str     wzr, [x21, x26, lsl #2]
+        mov     w10, #1000
+        udiv    x9, x29, x10
+        str     w9, [x21, x26, lsl #2]
         b       loop
 op_keyq:
-        str     wzr, [x21, x26, lsl #2]
+        ldr     x9, =keys_img
+        ldr     x10, =keys_end
+        sub     x10, x10, x9
+        ldr     x11, =key_i
+        ldr     w12, [x11]
+        cmp     w12, w10
+        b.hs    1f
+        ldrb    w13, [x9, x12]
+        add     w12, w12, #1
+        str     w12, [x11]
+        str     w13, [x21, x26, lsl #2]
+        b       loop
+1:      str     wzr, [x21, x26, lsl #2]
         b       loop
 op_dispq:
         ldr     x9, =disp_vmode
@@ -1160,6 +1186,9 @@ cpuid_zero:    .word 0, 0, 0, 0
 guest_img:
         .include "s1_guest.inc"
 guest_end:
+keys_img:
+        .include "s1_keys.inc"
+keys_end:
 
         .section .bss
         .balign 8
@@ -1171,6 +1200,7 @@ disp_fbtot:  .space 4
 disp_vmode:  .space 4
 disp_frame:  .space 4
 disp_rawkb:  .space 4
+key_i:       .space 4
         .balign 8
 cells:  .space 4000
         .balign 4096
