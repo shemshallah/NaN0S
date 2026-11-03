@@ -1,0 +1,19 @@
+# system.nancfg - NANNET control plane (M1/M2 grammar)
+# Keywords are read by first letter; numbers are decimal or 0x. Ids are stable.
+# link <ifid> <0|1>
+link 0 1
+link 1 1
+link 2 1
+# addr <ifid> <ip16> <prefix 0..16>
+addr 1 0x0A00 16
+# route <dst16> <prefix> <gw16> <ifid> <metric>
+route 0x0000 0 0x0A01 1 1
+# dns <ip16>
+dns 0x0A01
+# driver <drvid> <0|1>
+driver 9 1
+driver 10 1
+# wifi: wscan <ifid> | wjoin <ifid> <scan-index> | wleave <ifid>
+# wscan 2
+# wjoin 2 0
+# wleave 2
