@@ -82,7 +82,7 @@ Image rule: the image is used EXCLUSIVELY for allocation (boot + kernel + empty 
 
 Every museum piece includes: date of event, people involved (alive/dead), history lesson (what/why), code lesson (what/how). Authenticity badge: EXACT / RE-CREATION / INSPIRED. MIPS ladder: VM speed vs each era's machine. All ROMs homebrew.
 
-### Double-Endian Exploitation (applies to ALL exhibits)
+### Double-Endian Handling (applies to ALL exhibits)
 
 The NaN16 word is the core data structure. Every exhibit leverages:
 1. **Class nibble as function**: n=(c_near<<2)|c_far is truth table for f(a,b). BOOL_n computes across 32 lanes. Any 2-input Boolean function = one instruction.

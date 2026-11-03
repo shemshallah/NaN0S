@@ -1174,3 +1174,8 @@ Spec: `spec/TRANSLATOR.md`.
 - x86 gold stays frozen; image layout unchanged (boot 512 + kernel 5808 +
   guest 24904 words); build/nan0s.img sha256
   4c79207c93fc0b3639a0c75d6b318487fad5b219565ce6bbee9f7a8c8214a7a2.
+- Roadmap: text-only browser (no image or script path). Image ingestion stays
+  hard-blocked at the network edge until an in-network classifier exists.
+- Roadmap: a standalone NANNET manager owns links (wired/WiFi), addresses,
+  routes, DNS and driver load state; NANNETSUITE is a toolkit, not the control
+  plane. Config lives in `.nancfg` files.

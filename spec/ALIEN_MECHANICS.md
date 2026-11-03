@@ -261,7 +261,7 @@ by forcing an ALU operation. The hardware exception handler is global. When a
 ### The alien capability
 
 Instantaneous state transfer across the entire memory space. It is not moving
-data faster than light. It is exploiting the global nature of hardware
+data faster than light. It is leveraging the global nature of hardware
 interrupts and a shared payload. The museum calls it a "spooky memory bus" and
 then explains exactly why it is not physics.
 
