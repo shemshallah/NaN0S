@@ -169,6 +169,22 @@ function readHeaderFile(path, totalSectors) {
     return parseHeader(hb, sectors);
   } finally { fs.closeSync(fd); }
 }
+// Update unauthenticated header words after creation (currently the FS marker,
+// words 13..15). Words 0..10 are covered by every sector AD and must not change.
+function setHeaderWords(path, map) {
+  const fd = fs.openSync(path, "r+");
+  try {
+    const hb = Buffer.alloc(SECTOR);
+    if (fs.readSync(fd, hb, 0, SECTOR, 0) < SECTOR) return false;
+    for (const [k, v] of Object.entries(map)) {
+      const i = Number(k);
+      if (!Number.isInteger(i) || i < 11 || i > 15) return false;
+      putWord(hb, i * 8, BigInt(v));
+    }
+    fs.writeSync(fd, hb, 0, SECTOR, 0);
+    return true;
+  } finally { fs.closeSync(fd); }
+}
 function readSectorFile(path, key, lba, totalSectors) {
   const info = readHeaderFile(path, totalSectors);
   if (!info || lba < 0 || lba >= info.dataSectors) return null;
@@ -239,6 +255,9 @@ function growFile(path, key, totalBytes) {
       fs.writeSync(hf, hb, 0, SECTOR, 0);
     } finally { fs.closeSync(hf); }
   }
+  if (old.h[13] !== 0n || old.h[14] !== 0n || old.h[15] !== 0n) {
+    setHeaderWords(tmp, { 13: old.h[13], 14: old.h[14], 15: old.h[15] });
+  }
   fs.renameSync(tmp, path);
   return readHeaderFile(path);
 }
@@ -265,7 +284,7 @@ function infoOf(buf) {
     rollback: i.rollback, used: i.used, flags: i.flags, lazy: i.lazy };
 }
 module.exports = { format, createLazy, lazyGeometry, growFile, verify, verifyFile,
-  readSector, writeSector, readSectorFile, writeSectorFile, readHeaderFile,
+  readSector, writeSector, readSectorFile, writeSectorFile, readHeaderFile, setHeaderWords,
   infoOf, SECTOR, MAGIC };
 
 function parseSize(s) {

@@ -45,6 +45,19 @@ BOOL.14 r1,r1,r2
 MOVI r2,1
 BOOL.8 r1,r1,r2
 ST r1,r0,@lazy
+; word13 cells 52/53 = unauthenticated nan0s_fs marker
+LD r1,r0,4148
+LD r2,r0,4149
+SHL r2,r2,16
+BOOL.14 r1,r1,r2
+ST r0,r0,@fs
+MOVI r2,0x5331
+MOVHI r2,0x3046
+CMP r1,r2
+JMP[NE] @nofs
+MOVI r1,1
+ST r1,r0,@fs
+nofs:
 ; full volumes have no used word: use capacity
 LD r1,r0,@lazy
 CMP r1,r0
@@ -74,6 +87,10 @@ CALL @puthex8
 MOVI r1,@s_lazy
 CALL @puts
 LD r5,r0,@lazy
+CALL @puthex8
+MOVI r1,@s_fs
+CALL @puts
+LD r5,r0,@fs
 CALL @puthex8
 MOVI r1,@s_nl
 CALL @puts
@@ -126,6 +143,8 @@ suite:
 .word 0
 lazy:
 .word 0
+fs:
+.word 0
 s_ok:
 .str "NAN0S_FS OK"
 s_cap:
@@ -136,6 +155,8 @@ s_suite:
 .str " suite="
 s_lazy:
 .str " lazy="
+s_fs:
+.str " fs="
 s_nl:
 .str "\n"
 s_no:

@@ -85,7 +85,7 @@ Default test image, kept under the Termux home:
 ~/nan0s_fs/nan0s_fs.img   1 GiB sparse NSPV suite-1 image
 ~/nan0s_fs/nan0s_fs.key   KEY=<64 hex> / NON=<32 hex>, mode 0600
 
-tools/nan0s_fs.sh make 1G
+tools/nan0s_fs.sh make 1G     # volume + nan0s_fs mkfs
 tools/nan0s_fs.sh check          # boot check; creates the image if absent
 tools/nan0s_fs.sh boot --verify  # header + every used sector; non-zero if invalid
 tools/nan0s_fs.sh grow 2G        # grow capacity, re-sealing used sectors
@@ -114,6 +114,49 @@ Android: the **Fs** button prompts for a size (default 1 GiB) and creates `files
 header is valid. **Reset** removes it and returns to `disk.nanfs`. The **Disk**
 button can still open a host-linked image from shared storage.
 
+## nan0s_fs file layer
+
+`crypt/nan0s_fs` is a flat, encrypted file layer over logical NSPV data blocks:
+
+- block 0 = superblock (`NAN0FS1`, capacity, next free, file count)
+- block 1 = directory, 8 entries of 64 bytes
+- blocks 2.. = contiguous file extents
+- every block is sealed by NSPV; unused blocks stay sparse holes
+- header word 13 carries the unauthenticated `NAN0FS1` marker, word 15 the
+  file count; the guest boot cart prints `fs=00000001`
+
+Commands (image + key):
+
+```
+crypt/nan0s_fs mkfs  image keyhex
+crypt/nan0s_fs put   image keyhex local name
+crypt/nan0s_fs get   image keyhex name out
+crypt/nan0s_fs ls    image keyhex
+crypt/nan0s_fs rm    image keyhex name
+crypt/nan0s_fs check image keyhex
+crypt/nan0s_fs resize image keyhex   # after volume grow
+```
+
+Shortcuts through the default image:
+
+```
+tools/nan0s_fs.sh mkfs
+tools/nan0s_fs.sh put note.txt note.txt
+tools/nan0s_fs.sh ls
+tools/nan0s_fs.sh get note.txt /tmp/note.txt
+tools/nan0s_fs.sh checkfs
+tools/nan0s_fs.sh boot --verify
+```
+
+`boot --verify` verifies every nonzero tag **and** the `nan0s_fs` superblock,
+directory, extents and file count. `grow` preserves the file layer and resizes
+its superblock capacity. The Android **Fs** image is an NSPV volume without the
+encrypted file layer yet (`fs=00000000`); create a file layer on the host and
+open that image through **Disk**, or add the guest-side mkfs next.
+
+Limits: 8 files, flat namespace, no rename, deletion does not reclaim extents,
+and the guest can boot/check the filesystem marker but does not mount files yet.
+
 ## Storage backends
 
 - **x86 virtual HDD:** QEMU `-drive format=raw,if=ide,file=vol.img`. The guest
@@ -136,11 +179,12 @@ button can still open a host-linked image from shared storage.
 
 ## Current limits
 
-1. The guest decrypts every populated data sector into RAM
-   (`nspv_decrypt.nan`), but has no chunked file/mount layer; each sector is
-   verified and then discarded; zero-tag holes are skipped. A 1 GiB lazy image boots through the header
-   check (`nan0s_fs_check.nas`), not a full decrypt. The next port adds a sector
-   cache, an allocated-extent map and the NSPF1 file reader.
+1. The guest decrypts the populated prefix of a full or lazy volume
+   (`nspv_decrypt.nan`) and skips zero-tag holes, but has no guest file/mount
+   layer; each sector is verified and then discarded. A 1 GiB lazy image boots
+   through the header check (`nan0s_fs_check.nas`). The host file layer exists in
+   `crypt/nan0s_fs`; the next port adds the guest directory/extent reader and a
+   sector cache.
 2. Encrypted **boot** is not implemented: bootloader/NaNFS decryption, operator
    or TPM key release, rollback-counter enforcement and key zeroization are
    pending.

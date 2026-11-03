@@ -12,6 +12,12 @@
 #   format [image|device] [size] [--device]
 #                           overwrite/create a volume (destructive)
 #   grow [size] [image]     grow capacity, re-sealing only the used prefix
+#   mkfs [image]            write the nan0s_fs superblock/directory
+#   put <local> <name> [image]        store a file
+#   get <name> <out> [image]          extract a file
+#   ls [image]                        list files
+#   rm <name> [image]                 remove a directory entry
+#   checkfs [image]                   verify the nan0s_fs layer
 #   info [image]            header/capacity/used information
 #   link [image] [target]   copy for Android testing; default shared Download
 #
@@ -56,6 +62,7 @@ make_image() {
   fi
   read_key
   node crypt/volume.cjs create 1 "$image" "$KEY" "$NON" "$size" --lazy
+  crypt/nan0s_fs mkfs "$image" "$KEY"
 }
 
 check_image() {
@@ -71,6 +78,7 @@ check_image() {
       node crypt/volume.cjs check "$image" "$KEY" --sectors "$sectors" --verify
     else
       node crypt/volume.cjs check "$image" "$KEY" --verify
+      crypt/nan0s_fs check "$image" "$KEY"
     fi
   elif [ -b "$image" ]; then
     sectors=$(( $(blockdev --getsize64 "$image") / 512 ))
@@ -125,7 +133,28 @@ case "$cmd" in
   grow)
     size="${1:-2G}"; image="${2:-$IMG}"
     read_key
-    node crypt/volume.cjs grow "$image" "$KEY" "$size" ;;
+    node crypt/volume.cjs grow "$image" "$KEY" "$size"
+    if crypt/nan0s_fs check "$image" "$KEY" >/dev/null 2>&1; then
+      crypt/nan0s_fs resize "$image" "$KEY"
+    fi ;;
+  mkfs)
+    image="${1:-$IMG}"; read_key; crypt/nan0s_fs mkfs "$image" "$KEY" ;;
+  put)
+    local="${1:-}"; name="${2:-}"; image="${3:-$IMG}"
+    [ -n "$local" ] && [ -n "$name" ] || { echo "usage: $0 put <local> <name> [image]" >&2; exit 2; }
+    read_key; crypt/nan0s_fs put "$image" "$KEY" "$local" "$name" ;;
+  get)
+    name="${1:-}"; out="${2:-}"; image="${3:-$IMG}"
+    [ -n "$name" ] && [ -n "$out" ] || { echo "usage: $0 get <name> <out> [image]" >&2; exit 2; }
+    read_key; crypt/nan0s_fs get "$image" "$KEY" "$name" "$out" ;;
+  ls)
+    image="${1:-$IMG}"; read_key; crypt/nan0s_fs ls "$image" "$KEY" ;;
+  rm)
+    name="${1:-}"; image="${2:-$IMG}"
+    [ -n "$name" ] || { echo "usage: $0 rm <name> [image]" >&2; exit 2; }
+    read_key; crypt/nan0s_fs rm "$image" "$KEY" "$name" ;;
+  checkfs)
+    image="${1:-$IMG}"; read_key; crypt/nan0s_fs check "$image" "$KEY" ;;
   info)
     target="${1:-$IMG}"
     if [ -b "$target" ]; then
@@ -138,5 +167,5 @@ case "$cmd" in
     read_key
     link_image "${1:-$IMG}" "${2:-}" ;;
   *)
-    echo "usage: $0 make|check|boot|format|grow|info|link [args]" >&2; exit 2 ;;
+    echo "usage: $0 make|check|boot|format|grow|mkfs|put|get|ls|rm|checkfs|info|link [args]" >&2; exit 2 ;;
 esac
