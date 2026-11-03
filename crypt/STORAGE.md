@@ -1,8 +1,8 @@
 # NSPV storage volumes
 
-Status: host format/verify/read/write + guest header probe implemented. Guest
-sector decryption and encrypted boot are pending. Experimental; not for real
-data yet.
+Status: host format/verify/read/write + guest NSPV sector decrypt implemented.
+The guest decrypt cart passes on the C-core disk fd and x86 QEMU IDE.
+Encrypted boot and a chunked guest file/mount tool are pending.
 
 ## NSPV1 sector format
 
@@ -50,6 +50,8 @@ Gates:
 ```
 sh crypt/volume_gate.sh    # suites 1/2, write/read, header/tag/data tamper, wrong key
 sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
+sh crypt/storage_decrypt_gate.sh  # guest sector decrypt on C-core fd + QEMU IDE
+sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
 ```
 
 ## Storage backends
@@ -71,7 +73,8 @@ sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
 
 ## Current limits
 
-1. The guest only probes the header today; sector decrypt/mount is the next
+1. The guest decrypts one NSPV sector today (`crypt/guest/nspv_decrypt.nan`),
+   not a chunked multi-sector mount; the next port iterates the volume.
    raw-NaN16 port. The 512-byte capsule round-trip itself is gated privately.
 2. Encrypted **boot** is not implemented: bootloader/NaNFS decryption, operator
    or TPM key release, rollback-counter enforcement and key zeroization are
