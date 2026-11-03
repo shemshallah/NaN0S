@@ -38,6 +38,10 @@ sh crypt/nspfile open <in> <out> <keyhex>
 
 Full container details: `FORMAT.md`.
 
+Storage volumes: NSPV1 sector format, host `nspvol`, and the
+ATA/fd probe for x86 HDD and Android storage are in `STORAGE.md`.
+Full container details: `FORMAT.md`.
+
 ## Host reference
 
 `crypt/reference/nsp.cjs` contains the NSP-7/NSP-8 capsule AEAD and the NSPF1

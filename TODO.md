@@ -1201,3 +1201,9 @@ Spec: `spec/TRANSLATOR.md`.
       key zeroization.
 - [ ] ML-KEM-768, Ed25519, ML-DSA-44, SLH-DSA (suites 3/4/5 stay planned and
       fail closed until implemented).
+- [x] NSPV1 volume tool: format/verify/info/read/write; suites 1/2; gate
+      (`crypt/volume_gate.sh`).
+- [x] Storage probe on C-core disk fd (Android path) and x86 QEMU IDE
+      (`crypt/storage_gate.sh`); plug-and-play NSPV magic detection.
+- [ ] Guest sector decryption/mount and encrypted boot; Android SAF wiring for
+      the volume picker; real-HDD validation.
