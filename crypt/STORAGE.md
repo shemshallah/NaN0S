@@ -1,8 +1,9 @@
 # NSPV storage volumes
 
-Status: host format/verify/read/write + guest NSPV sector decrypt implemented.
-The guest decrypt cart passes on the C-core disk fd and x86 QEMU IDE.
-Encrypted boot and a chunked guest file/mount tool are pending.
+Status: host format/verify/read/write + guest NSPV all-sector decrypt implemented.
+The guest decrypt cart passes on the C-core disk fd and x86 QEMU IDE for every
+data sector of the test volume (16 sectors). A chunked guest file/mount tool and
+encrypted boot are pending.
 
 ## NSPV1 sector format
 
@@ -50,32 +51,37 @@ Gates:
 ```
 sh crypt/volume_gate.sh    # suites 1/2, write/read, header/tag/data tamper, wrong key
 sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
-sh crypt/storage_decrypt_gate.sh  # guest sector decrypt on C-core fd + QEMU IDE
-sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
+sh crypt/storage_decrypt_gate.sh  # guest all-sector decrypt on C-core fd + QEMU IDE
 ```
+
+The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors`, selects
+the tag slot (`lba % 10` in the tag table), derives `nonce + lba`, decrypts the
+sector capsule, verifies the tag, and checks the plaintext pattern. It prints
+`VOL PASS <count>`; the boot variant is `nspv_decrypt_boot.nan`.
 
 ## Storage backends
 
 - **x86 virtual HDD:** QEMU `-drive format=raw,if=ide,file=vol.img`. The guest
-  ATA PIO path reads sector 0; `storage_gate.sh` PASS.
+  ATA PIO path reads every data sector; `storage_decrypt_gate.sh` PASS.
 - **x86 real HDD:** the same ATA primary-master path. Write the prepared volume
-  image to the drive (destructive; verify the device first). The guest probe
+  image to the drive (destructive; verify the device first). The guest decrypt
   does not depend on QEMU.
 - **Android emulated:** the bundled `disk.nanfs`, or any SAF file, is attached
   as a file descriptor (`NanNative.attachDiskFd`); the C core exposes it as the
-  ATA primary master. The C-core leg of `storage_gate.sh` uses this path.
+  ATA primary master. The C-core leg of `storage_decrypt_gate.sh` uses this path.
 - **Android real:** use the SAF picker (`Disk`) to attach any file/content
   provider descriptor. Raw block devices are not available to a normal app
   without root; "any storage" means any file/fd the picker can provide.
 - **Plug and play:** the guest reads sector 0 and checks the NSPV magic. An
   unformatted/plain volume prints `NSPV NO`; an NSPV volume prints `NSPV OK`.
-  Format/unlock is done with the host tool until the guest port lands.
+  The decrypt cart then walks all data sectors. Format/rekey is done with the
+  host tool; the guest unlock/mount layer is the next port.
 
 ## Current limits
 
-1. The guest decrypts one NSPV sector today (`crypt/guest/nspv_decrypt.nan`),
-   not a chunked multi-sector mount; the next port iterates the volume.
-   raw-NaN16 port. The 512-byte capsule round-trip itself is gated privately.
+1. The guest decrypts every data sector into RAM (`nspv_decrypt.nan`), but has
+   no chunked file/mount layer; each sector is verified and then discarded.
+   The next port adds a sector cache and NSPF1 chunk reader.
 2. Encrypted **boot** is not implemented: bootloader/NaNFS decryption, operator
    or TPM key release, rollback-counter enforcement and key zeroization are
    pending.

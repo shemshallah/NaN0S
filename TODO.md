@@ -1205,7 +1205,9 @@ Spec: `spec/TRANSLATOR.md`.
       (`crypt/volume_gate.sh`).
 - [x] Storage probe on C-core disk fd (Android path) and x86 QEMU IDE
       (`crypt/storage_gate.sh`); plug-and-play NSPV magic detection.
-- [x] Guest NSPV sector decrypt (suite 1) on C-core fd + x86 QEMU IDE;
+- [x] Guest NSPV all-sector decrypt (suite 1) on C-core fd + x86 QEMU IDE;
       public cart `crypt/guest/nspv_decrypt.nan` and `storage_decrypt_gate.sh`.
-- [ ] Guest multi-sector/chunked mount and encrypted boot; Android SAF wiring for
-      the volume picker; real-HDD validation.
+      The cart walks `data_sectors`, selects tag slots, derives `nonce + lba`,
+      verifies every tag, and prints `VOL PASS 00000010` for a 16-sector volume.
+- [ ] Guest chunked NSPF1 file/mount layer and encrypted boot; Android SAF wiring
+      for the volume picker; real-HDD validation.
