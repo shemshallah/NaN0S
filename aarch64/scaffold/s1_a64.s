@@ -53,12 +53,15 @@ copy:   cmp     x11, x10
         b       copy
 copy_done:
         ldr     x21, =regs
-        mov     w9, #1
-        str     w9, [x21, #52]      // r13 = 1 (NaN16 convention)
         mov     w22, #0             // pc
         mov     w23, #0             // k = 2Z+L
 loop:
         add     x29, x29, #1
+.ifdef S1_MAXSTEPS
+        ldr     x10, =S1_MAXSTEPS
+        cmp     x29, x10
+        b.hs    halt
+.endif
         and     w9, w22, #0x3FFFFF
         lsl     x9, x9, #3
         add     x9, x19, x9
@@ -222,7 +225,7 @@ disp:
         cmp     w25, #0x3E
         b.eq    loop
         cmp     w25, #0x3F
-        b.eq    op_in0
+        b.eq    op_inb
         cmp     w25, #0x40
         b.eq    op_in0
         cmp     w25, #0x41
@@ -1049,6 +1052,19 @@ ff_l:   cmp     w14, w9
 op_in0:
         str     wzr, [x21, x26, lsl #2]
         b       loop
+op_inb:
+        ldr     w9, [x21, x27, lsl #2]
+        movz    w10, #0x03DA
+        cmp     w9, w10
+        b.ne    1f
+        ldr     x9, =disp_retrace
+        ldr     w10, [x9]
+        eor     w10, w10, #8
+        str     w10, [x9]
+        str     w10, [x21, x26, lsl #2]
+        b       loop
+1:      str     wzr, [x21, x26, lsl #2]
+        b       loop
 op_rdtsc:
         ldr     w9, [x21, x27, lsl #2]
         cbz     w9, 1f
@@ -1184,7 +1200,7 @@ cpuid_zero:    .word 0, 0, 0, 0
 
         .balign 8
 guest_img:
-        .include "s1_guest.inc"
+        .incbin "s1_guest.bin"
 guest_end:
 keys_img:
         .include "s1_keys.inc"
@@ -1200,6 +1216,7 @@ disp_fbtot:  .space 4
 disp_vmode:  .space 4
 disp_frame:  .space 4
 disp_rawkb:  .space 4
+disp_retrace: .space 4
 key_i:       .space 4
         .balign 8
 cells:  .space 4000

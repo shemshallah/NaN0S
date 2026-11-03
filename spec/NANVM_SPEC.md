@@ -460,15 +460,17 @@ FBINFO VSYNC FBCOPY FBFILL OUTB INB INW OUTW OUTSW OUTL CPUID RDTSC, with
 predication and exact `!G`/`!O` + pc hex traps, over a 4M-word writable
 guest RAM plus a 16 MiB VRAM and the 2000-cell text plane (reset state
 cells 0x0720, FBTOT 64000); FP/SIMD is enabled at the current EL; HALT
-exits qemu via semihosting. Ports are stubs for now (IN reads 0, OUT is
-ignored). TICK is the deterministic harness clock, `steps/1000`
-(`--clock steps:1000` in the gate); KEY/KEYQ drain a key ring preloaded from
-a generated image include (default empty); KEY waits when the ring is empty.
-The gate runs eleven real programs differentially: s1_test, carry_probe,
-nalloc_test (3,156 allocator checks), a64_test (portable core self-test), the
-float edge-vector test, the device-boundary test, ring_test, the key-ring
-test, n16de_test, a2_boot_test and nan16dump_test. Remaining: real port
-devices (PS/2, VGA, ATA, PIT, PCI), then the work image.
+exits qemu via semihosting. Ports are stubs for now (IN reads 0 except the
+VGA retrace toggle at 0x3DA, OUT is ignored). TICK is the deterministic
+harness clock, `steps/1000`; KEY/KEYQ drain a key ring preloaded from a
+generated image include (default empty); KEY waits when the ring is empty.
+The guest image is a raw word blob (`.incbin`), so the shipped image loads
+directly. The gate runs eleven real programs plus the full work image
+differentially: the `nan0s.img` guest words built with a 3,000,000-step
+budget must produce byte-identical serial (`NaN/0S R26J READY MENU=S`).
+Remaining for the driver tests: raw PS/2, ATA, PIT and PCI port devices;
+then the Android integration that retires the C interpreter from the
+product.
 
 ### 12.3 Android: bare-minimum C
 

@@ -12,10 +12,9 @@ run_one(){
   aarch64/android/nan_cli --img "$T/$name.nan" --steps 20000000 --serial \
       $CLK $KEYS > "$T/$name.ref" 2>/dev/null
   if [ -n "$kbytes" ]; then printf '%s\n' "$kbytes" > "$T/s1_keys.inc"; else : > "$T/s1_keys.inc"; fi
-  awk '{ sub(/;.*/, ""); gsub(/[ \t]/, ""); if ($0 == "") next;
-         split($0, a, "_");
-         if (a[1] ~ /^[0-9A-Fa-f]+$/ && a[2] ~ /^[0-9A-Fa-f]+$/ && a[3] ~ /^[0-9A-Fa-f]+$/)
-           print ".quad 0x" a[1] a[2] a[3] }' "$T/$name.nan" > "$T/s1_guest.inc"
+  awk '{ sub(/;.*/, ""); gsub(/[ \t_]/, ""); if (length($0) != 16 || $0 !~ /^[0-9A-Fa-f]+$/) next;
+         s = ""; for (i = 15; i >= 1; i -= 2) s = s substr($0, i, 2); print s }' \
+       "$T/$name.nan" | xxd -r -p > "$T/s1_guest.bin"
   as -I "$T" -o "$T/$name.o" aarch64/scaffold/s1_a64.s
   ld -Ttext=0x40000000 -e _start -o "$T/$name.elf" "$T/$name.o"
   timeout 30 qemu-system-aarch64 -M virt -m 128M -cpu cortex-a57 \
@@ -42,8 +41,20 @@ grep -q "E" "$T/ring.ref" || { echo "s1 a64 gate: FAIL (ring test reference)"; e
 run_one keytest aarch64/scaffold/s1_key_test.nas "" "A,B,ENTER" ".byte 65,66,13"
 printf 'AB\r' > "$T/key.gold"
 cmp -s "$T/key.gold" "$T/keytest.ref" || { echo "s1 a64 gate: FAIL (key test reference)"; od -An -c "$T/keytest.ref"; exit 1; }
+# full work image: guest words from the shipped floppy image, 3M-step budget
+img=aarch64/android/app/src/main/assets/nan0s.img
+aarch64/android/nan_cli --img "$img" --steps 3000000 --serial > "$T/img.ref" 2>/dev/null
+grep -q "READY" "$T/img.ref" || { echo "s1 a64 gate: FAIL (work image reference)"; exit 1; }
+dd if="$img" of="$T/s1_guest.bin" bs=8 skip=1088 count=65536 2>/dev/null
+: > "$T/s1_keys.inc"
+as -I "$T" --defsym S1_MAXSTEPS=3000000 -o "$T/img.o" aarch64/scaffold/s1_a64.s
+ld -Ttext=0x40000000 -e _start -o "$T/img.elf" "$T/img.o"
+timeout 30 qemu-system-aarch64 -M virt -m 128M -cpu cortex-a57 -kernel "$T/img.elf" \
+    -nographic -semihosting > "$T/img.out" 2>"$T/img.err" || true
+cmp -s "$T/img.ref" "$T/img.out" || { echo "s1 a64 gate: FAIL (work image serial differs)";
+    echo "ref:"; od -An -c "$T/img.ref" | head -3; echo "s1:"; od -An -c "$T/img.out" | head -3; exit 1; }
 for t in n16de_test a2_boot_test nan16dump_test; do
   run_one "$t" "src/tests/$t.nas"
   grep -q "PASS" "$T/$t.ref" || { echo "s1 a64 gate: FAIL ($t reference)"; exit 1; }
 done
-echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + ring + keytest + n16de + a2_boot + nan16dump)"
+echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + ring + keytest + n16de + a2_boot + nan16dump + work image)"
