@@ -15,8 +15,8 @@ for s in 1 2; do
   node crypt/reference/nsp.cjs file-open "$T/enc$s" "$T/dec$s" "$KEY" >/dev/null
   cmp -s "$T/plain" "$T/dec$s" || { echo "crypt gate: FAIL (suite $s)"; exit 1; }
 done
-crypt/nspfile seal 1 "$T/plain" "$T/ecli" "$KEY" "$NON" >/dev/null
-crypt/nspfile open "$T/ecli" "$T/dcli" "$KEY" >/dev/null
+sh crypt/nspfile seal 1 "$T/plain" "$T/ecli" "$KEY" "$NON" >/dev/null
+sh crypt/nspfile open "$T/ecli" "$T/dcli" "$KEY" >/dev/null
 cmp -s "$T/plain" "$T/dcli" || { echo "crypt gate: FAIL (CLI)"; exit 1; }
 node -e 'require("fs").writeFileSync(process.argv[1], Buffer.alloc(0))' "$T/empty"
 node crypt/reference/nsp.cjs file-seal 1 "$T/empty" "$T/e0" "$KEY" "$NON" >/dev/null

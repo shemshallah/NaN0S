@@ -23,8 +23,8 @@ from the tree today; Ed25519/ML-DSA/SLH-DSA are specification targets only.
 ## File usage
 
 ```
-crypt/nspfile seal <1|2> <in> <out> <keyhex> <noncehex>
-crypt/nspfile open <in> <out> <keyhex>
+sh crypt/nspfile seal <1|2> <in> <out> <keyhex> <noncehex>
+sh crypt/nspfile open <in> <out> <keyhex>
 ```
 
 - key: 32 bytes = 64 hex chars
