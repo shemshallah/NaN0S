@@ -53,6 +53,8 @@ sh crypt/volume_gate.sh    # suites 1/2, write/read, header/tag/data tamper, wro
 sh crypt/storage_gate.sh   # NSPV probe on C-core disk fd + x86 QEMU IDE
 sh crypt/storage_decrypt_gate.sh  # guest all-sector decrypt on C-core fd + QEMU IDE
 sh crypt/storage_boot_gate.sh     # sparse 1 GiB: header + populated prefix, C-core + x86 IDE
+sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact, guest fs
+sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -65,8 +67,10 @@ mark. A 1 GiB image with only sector 2 populated prints `VOL PASS 00000003`
 (used=3, sectors 0/1 holes).
 
 The boot check cart (`crypt/guest/nan0s_fs_check.nas`) reads sector 0 only and
-prints `NAN0S_FS OK cap=<hex> used=<hex> suite=<hex> lazy=<bit>`; it does not
-walk a 1 GiB image just to boot.
+prints `NAN0S_FS OK cap=<hex> used=<hex> suite=<hex> lazy=<bit> fs=<bit>`; it
+does not walk a 1 GiB image just to boot. The metadata cart
+(`crypt/guest/nan0s_fs_meta.nan`) decrypts logical block 0 and authenticates
+the `NAN0FS1` superblock/version/tag; a tampered data byte prints `VOL FAIL`.
 
 ## Sparse, arbitrary-size images
 
@@ -168,8 +172,9 @@ layer yet (`fs=00000000`); create a file layer on the host and open that image
 through **Disk**, or add the guest-side mkfs next.
 
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
-the superblock (compact when exhausted), flat namespace (no directories), and
-the guest can boot/check the filesystem marker but does not mount files yet.
+the superblock (compact when exhausted), flat namespace (no directories). The
+guest can check the outer header, the `fs` marker and the encrypted superblock,
+but does not list or mount files yet.
 
 ## Storage backends
 

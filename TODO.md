@@ -1221,7 +1221,8 @@ Spec: `spec/TRANSLATOR.md`.
       df/compact/check/resize, superblock + chained directory blocks +
       contiguous file extents (arbitrary count), rename, first-fit free-extent
       reuse (58 extents, coalesced), compaction/defragmentation, guest `fs=`
-      boot marker, `crypt/nan0s_fs_gate.sh` PASS on C-core + x86 IDE.
+      boot marker, guest superblock decrypt/auth (`nan0s_fs_meta.nan`),
+      `crypt/nan0s_fs_gate.sh` + `nan0s_fs_meta_gate.sh` PASS C-core + x86 IDE.
 - [ ] Guest-side directory/extent mount; subdirectories; larger/better free
       map than 58 superblock extents; chunked NSPF1 file reader; encrypted boot;
       Android SAF wiring for the volume picker; real-HDD validation.
