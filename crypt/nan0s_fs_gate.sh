@@ -13,9 +13,19 @@ crypt/nan0s_fs put "$T/fs.img" "$KEY" "$T/hello" hello.txt | grep -q '^PUT hello
 crypt/nan0s_fs ls "$T/fs.img" "$KEY" | grep -q '^hello.txt 2 1 '
 crypt/nan0s_fs get "$T/fs.img" "$KEY" hello.txt "$T/out"
 cmp "$T/hello" "$T/out"
-crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=1 '
+for i in $(seq 1 11); do
+  printf 'file %02d\n' "$i" > "$T/f$i"
+  crypt/nan0s_fs put "$T/fs.img" "$KEY" "$T/f$i" "f$i.txt" >/dev/null
+done
+[ "$(crypt/nan0s_fs ls "$T/fs.img" "$KEY" | wc -l | tr -d ' ')" = "12" ]
+crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=12 '
+crypt/nan0s_fs get "$T/fs.img" "$KEY" f6.txt "$T/f6.out"
+cmp "$T/f6" "$T/f6.out"
 crypt/nan0s_fs rm "$T/fs.img" "$KEY" hello.txt >/dev/null
-crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=0 '
+crypt/nan0s_fs rm "$T/fs.img" "$KEY" f6.txt >/dev/null
+crypt/nan0s_fs rm "$T/fs.img" "$KEY" f11.txt >/dev/null
+crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=9 '
+[ "$(crypt/nan0s_fs ls "$T/fs.img" "$KEY" | wc -l | tr -d ' ')" = "9" ]
 
 awk -f tools/nmk.awk -v CMD=emit crypt/guest/nan0s_fs_check.nas > "$T/check.nan"
 aarch64/android/nan_cli --img "$T/check.nan" --disk "$T/fs.img" \

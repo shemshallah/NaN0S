@@ -1218,7 +1218,7 @@ Spec: `spec/TRANSLATOR.md`.
       (`crypt/guest/nan0s_fs_check.nas`), Android **Fs** sparse-image button
       (arbitrary GiB, default 1, 64 GiB dialog cap).
 - [x] nan0s_fs encrypted file layer: `crypt/nan0s_fs` mkfs/put/get/ls/rm/
-      check/resize, superblock + 8-entry directory + contiguous file blocks,
+      check/resize, superblock + chained directory blocks + contiguous file extents (arbitrary count),
       guest `fs=` boot marker, `crypt/nan0s_fs_gate.sh` PASS on C-core + x86 IDE.
 - [ ] Guest-side directory/extent mount; chunked NSPF1 file reader; deletion
       space reclaim; encrypted boot; Android SAF wiring for the volume picker;

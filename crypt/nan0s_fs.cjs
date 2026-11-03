@@ -1,18 +1,19 @@
 #!/usr/bin/env node
-// nan0s_fs: flat file layer over an NSPV volume.
-// Logical data block 0 = superblock, block 1 = directory, then contiguous files.
-// Every metadata/data block is an NSPV sealed sector; unused blocks stay holes.
+// nan0s_fs: flat file layer over an NSPV volume, v2 chained directory.
+// Block 0 = superblock; each file has one directory block (linked list) plus
+// contiguous payload blocks. File count is limited by volume capacity, not a
+// fixed 8-entry table.
 "use strict";
 const fs = require("fs");
 const vol = require("./volume.cjs");
 const nsp = require("./reference/nsp.cjs");
 
 const SECTOR = 512;
-const ENTRIES = 8;
-const ENTRY = 64;
+const VERSION = 2;
+const NAME_MAX = 39;
 const FS_MAGIC = 0x4E414E30465331n; // "NAN0FS1" in the unauthenticated header
 const SB_MAGIC = "NAN0FS1";
-const NAME_MAX = 39;
+const DIR_MAGIC = "NDIR1";
 
 function needHeader(image) {
   const h = vol.readHeaderFile(image);
@@ -27,87 +28,111 @@ function block(image, key, lba) {
 function putBlock(image, key, lba, b) {
   if (!vol.writeSectorFile(image, key, lba, b)) throw new Error("write block " + lba);
 }
-function readFs(image, key) {
+function readSuper(image, key) {
   const sb = block(image, key, 0);
   if (sb.toString("ascii", 0, 7) !== SB_MAGIC) throw new Error("no nan0s_fs superblock");
   const version = sb.readUInt32LE(8), blockSize = sb.readUInt32LE(12);
   const capacity = sb.readUInt32LE(16), next = sb.readUInt32LE(20);
   const files = sb.readUInt32LE(24), flags = sb.readUInt32LE(28);
-  if (version !== 1 || blockSize !== SECTOR) throw new Error("bad nan0s_fs superblock");
-  const dir = block(image, key, 1);
-  return { sb, dir, version, capacity, next, files, flags };
+  const first = sb.readUInt32LE(32), last = sb.readUInt32LE(36);
+  if (version !== VERSION || blockSize !== SECTOR) throw new Error("bad nan0s_fs superblock");
+  return { sb, version, capacity, next, files, flags, first, last };
 }
-function entries(dir) {
-  const out = [];
-  for (let e = 0; e < ENTRIES; e++) {
-    const o = e * ENTRY;
-    const name = dir.toString("utf8", o, o + 40).replace(/\0.*$/, "");
-    if (!name) continue;
-    out.push({ slot: e, offset: o, name,
-      start: dir.readUInt32LE(o + 40), sectors: dir.readUInt32LE(o + 44),
-      size: dir.readUInt32LE(o + 48), flags: dir.readUInt32LE(o + 52) });
+function readDirBlock(image, key, lba) {
+  const b = block(image, key, lba);
+  if (b.toString("ascii", 0, 5) !== DIR_MAGIC) throw new Error("bad directory block " + lba);
+  return {
+    lba, b, next: b.readUInt32LE(8),
+    name: b.toString("utf8", 12, 52).replace(/\0.*$/, ""),
+    start: b.readUInt32LE(52), sectors: b.readUInt32LE(56),
+    size: b.readUInt32LE(60), flags: b.readUInt32LE(64),
+  };
+}
+function readFs(image, key) {
+  const f = readSuper(image, key);
+  const dirs = [];
+  const seen = new Set();
+  let lba = f.first;
+  while (lba !== 0) {
+    if (lba < 1 || lba >= f.capacity || seen.has(lba)) throw new Error("bad directory chain");
+    const d = readDirBlock(image, key, lba);
+    dirs.push(d);
+    seen.add(lba);
+    lba = d.next;
+    if (dirs.length > f.capacity) throw new Error("directory loop");
   }
-  return out;
+  if (f.last !== (dirs.length ? dirs[dirs.length - 1].lba : 0)) throw new Error("directory tail mismatch");
+  if (f.files !== dirs.length) throw new Error("file count mismatch");
+  f.dirs = dirs;
+  return f;
 }
-function findEntry(dir, name) {
-  return entries(dir).find(e => e.name === name) || null;
-}
-function writeMeta(image, key, f, fileCount) {
+function writeSuper(image, key, f) {
   f.sb.writeUInt32LE(f.next, 20);
-  f.sb.writeUInt32LE(fileCount, 24);
+  f.sb.writeUInt32LE(f.files, 24);
+  f.sb.writeUInt32LE(f.first, 32);
+  f.sb.writeUInt32LE(f.last, 36);
   putBlock(image, key, 0, f.sb);
-  putBlock(image, key, 1, f.dir);
-  vol.setHeaderWords(image, { 13: FS_MAGIC, 14: 1n, 15: BigInt(fileCount) });
+  vol.setHeaderWords(image, { 13: FS_MAGIC, 14: VERSION, 15: BigInt(f.files) });
 }
 function mkfs(image, key) {
   const h = needHeader(image);
-  if (h.dataSectors < 2) throw new Error("volume too small");
+  if (h.dataSectors < 1) throw new Error("volume too small");
   const sb = Buffer.alloc(SECTOR);
   sb.write(SB_MAGIC, 0, "ascii");
-  sb.writeUInt32LE(1, 8);
+  sb.writeUInt32LE(VERSION, 8);
   sb.writeUInt32LE(SECTOR, 12);
   sb.writeUInt32LE(h.dataSectors, 16);
-  sb.writeUInt32LE(2, 20);
-  sb.writeUInt32LE(0, 24);
-  sb.writeUInt32LE(0, 28);
+  sb.writeUInt32LE(1, 20); // next free; block 0 is the superblock
+  sb.writeUInt32LE(0, 24); // files
+  sb.writeUInt32LE(0, 28); // flags
+  sb.writeUInt32LE(0, 32); // first directory block
+  sb.writeUInt32LE(0, 36); // last directory block
   putBlock(image, key, 0, sb);
-  putBlock(image, key, 1, Buffer.alloc(SECTOR));
-  vol.setHeaderWords(image, { 13: FS_MAGIC, 14: 1n, 15: 0n });
-  console.log("MKFS capacity=" + h.dataSectors + " next=2");
+  vol.setHeaderWords(image, { 13: FS_MAGIC, 14: VERSION, 15: 0n });
+  console.log("MKFS capacity=" + h.dataSectors + " next=1");
+}
+function findFile(f, name) {
+  return f.dirs.find(d => d.name === name) || null;
 }
 function put(image, key, local, name) {
   if (!name || Buffer.byteLength(name) > NAME_MAX) throw new Error("name too long");
   const f = readFs(image, key);
-  if (findEntry(f.dir, name)) throw new Error("exists: " + name);
-  let slot = -1;
-  for (let e = 0; e < ENTRIES; e++) {
-    if (!f.dir.toString("utf8", e * ENTRY, e * ENTRY + 40).replace(/\0.*$/, "")) { slot = e; break; }
-  }
-  if (slot < 0) throw new Error("directory full");
+  if (findFile(f, name)) throw new Error("exists: " + name);
   const data = fs.readFileSync(local);
   const sectors = Math.max(1, Math.ceil(data.length / SECTOR));
-  const start = f.next;
+  const dirLba = f.next;
+  const start = dirLba + 1;
   if (start + sectors > f.capacity) throw new Error("no space");
   for (let i = 0; i < sectors; i++) {
     const b = Buffer.alloc(SECTOR);
     data.copy(b, 0, i * SECTOR, Math.min(data.length, (i + 1) * SECTOR));
     putBlock(image, key, start + i, b);
   }
-  const o = slot * ENTRY;
-  f.dir.fill(0, o, o + ENTRY);
-  f.dir.write(name, o, "utf8");
-  f.dir.writeUInt32LE(start, o + 40);
-  f.dir.writeUInt32LE(sectors, o + 44);
-  f.dir.writeUInt32LE(data.length, o + 48);
-  f.dir.writeUInt32LE(0, o + 52);
+  const d = Buffer.alloc(SECTOR);
+  d.write(DIR_MAGIC, 0, "ascii");
+  d.writeUInt32LE(0, 8);
+  d.write(name, 12, "utf8");
+  d.writeUInt32LE(start, 52);
+  d.writeUInt32LE(sectors, 56);
+  d.writeUInt32LE(data.length, 60);
+  d.writeUInt32LE(0, 64);
+  putBlock(image, key, dirLba, d);
+  if (f.last !== 0) {
+    const tail = f.dirs[f.dirs.length - 1];
+    tail.b.writeUInt32LE(dirLba, 8);
+    putBlock(image, key, f.last, tail.b);
+  } else {
+    f.first = dirLba;
+  }
+  f.last = dirLba;
   f.next = start + sectors;
   f.files++;
-  writeMeta(image, key, f, f.files);
-  console.log("PUT " + name + " start=" + start + " sectors=" + sectors + " bytes=" + data.length);
+  writeSuper(image, key, f);
+  console.log("PUT " + name + " dir=" + dirLba + " start=" + start + " sectors=" + sectors + " bytes=" + data.length);
 }
 function get(image, key, name, out) {
   const f = readFs(image, key);
-  const e = findEntry(f.dir, name);
+  const e = findFile(f, name);
   if (!e) throw new Error("not found: " + name);
   const parts = [];
   for (let i = 0; i < e.sectors; i++) parts.push(block(image, key, e.start + i));
@@ -117,24 +142,31 @@ function get(image, key, name, out) {
 }
 function ls(image, key) {
   const f = readFs(image, key);
-  const es = entries(f.dir);
-  if (!es.length) { console.log("EMPTY"); return; }
-  for (const e of es) console.log(e.name + " " + e.start + " " + e.sectors + " " + e.size);
+  if (!f.dirs.length) { console.log("EMPTY"); return; }
+  for (const e of f.dirs) console.log(e.name + " " + e.start + " " + e.sectors + " " + e.size);
 }
 function rm(image, key, name) {
   const f = readFs(image, key);
-  const e = findEntry(f.dir, name);
-  if (!e) throw new Error("not found: " + name);
-  f.dir.fill(0, e.offset, e.offset + ENTRY);
-  f.files = Math.max(0, f.files - 1);
-  writeMeta(image, key, f, f.files);
+  const i = f.dirs.findIndex(d => d.name === name);
+  if (i < 0) throw new Error("not found: " + name);
+  const d = f.dirs[i];
+  if (i > 0) {
+    const prev = f.dirs[i - 1];
+    prev.b.writeUInt32LE(d.next, 8);
+    putBlock(image, key, prev.lba, prev.b);
+  } else {
+    f.first = d.next;
+  }
+  if (f.last === d.lba) f.last = i > 0 ? f.dirs[i - 1].lba : 0;
+  f.files--;
+  writeSuper(image, key, f);
   console.log("RM " + name);
 }
 function resize(image, key) {
   const h = needHeader(image);
   const f = readFs(image, key);
   if (h.dataSectors < f.next) throw new Error("capacity below next free block");
-  for (const e of entries(f.dir)) {
+  for (const e of f.dirs) {
     if (e.start < 2 || e.start + e.sectors > h.dataSectors) throw new Error("extent outside capacity");
   }
   f.sb.writeUInt32LE(h.dataSectors, 16);
@@ -146,13 +178,10 @@ function check(image, key) {
   if (h.h[13] !== FS_MAGIC) { console.log("FS NO"); process.exit(1); }
   const f = readFs(image, key);
   if (f.capacity > h.dataSectors || f.next > f.capacity) throw new Error("bad geometry");
-  let count = 0;
-  for (const e of entries(f.dir)) {
+  for (const e of f.dirs) {
     if (e.start < 2 || e.start + e.sectors > f.capacity) throw new Error("bad extent: " + e.name);
     if (e.size > e.sectors * SECTOR) throw new Error("bad size: " + e.name);
-    count++;
   }
-  if (count !== f.files) throw new Error("file count mismatch");
   console.log("FS OK files=" + f.files + " next=" + f.next + " capacity=" + f.capacity);
 }
 

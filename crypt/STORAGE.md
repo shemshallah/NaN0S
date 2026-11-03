@@ -118,9 +118,10 @@ button can still open a host-linked image from shared storage.
 
 `crypt/nan0s_fs` is a flat, encrypted file layer over logical NSPV data blocks:
 
-- block 0 = superblock (`NAN0FS1`, capacity, next free, file count)
-- block 1 = directory, 8 entries of 64 bytes
-- blocks 2.. = contiguous file extents
+- block 0 = superblock (`NAN0FS1`, capacity, next free, file count, first/last)
+- each file has one `NDIR1` directory block in a chained list, carrying its
+  name, payload start, sector count, byte size and flags
+- payload blocks are contiguous; file count is limited only by volume capacity
 - every block is sealed by NSPV; unused blocks stay sparse holes
 - header word 13 carries the unauthenticated `NAN0FS1` marker, word 15 the
   file count; the guest boot cart prints `fs=00000001`
@@ -154,7 +155,7 @@ its superblock capacity. The Android **Fs** image is an NSPV volume without the
 encrypted file layer yet (`fs=00000000`); create a file layer on the host and
 open that image through **Disk**, or add the guest-side mkfs next.
 
-Limits: 8 files, flat namespace, no rename, deletion does not reclaim extents,
+Limits: arbitrary file count up to volume capacity, flat namespace, no rename, deletion does not reclaim extents,
 and the guest can boot/check the filesystem marker but does not mount files yet.
 
 ## Storage backends
