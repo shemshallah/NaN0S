@@ -454,14 +454,19 @@ reference harness for the serial golden, converts the emitted image to the S1
 guest and requires byte-identical output on qemu virt. Covered ops: BOOL MOVI
 MOVHI ADD SUB MUL MULH MULHU DIV MOD DIVU MODU CMP CMPS ADDI SHL SHR SAR JMP
 JMPF JMPR CALL CALLF CALLR RET NOP PUTC LD ST LDB STB STW LDN BSWAPM BCOPY
-BFILL HALT plus FADD FSUB FMUL FDIV FSQRT FCMP CVTIF CVTFI with the x86 SSE
-NaN rules, with predication and exact `!G`/`!O` + pc hex traps, over a
-4M-word writable guest RAM (image copied at boot); FP/SIMD is enabled at the
-current EL; HALT exits qemu via semihosting. The gate runs eight real
+BFILL HALT, FADD FSUB FMUL FDIV FSQRT FCMP CVTIF CVTFI with the x86 SSE NaN
+rules, and the device boundary: VPOKE VPEEK KEY KEYQ TICK DISPQ DISPSET
+FBINFO VSYNC FBCOPY FBFILL OUTB INB INW OUTW OUTSW OUTL CPUID RDTSC, with
+predication and exact `!G`/`!O` + pc hex traps, over a 4M-word writable
+guest RAM plus a 16 MiB VRAM and the 2000-cell text plane (reset state
+cells 0x0720, FBTOT 64000); FP/SIMD is enabled at the current EL; HALT
+exits qemu via semihosting. Ports are stubs for now (IN reads 0, OUT is
+ignored), KEY waits for a host input path that does not exist yet, and TICK
+returns 0 to match the reference's default clock. The gate runs nine real
 programs differentially: s1_test, carry_probe, nalloc_test (3,156 allocator
-checks), a64_test (portable core self-test), the float edge-vector test,
-n16de_test, a2_boot_test and nan16dump_test. Remaining: device/port ops
-(TICK/KEY/DISP/FB), then the work image.
+checks), a64_test (portable core self-test), the float edge-vector test, the
+device-boundary test, n16de_test, a2_boot_test and nan16dump_test. Remaining:
+host input/clock plumbing, real port devices, then the work image.
 
 ### 12.3 Android: bare-minimum C
 

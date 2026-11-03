@@ -1,0 +1,191 @@
+; S1 device-boundary test: text plane, mode 13h VRAM, FB copy/fill, CPUID,
+; KEYQ/TICK. Matches the core's reset state (cells 0x0720) and mode rules.
+; Expected serial: DEV PASS\r\n
+main:
+MOVI r13,1
+; 1 initial cell 5 = 0x0720
+MOVI r2,5
+VPEEK r3,r2
+MOVI r4,1824
+CMP r3,r4
+JMP[NE] @fail
+; 2 poke/peek text cell
+MOVI r1,8001
+VPOKE r1,r2
+VPEEK r3,r2
+CMP r3,r1
+JMP[NE] @fail
+; 3 out-of-range peek leaves r[d]; out-of-range poke is ignored
+MOVI r2,2000
+MOVI r3,4660
+VPEEK r3,r2
+MOVI r4,4660
+CMP r3,r4
+JMP[NE] @fail
+MOVI r1,8002
+VPOKE r1,r2
+; 4 DISPQ text = 0x00031950
+DISPQ r3
+MOVI r4,6480
+MOVHI r4,3
+CMP r3,r4
+JMP[NE] @fail
+; 5 KEYQ empty = 0
+MOVI r3,85
+KEYQ r3
+MOVI r4,0
+CMP r3,r4
+JMP[NE] @fail
+; 6 DISPSET 3 clears the text plane
+MOVI r2,3
+DISPSET r2
+MOVI r2,5
+VPEEK r3,r2
+MOVI r4,0
+CMP r3,r4
+JMP[NE] @fail
+; 7 mode 13h: DISPQ, FBINFO
+MOVI r2,19
+DISPSET r2
+DISPQ r3
+MOVI r4,51200
+MOVHI r4,4864
+CMP r3,r4
+JMP[NE] @fail
+FBINFO r3
+MOVI r4,200
+MOVHI r4,320
+CMP r3,r4
+JMP[NE] @fail
+; 8 gfx poke/peek byte
+MOVI r2,10
+MOVI r1,65
+VPOKE r1,r2
+VPEEK r3,r2
+CMP r3,r1
+JMP[NE] @fail
+; 9 FBFILL colour 126 at 100..103; 104 stays 0
+MOVI r1,126
+MOVI r2,100
+MOVI r3,4
+FBFILL r3,r2,r1
+VPEEK r5,r2
+MOVI r6,126
+CMP r5,r6
+JMP[NE] @fail
+MOVI r2,103
+VPEEK r5,r2
+CMP r5,r6
+JMP[NE] @fail
+MOVI r2,104
+VPEEK r5,r2
+MOVI r6,0
+CMP r5,r6
+JMP[NE] @fail
+; 10 FBCOPY 4 bytes 200..203 -> 300..303
+MOVI r2,200
+MOVI r1,85
+VPOKE r1,r2
+MOVI r2,201
+MOVI r1,102
+VPOKE r1,r2
+MOVI r2,202
+MOVI r1,119
+VPOKE r1,r2
+MOVI r2,203
+MOVI r1,136
+VPOKE r1,r2
+MOVI r3,4
+MOVI r4,300
+MOVI r5,200
+FBCOPY r3,r4,r5
+MOVI r2,300
+VPEEK r6,r2
+MOVI r7,85
+CMP r6,r7
+JMP[NE] @fail
+MOVI r2,303
+VPEEK r6,r2
+MOVI r7,136
+CMP r6,r7
+JMP[NE] @fail
+; 11 back to text
+MOVI r2,3
+DISPSET r2
+DISPQ r3
+MOVI r4,6480
+MOVHI r4,3
+CMP r3,r4
+JMP[NE] @fail
+; 12 CPUID leaf 0 EBX = 0x314E614E
+MOVI r1,0
+MOVI r5,1
+CPUID r3,r1,r5
+MOVI r4,24910
+MOVHI r4,12622
+CMP r3,r4
+JMP[NE] @fail
+; 13 CPUID leaf 1 EAX = 0x00000F10
+MOVI r1,1
+MOVI r5,0
+CPUID r3,r1,r5
+MOVI r4,3856
+CMP r3,r4
+JMP[NE] @fail
+; 14 CPUID 0x80000002 reg0 = "NaN1"
+MOVI r1,2
+MOVHI r1,32768
+MOVI r5,0
+CPUID r3,r1,r5
+MOVI r4,24910
+MOVHI r4,12622
+CMP r3,r4
+JMP[NE] @fail
+; 15 TICK = 0 with the reference default clock
+TICK r3
+MOVI r4,0
+CMP r3,r4
+JMP[NE] @fail
+MOVI r1,68
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,86
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,13
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+fail:
+MOVI r1,68
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,86
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,13
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT

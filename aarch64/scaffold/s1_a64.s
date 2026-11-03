@@ -19,6 +19,17 @@ _start:
 1:      mov     x0, #0x300000       // CPACR_EL1.FPEN = 3
         msr     cpacr_el1, x0
         isb
+        // display state: text mode, cells 0x0720, FBTOT 64000 (core reset)
+        ldr     x9, =cells
+        mov     w10, #0x0720
+        mov     x11, #2000
+2:      strh    w10, [x9], #2
+        subs    x11, x11, #1
+        b.ne    2b
+        ldr     x9, =disp_fbtot
+        mov     w10, #64000
+        str     w10, [x9]
+        mov     x29, #0             // step counter (RDTSC)
         // PL011 at 0x09000000: 8N1 + FIFO, UART/TX/RX enable, clear IRQs
         ldr     x20, =0x09000000
         mov     w2, #0x70
@@ -47,6 +58,7 @@ copy_done:
         mov     w22, #0             // pc
         mov     w23, #0             // k = 2Z+L
 loop:
+        add     x29, x29, #1
         and     w9, w22, #0x3FFFFF
         lsl     x9, x9, #3
         add     x9, x19, x9
@@ -185,6 +197,44 @@ disp:
         b.eq    op_cvtfi
         cmp     w25, #0x2F
         b.eq    loop
+        cmp     w25, #0x10
+        b.eq    op_vpoke
+        cmp     w25, #0x11
+        b.eq    op_vpeek
+        cmp     w25, #0x12
+        b.eq    op_key
+        cmp     w25, #0x13
+        b.eq    op_tick
+        cmp     w25, #0x18
+        b.eq    op_dispq
+        cmp     w25, #0x19
+        b.eq    op_dispset
+        cmp     w25, #0x1A
+        b.eq    op_keyq
+        cmp     w25, #0x3A
+        b.eq    op_fbinfo
+        cmp     w25, #0x3B
+        b.eq    op_vsync
+        cmp     w25, #0x3C
+        b.eq    op_fbcopy
+        cmp     w25, #0x3D
+        b.eq    op_fbfill
+        cmp     w25, #0x3E
+        b.eq    loop
+        cmp     w25, #0x3F
+        b.eq    op_in0
+        cmp     w25, #0x40
+        b.eq    op_in0
+        cmp     w25, #0x41
+        b.eq    loop
+        cmp     w25, #0x42
+        b.eq    loop
+        cmp     w25, #0x43
+        b.eq    loop
+        cmp     w25, #0x44
+        b.eq    op_cpuid
+        cmp     w25, #0x45
+        b.eq    op_rdtsc
         cmp     w25, #0x38
         b.eq    op_jmpf
         cmp     w25, #0x39
@@ -759,6 +809,277 @@ fpbin:
         movz    w0, #0xFFC0, lsl #16
 7:      ret
 
+// ---- device boundary (text plane, VRAM, ports, timer, CPUID) -------------
+op_vpoke:
+        ldr     x9, =disp_vmode
+        ldr     w10, [x9]
+        ldr     w11, [x21, x27, lsl #2]
+        ldr     w12, [x21, x26, lsl #2]
+        cbnz    w10, 1f
+        cmp     w11, #2000
+        b.hs    9f
+        ldr     x9, =cells
+        strh    w12, [x9, x11, lsl #1]
+        b       9f
+1:      ldr     x9, =disp_fbtot
+        ldr     w13, [x9]
+        cmp     w11, w13
+        b.hs    9f
+        ldr     x9, =vram
+        strb    w12, [x9, x11]
+9:      b       loop
+op_vpeek:
+        ldr     x9, =disp_vmode
+        ldr     w10, [x9]
+        ldr     w11, [x21, x27, lsl #2]
+        cbnz    w10, 1f
+        cmp     w11, #2000
+        b.hs    9f
+        ldr     x9, =cells
+        ldrh    w12, [x9, x11, lsl #1]
+        str     w12, [x21, x26, lsl #2]
+        b       9f
+1:      ldr     x9, =disp_fbtot
+        ldr     w13, [x9]
+        cmp     w11, w13
+        b.hs    9f
+        ldr     x9, =vram
+        ldrb    w12, [x9, x11]
+        str     w12, [x21, x26, lsl #2]
+9:      b       loop
+op_key:
+key_wait:
+        wfe
+        b       key_wait
+op_tick:
+        str     wzr, [x21, x26, lsl #2]
+        b       loop
+op_keyq:
+        str     wzr, [x21, x26, lsl #2]
+        b       loop
+op_dispq:
+        ldr     x9, =disp_vmode
+        ldr     w10, [x9]
+        cbz     w10, 1f
+        movz    w11, #0xC800
+        movk    w11, #0x1300, lsl #16
+        b       2f
+1:      movz    w11, #0x1950
+        movk    w11, #0x0003, lsl #16
+2:      str     w11, [x21, x26, lsl #2]
+        b       loop
+op_dispset:
+        ldr     w9, [x21, x26, lsl #2]
+        movz    w10, #0xFFFF, lsl #16
+        cmp     w9, w10
+        b.hs    ds_raw
+        cmp     w9, #0x10000
+        b.hs    ds_vbe
+        and     w10, w9, #255
+        cmp     w10, #0x13
+        b.eq    ds_m13
+        ldr     x9, =disp_vmode
+        str     wzr, [x9]
+        ldr     x9, =disp_fbw
+        mov     w10, #80
+        str     w10, [x9]
+        ldr     x9, =disp_fbh
+        mov     w10, #25
+        str     w10, [x9]
+        ldr     x0, =cells
+        mov     x1, #4000
+        bl      memzero
+        b       ds_done
+ds_m13:
+        ldr     x9, =disp_vmode
+        mov     w10, #1
+        str     w10, [x9]
+        ldr     x9, =disp_fbtot
+        mov     w10, #64000
+        str     w10, [x9]
+        ldr     x9, =disp_fbw
+        mov     w10, #320
+        str     w10, [x9]
+        ldr     x9, =disp_fbh
+        mov     w10, #200
+        str     w10, [x9]
+        ldr     x0, =vram
+        mov     x1, #64000
+        bl      memzero
+        b       ds_done
+ds_vbe:
+        lsr     w10, w9, #16
+        and     w11, w9, #0xFFFF
+        ldr     x12, =disp_fbw
+        str     w10, [x12]
+        ldr     x12, =disp_fbh
+        str     w11, [x12]
+        mul     w12, w10, w11
+        ldr     x13, =disp_fbtot
+        str     w12, [x13]
+        ldr     x13, =disp_vmode
+        mov     w14, #1
+        str     w14, [x13]
+        movz    w14, #0x0100, lsl #16
+        cmp     w12, w14
+        csel    w12, w12, w14, lo
+        lsr     w12, w12, #2
+        lsl     w12, w12, #2
+        ldr     x0, =vram
+        mov     w1, w12
+        bl      memzero
+        b       ds_done
+ds_raw:
+        and     w10, w9, #255
+        ldr     x9, =disp_rawkb
+        str     w10, [x9]
+ds_done:
+        b       loop
+op_fbinfo:
+        ldr     x9, =disp_fbw
+        ldr     w10, [x9]
+        ldr     x9, =disp_fbh
+        ldr     w11, [x9]
+        lsl     w10, w10, #16
+        orr     w10, w10, w11
+        str     w10, [x21, x26, lsl #2]
+        b       loop
+op_vsync:
+        ldr     x9, =disp_vmode
+        ldr     w10, [x9]
+        cbz     w10, loop
+        ldr     x9, =disp_frame
+        ldr     w10, [x9]
+        add     w10, w10, #1
+        str     w10, [x9]
+        b       loop
+op_fbcopy:
+        ldr     w9, [x21, x26, lsl #2]
+        ldr     w10, [x21, x27, lsl #2]
+        and     w11, w28, #15
+        ldr     w11, [x21, x11, lsl #2]
+        cbz     w9, loop
+        ldr     x12, =vram
+        movz    w13, #0x0100, lsl #16
+        add     w14, w10, w9
+        cmp     w14, w13
+        b.hi    fbc_gen
+        add     w14, w11, w9
+        cmp     w14, w13
+        b.hi    fbc_gen
+        add     w14, w10, w9
+        cmp     w14, w11
+        b.ls    fbc_fast
+        add     w14, w11, w9
+        cmp     w14, w10
+        b.ls    fbc_fast
+        b       fbc_gen
+fbc_fast:
+        mov     w14, #0
+fbc_f:  cmp     w14, w9
+        b.hs    loop
+        add     w15, w11, w14
+        ldrb    w0, [x12, x15]
+        add     w15, w10, w14
+        strb    w0, [x12, x15]
+        add     w14, w14, #1
+        b       fbc_f
+fbc_gen:
+        mov     w14, #0
+fbc_g:  cmp     w14, w9
+        b.hs    loop
+        add     w0, w10, w14
+        cmp     w0, w13
+        b.hs    2f
+        add     w1, w11, w14
+        cmp     w1, w13
+        b.hs    3f
+        ldrb    w2, [x12, x1]
+        strb    w2, [x12, x0]
+        b       2f
+3:      strb    wzr, [x12, x0]
+2:      add     w14, w14, #1
+        b       fbc_g
+op_fbfill:
+        ldr     w9, [x21, x26, lsl #2]
+        ldr     w10, [x21, x27, lsl #2]
+        and     w11, w28, #15
+        ldr     w11, [x21, x11, lsl #2]
+        and     w11, w11, #0xFF
+        ldr     x12, =vram
+        movz    w13, #0x0100, lsl #16
+        cmp     w10, w13
+        b.hs    loop
+        sub     w14, w13, w10
+        cmp     w9, w14
+        csel    w9, w9, w14, lo
+        mov     w14, #0
+ff_l:   cmp     w14, w9
+        b.hs    loop
+        add     w15, w10, w14
+        strb    w11, [x12, x15]
+        add     w14, w14, #1
+        b       ff_l
+op_in0:
+        str     wzr, [x21, x26, lsl #2]
+        b       loop
+op_rdtsc:
+        ldr     w9, [x21, x27, lsl #2]
+        cbz     w9, 1f
+        lsr     x10, x29, #32
+        b       2f
+1:      mov     w10, w29
+2:      str     w10, [x21, x26, lsl #2]
+        b       loop
+op_cpuid:
+        ldr     w9, [x21, x27, lsl #2]
+        cbz     w9, cp_l0
+        cmp     w9, #1
+        b.eq    cp_l1
+        movz    w10, #0x8000, lsl #16
+        cmp     w9, w10
+        b.eq    cp_l80
+        add     w10, w10, #1
+        cmp     w9, w10
+        b.eq    cp_l81
+        add     w10, w10, #1
+        cmp     w9, w10
+        b.eq    cp_l82
+        add     w10, w10, #1
+        cmp     w9, w10
+        b.eq    cp_l83
+        add     w10, w10, #1
+        cmp     w9, w10
+        b.eq    cp_l84
+        ldr     x10, =cpuid_zero
+        b       cp_pick
+cp_l0:  ldr     x10, =cpuid_l0
+        b       cp_pick
+cp_l1:  ldr     x10, =cpuid_l1
+        b       cp_pick
+cp_l80: ldr     x10, =cpuid_l80
+        b       cp_pick
+cp_l81: ldr     x10, =cpuid_l81
+        b       cp_pick
+cp_l82: ldr     x10, =cpuid_l82
+        b       cp_pick
+cp_l83: ldr     x10, =cpuid_l83
+        b       cp_pick
+cp_l84: ldr     x10, =cpuid_l84
+cp_pick:
+        and     w11, w28, #15
+        ldr     w11, [x21, x11, lsl #2]
+        and     w11, w11, #3
+        ldr     w12, [x10, x11, lsl #2]
+        str     w12, [x21, x26, lsl #2]
+        b       loop
+memzero:
+        cbz     x1, 2f
+1:      strb    wzr, [x0], #1
+        subs    x1, x1, #1
+        b.ne    1b
+2:      ret
+
 // mkword: w0=payload, w1=nibble -> x0=word (clobbers x0,x2..x5)
 mkword:
         adr     x2, heads
@@ -825,6 +1146,15 @@ halt:
         .section .rodata
         .balign 2
 heads:  .hword 0x7FF1, 0xFFF1, 0x7FF8, 0xFFF8
+        .balign 4
+cpuid_l0:      .word 0x16, 0x314E614E, 0x4D565F65, 0x726F4336
+cpuid_l1:      .word 0x00000F10, 0, 0, 1
+cpuid_l80:     .word 0x80000004, 0, 0, 0
+cpuid_l81:     .word 0, 0, 0, 0x20000000
+cpuid_l82:     .word 0x314E614E, 0x6F702036, 0x62617472, 0x4320656C
+cpuid_l83:     .word 0x726F6320, 0x6E282065, 0x7820746F, 0x20293836
+cpuid_l84:     .word 0, 0, 0, 0
+cpuid_zero:    .word 0, 0, 0, 0
 
         .balign 8
 guest_img:
@@ -834,6 +1164,17 @@ guest_end:
         .section .bss
         .balign 8
 regs:   .space 64
+        .balign 8
+disp_fbw:    .space 4
+disp_fbh:    .space 4
+disp_fbtot:  .space 4
+disp_vmode:  .space 4
+disp_frame:  .space 4
+disp_rawkb:  .space 4
+        .balign 8
+cells:  .space 4000
+        .balign 4096
+vram:   .space 16777216           // 16 MiB display VRAM (NAN_VRAM)
         .balign 4096
 guest_ram:
         .space 33554432            // 4M words (M = 0x3FFFFF)

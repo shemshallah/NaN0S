@@ -32,8 +32,10 @@ run_one a64test src/tests/a64_test.nas
 grep -q "PASS" "$T/a64test.ref" || { echo "s1 a64 gate: FAIL (a64_test reference)"; exit 1; }
 run_one fptest aarch64/scaffold/s1_fp_test.nas
 grep -q "FP PASS" "$T/fptest.ref" || { echo "s1 a64 gate: FAIL (fp test reference)"; exit 1; }
+run_one devtest aarch64/scaffold/s1_dev_test.nas
+grep -q "DEV PASS" "$T/devtest.ref" || { echo "s1 a64 gate: FAIL (device test reference)"; exit 1; }
 for t in n16de_test a2_boot_test nan16dump_test; do
   run_one "$t" "src/tests/$t.nas"
   grep -q "PASS" "$T/$t.ref" || { echo "s1 a64 gate: FAIL ($t reference)"; exit 1; }
 done
-echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + n16de + a2_boot + nan16dump)"
+echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + n16de + a2_boot + nan16dump)"
