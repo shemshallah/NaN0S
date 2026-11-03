@@ -1195,7 +1195,8 @@ Spec: `spec/TRANSLATOR.md`.
 - [x] NSP-7/NSP-8 capsule reference + frozen KATs (`crypt/vectors/capsule.txt`).
 - [x] NSPF1 authenticated file container + CLI + gate (`crypt/`; suites 1/2;
       empty/odd files, tamper/truncate/wrong-key/planned refusal).
-- [ ] Raw NaN16 product port and guest file/volume integration.
+- [~] Raw NaN16 product port: internal 512-byte capsule round-trip PASS;
+      public guest NSPF1 tool and encrypted system boot pending.
 - [ ] Encrypted system boot: volume header, operator/TPM key, rollback counter,
       key zeroization.
 - [ ] ML-KEM-768, Ed25519, ML-DSA-44, SLH-DSA (suites 3/4/5 stay planned and

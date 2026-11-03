@@ -45,6 +45,9 @@ Failure cases:
 - suite 2: NSP-8 capsule `seal8`/`open8` (reference, 16-round QST);
 - suites 3/4/5: refused until implemented.
 
+Internal guest milestone: 512-byte capsule round-trip PASS (64 words,
+10-word AD, tag/tamper); chunked container and encrypted boot pending.
+
 ## System volume (planned)
 
 1. Reserve the header/chunk map at a fixed volume offset.

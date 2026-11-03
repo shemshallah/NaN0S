@@ -4,6 +4,10 @@ Status: reference implementation, usable on the host for files. The product
 (NaN16) port and encrypted-system boot are pending. Experimental; do not
 protect real data yet.
 
+Internal guest milestone: 512-byte capsule round-trip PASS in raw NaN16
+(64 words, 10-word AD, tag/tamper). The public guest NSPF1 tool and
+encrypted boot are pending.
+
 Separate from NANNET (network manager) and NANNETSUITE (toolkit). This suite is
 the encryption product: capsule AEAD, file/volume container, suite selection.
 
