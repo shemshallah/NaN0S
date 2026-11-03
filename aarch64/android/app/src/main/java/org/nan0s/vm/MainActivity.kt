@@ -6,14 +6,17 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -28,6 +31,7 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val log = StringBuilder()
     private val reqImage = 1
     private val reqDisk = 2
+    private val reqWifi = 3
     private val autosave get() = File(filesDir, "autosave.nan1")
     private val diskFile get() = File(filesDir, "disk.nanfs")
     private var diskPfd: ParcelFileDescriptor? = null
@@ -110,7 +114,77 @@ class MainActivity : Activity(), NanLoop.Listener {
         row.addView(btn("Scale") { view.integerScale = !view.integerScale; view.invalidate() })
         row.addView(btn("Fit") { view.resetZoom() })
         row.addView(btn("Log") { showLog() })
+        row.addView(btn("WiFi") { showWifi() })
         return HorizontalScrollView(this).apply { addView(row) }
+    }
+
+    // ---- real WiFi: status, scan, connect request ----
+    private fun showWifi() {
+        if (!WifiBridge.hasPermission(this)) {
+            WifiBridge.requestPermission(this, reqWifi)
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("WiFi")
+            .setMessage(WifiBridge.status(this) + "\n\nScan for networks, or open system WiFi settings.")
+            .setPositiveButton("Scan") { _, _ -> scanWifi() }
+            .setNeutralButton("Settings") { _, _ -> WifiBridge.openSettings(this) }
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
+    private fun scanWifi() {
+        if (!WifiBridge.hasPermission(this)) {
+            WifiBridge.requestPermission(this, reqWifi)
+            return
+        }
+        Toast.makeText(this, "Scanning...", Toast.LENGTH_SHORT).show()
+        WifiBridge.scan(this) { aps ->
+            runOnUiThread {
+                if (aps.isEmpty()) {
+                    AlertDialog.Builder(this)
+                        .setTitle("WiFi")
+                        .setMessage("No networks. Check that WiFi is on, scanning is permitted, and location services are enabled.")
+                        .setPositiveButton("Settings") { _, _ -> WifiBridge.openSettings(this) }
+                        .setNegativeButton("Close", null)
+                        .show()
+                } else {
+                    val labels = aps.map { "${it.ssid}   ${it.level} dBm   ${it.security}" }.toTypedArray()
+                    AlertDialog.Builder(this)
+                        .setTitle("WiFi networks")
+                        .setItems(labels) { _, i -> joinWifi(aps[i]) }
+                        .setNegativeButton("Close", null)
+                        .show()
+                }
+            }
+        }
+    }
+
+    private fun joinWifi(ap: WifiBridge.Ap) {
+        if (ap.security == "open") {
+            Toast.makeText(this, WifiBridge.join(this, ap.ssid, ""), Toast.LENGTH_LONG).show()
+            return
+        }
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            hint = "password"
+        }
+        AlertDialog.Builder(this)
+            .setTitle(ap.ssid)
+            .setMessage("WPA password")
+            .setView(input)
+            .setPositiveButton("Join") { _, _ ->
+                Toast.makeText(this, WifiBridge.join(this, ap.ssid, input.text.toString()), Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != reqWifi) return
+        if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) showWifi()
+        else Toast.makeText(this, "WiFi permission denied", Toast.LENGTH_LONG).show()
     }
 
     private fun pick(req: Int) {

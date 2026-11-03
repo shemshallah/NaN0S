@@ -1183,3 +1183,10 @@ Spec: `spec/TRANSLATOR.md`.
   WiFi scan/join/leave fixture, `.nancfg` apply/rollback); gates
   `tools/nannet_gate.sh`, `tools/nannet_link_gate.sh`,
   `tools/nannet_wifi_gate.sh`. M3 is service/menu integration.
+- x86 host networking: NE2000 ISA + QEMU user-net ARP gate
+  (`sh x86/tools/netgate.sh`) passes. The host's active connection (WiFi or
+  wired) carries traffic; next is DHCP/ICMP/UDP and NANNET `eth0` binding.
+- Android WiFi: the app has a real WifiManager panel (status, scan, connect
+  suggestion) with runtime permissions. Next is the host bridge
+  (VpnService/datagram + JNI) into NANNET. The APK build stays on the CI
+  `gradle :app:assembleDebug` path.

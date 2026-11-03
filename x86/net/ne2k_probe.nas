@@ -1,0 +1,337 @@
+; NE2000 ISA host-network probe (QEMU ne2k_isa + user-mode net).
+; Sends an ARP request for 10.0.2.2 from 10.0.2.15 and verifies the reply.
+; Boot cart at 8192. QEMU user-mode networking carries the host's active
+; connection (WiFi or wired); this probe is the x86 driver prototype for NANNET.
+.org 8192
+main:
+MOVI r13,1
+; CR=0x21 stop, page0
+MOVI r2,0x21
+MOVI r1,0x300
+OUTB r2,r1
+; DCR=0x49 (word transfer, LAS)
+MOVI r2,0x49
+MOVI r1,0x30E
+OUTB r2,r1
+; RBCR=0, RSAR=0
+MOVI r2,0
+MOVI r1,0x30A
+OUTB r2,r1
+MOVI r1,0x30B
+OUTB r2,r1
+MOVI r1,0x308
+OUTB r2,r1
+MOVI r1,0x309
+OUTB r2,r1
+; page1
+MOVI r2,0x61
+MOVI r1,0x300
+OUTB r2,r1
+; PAR = 52:54:00:12:34:56
+MOVI r2,0x52
+MOVI r1,0x301
+OUTB r2,r1
+MOVI r2,0x54
+MOVI r1,0x302
+OUTB r2,r1
+MOVI r2,0x00
+MOVI r1,0x303
+OUTB r2,r1
+MOVI r2,0x12
+MOVI r1,0x304
+OUTB r2,r1
+MOVI r2,0x34
+MOVI r1,0x305
+OUTB r2,r1
+MOVI r2,0x56
+MOVI r1,0x306
+OUTB r2,r1
+; CURR=0x47
+MOVI r2,0x47
+MOVI r1,0x307
+OUTB r2,r1
+; MAR0..7 = 0xFF
+MOVI r2,0xFF
+MOVI r1,0x308
+OUTB r2,r1
+MOVI r1,0x309
+OUTB r2,r1
+MOVI r1,0x30A
+OUTB r2,r1
+MOVI r1,0x30B
+OUTB r2,r1
+MOVI r1,0x30C
+OUTB r2,r1
+MOVI r1,0x30D
+OUTB r2,r1
+MOVI r1,0x30E
+OUTB r2,r1
+MOVI r1,0x30F
+OUTB r2,r1
+; page0
+MOVI r2,0x21
+MOVI r1,0x300
+OUTB r2,r1
+; PSTART=0x46, PSTOP=0x80, BNRY=0x46
+MOVI r2,0x46
+MOVI r1,0x301
+OUTB r2,r1
+MOVI r2,0x80
+MOVI r1,0x302
+OUTB r2,r1
+MOVI r2,0x46
+MOVI r2,0x47
+MOVI r1,0x303
+OUTB r2,r1
+; RCR=0x04 (broadcast), TCR=0x00
+MOVI r2,0x04
+MOVI r1,0x30C
+OUTB r2,r1
+MOVI r2,0x00
+MOVI r1,0x30D
+OUTB r2,r1
+; clear ISR, mask IMR
+MOVI r2,0xFF
+MOVI r1,0x307
+OUTB r2,r1
+MOVI r2,0x00
+MOVI r1,0x30F
+OUTB r2,r1
+; start
+MOVI r2,0x22
+MOVI r1,0x300
+OUTB r2,r1
+; remote write of the ARP frame at TPSR page 0x40
+MOVI r2,0x00
+MOVI r1,0x308
+OUTB r2,r1
+MOVI r2,0x40
+MOVI r1,0x309
+OUTB r2,r1
+MOVI r2,42
+MOVI r1,0x30A
+OUTB r2,r1
+MOVI r2,0
+MOVI r1,0x30B
+OUTB r2,r1
+MOVI r2,0x12
+MOVI r1,0x300
+OUTB r2,r1
+MOVI r4,@frame
+MOVI r5,21
+fw:
+LD r2,r4,0
+MOVI r1,0x310
+OUTW r2,r1
+ADDI r4,r4,1
+MOVI r6,1
+SUB r5,r5,r6
+CMP r5,r0
+JMP[NE] @fw
+; transmit: TBCR=42, TPSR=0x40, CR=0x26
+MOVI r2,42
+MOVI r1,0x305
+OUTB r2,r1
+MOVI r2,0
+MOVI r1,0x306
+OUTB r2,r1
+MOVI r2,0x40
+MOVI r1,0x304
+OUTB r2,r1
+MOVI r2,0x26
+MOVI r1,0x300
+OUTB r2,r1
+; poll TX (ISR PTX 0x40; TXE 0x80 is failure)
+MOVI r7,0xFFFF
+txp:
+MOVI r1,0x307
+INB r2,r1
+MOVI r3,0x02
+BOOL.8 r4,r2,r3
+CMP r4,r0
+JMP[NE] @txok
+MOVI r3,0x08
+BOOL.8 r4,r2,r3
+CMP r4,r0
+JMP[NE] @fail
+MOVI r6,1
+SUB r7,r7,r6
+CMP r7,r0
+JMP[NE] @txp
+JMP @fail
+txok:
+MOVI r2,0x02
+MOVI r1,0x307
+OUTB r2,r1
+; poll RX (ISR PRX 0x01)
+MOVI r7,0xFFFF
+rxp:
+MOVI r1,0x307
+INB r2,r1
+MOVI r3,0x01
+BOOL.8 r4,r2,r3
+CMP r4,r0
+JMP[NE] @rxok
+MOVI r6,1
+SUB r7,r7,r6
+CMP r7,r0
+JMP[NE] @rxp
+JMP @fail
+rxok:
+; BNRY page
+MOVI r1,0x303
+INB r6,r1
+; header: RSAR=page<<8, RBCR=4, remote read
+MOVI r2,0
+MOVI r1,0x308
+OUTB r2,r1
+MOVI r1,0x309
+BOOL.14 r2,r6,r0
+OUTB r2,r1
+MOVI r2,4
+MOVI r1,0x30A
+OUTB r2,r1
+MOVI r2,0
+MOVI r1,0x30B
+OUTB r2,r1
+MOVI r2,0x0A
+MOVI r1,0x300
+OUTB r2,r1
+MOVI r1,0x310
+INW r8,r1
+INW r9,r1
+; next page = (r8>>8)&0xFF; count = r9
+SHR r10,r8,8
+MOVI r2,255
+BOOL.8 r10,r10,r2
+; data at page<<8 + 4; count -= 4
+MOVI r2,4
+MOVI r1,0x308
+OUTB r2,r1
+MOVI r1,0x309
+BOOL.14 r2,r6,r0
+OUTB r2,r1
+MOVI r2,4
+SUB r9,r9,r2
+MOVI r3,255
+BOOL.8 r2,r9,r3
+MOVI r1,0x30A
+OUTB r2,r1
+SHR r2,r9,8
+MOVI r1,0x30B
+OUTB r2,r1
+MOVI r2,0x0A
+MOVI r1,0x300
+OUTB r2,r1
+; check the ARP reply words
+MOVI r4,0
+MOVI r5,21
+MOVI r8,0
+rxw:
+MOVI r1,0x310
+INW r2,r1
+MOVI r3,6
+CMP r4,r3
+JMP[EQ] @c6
+MOVI r3,10
+CMP r4,r3
+JMP[EQ] @c10
+MOVI r3,14
+CMP r4,r3
+JMP[EQ] @c14
+MOVI r3,15
+CMP r4,r3
+JMP[EQ] @c15
+JMP @rn
+c6:
+MOVI r3,0x0608
+CMP r2,r3
+JMP[NE] @rn
+MOVI r3,1
+BOOL.14 r8,r8,r3
+JMP @rn
+c10:
+MOVI r3,0x0200
+CMP r2,r3
+JMP[NE] @rn
+MOVI r3,2
+BOOL.14 r8,r8,r3
+JMP @rn
+c14:
+MOVI r3,0x000A
+CMP r2,r3
+JMP[NE] @rn
+MOVI r3,4
+BOOL.14 r8,r8,r3
+JMP @rn
+c15:
+MOVI r3,0x0202
+CMP r2,r3
+JMP[NE] @rn
+MOVI r3,8
+BOOL.14 r8,r8,r3
+rn:
+ADDI r4,r4,1
+MOVI r3,1
+SUB r5,r5,r3
+CMP r5,r0
+JMP[NE] @rxw
+; all four expected values seen
+MOVI r3,15
+CMP r8,r3
+JMP[NE] @fail
+; advance BNRY
+MOVI r1,0x303
+BOOL.14 r2,r10,r0
+OUTB r2,r1
+MOVI r2,0xFF
+MOVI r1,0x307
+OUTB r2,r1
+; NET PASS
+MOVI r1,78
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,13
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+fail:
+MOVI r1,78
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,13
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+frame:
+.word 0xFFFF, 0xFFFF, 0xFFFF, 0x5452, 0x1200, 0x5634, 0x0608
+.word 0x0100, 0x0008, 0x0406, 0x0100, 0x5452, 0x1200, 0x5634
+.word 0x000A, 0x0F02, 0x0000, 0x0000, 0x0000, 0x000A, 0x0202
