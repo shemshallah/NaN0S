@@ -14,6 +14,7 @@ const NAME_MAX = 39;
 const FS_MAGIC = 0x4E414E30465331n; // "NAN0FS1" in the unauthenticated header
 const SB_MAGIC = "NAN0FS1";
 const DIR_MAGIC = "NDIR1";
+const FREE_MAX = Math.floor((SECTOR - 44) / 8); // free extents in the superblock
 
 function needHeader(image) {
   const h = vol.readHeaderFile(image);
@@ -36,7 +37,43 @@ function readSuper(image, key) {
   const files = sb.readUInt32LE(24), flags = sb.readUInt32LE(28);
   const first = sb.readUInt32LE(32), last = sb.readUInt32LE(36);
   if (version !== VERSION || blockSize !== SECTOR) throw new Error("bad nan0s_fs superblock");
-  return { sb, version, capacity, next, files, flags, first, last };
+  return { sb, version, capacity, next, files, flags, first, last, free: readFree(sb) };
+}
+function readFree(sb) {
+  const n = sb.readUInt32LE(40);
+  if (n > FREE_MAX) throw new Error("bad free count");
+  const free = [];
+  for (let i = 0; i < n; i++) {
+    const start = sb.readUInt32LE(44 + i * 8);
+    const sectors = sb.readUInt32LE(48 + i * 8);
+    if (start < 1 || sectors < 1) throw new Error("bad free extent");
+    free.push({ start, sectors });
+  }
+  return free;
+}
+function writeFree(sb, free) {
+  if (free.length > FREE_MAX) throw new Error("free list full");
+  sb.fill(0, 40, SECTOR);
+  sb.writeUInt32LE(free.length, 40);
+  for (let i = 0; i < free.length; i++) {
+    sb.writeUInt32LE(free[i].start, 44 + i * 8);
+    sb.writeUInt32LE(free[i].sectors, 48 + i * 8);
+  }
+}
+function addFree(free, start, sectors) {
+  if (sectors < 1) return;
+  const all = free.concat([{ start, sectors }]).sort((a, b) => a.start - b.start);
+  const out = [];
+  for (const e of all) {
+    if (e.sectors < 1) continue;
+    const last = out[out.length - 1];
+    if (last && e.start < last.start + last.sectors) throw new Error("overlapping free extents");
+    if (last && e.start === last.start + last.sectors) last.sectors += e.sectors;
+    else out.push({ start: e.start, sectors: e.sectors });
+  }
+  if (out.length > FREE_MAX) throw new Error("free list full; compact instead");
+  free.length = 0;
+  for (const e of out) free.push(e);
 }
 function readDirBlock(image, key, lba) {
   const b = block(image, key, lba);
@@ -71,6 +108,7 @@ function writeSuper(image, key, f) {
   f.sb.writeUInt32LE(f.files, 24);
   f.sb.writeUInt32LE(f.first, 32);
   f.sb.writeUInt32LE(f.last, 36);
+  writeFree(f.sb, f.free);
   putBlock(image, key, 0, f.sb);
   vol.setHeaderWords(image, { 13: FS_MAGIC, 14: VERSION, 15: BigInt(f.files) });
 }
@@ -99,9 +137,22 @@ function putData(image, key, data, name) {
   const f = readFs(image, key);
   if (findFile(f, name)) throw new Error("exists: " + name);
   const sectors = Math.max(1, Math.ceil(data.length / SECTOR));
-  const dirLba = f.next;
+  const need = 1 + sectors;
+  let dirLba = 0;
+  for (let i = 0; i < f.free.length; i++) {
+    const e = f.free[i];
+    if (e.sectors < need) continue;
+    dirLba = e.start;
+    if (e.sectors === need) f.free.splice(i, 1);
+    else { e.start += need; e.sectors -= need; }
+    break;
+  }
+  if (dirLba === 0) {
+    dirLba = f.next;
+    if (dirLba + need > f.capacity) throw new Error("no space");
+    f.next += need;
+  }
   const start = dirLba + 1;
-  if (start + sectors > f.capacity) throw new Error("no space");
   for (let i = 0; i < sectors; i++) {
     const b = Buffer.alloc(SECTOR);
     data.copy(b, 0, i * SECTOR, Math.min(data.length, (i + 1) * SECTOR));
@@ -124,7 +175,6 @@ function putData(image, key, data, name) {
     f.first = dirLba;
   }
   f.last = dirLba;
-  f.next = start + sectors;
   f.files++;
   writeSuper(image, key, f);
   console.log("PUT " + name + " dir=" + dirLba + " start=" + start + " sectors=" + sectors + " bytes=" + data.length);
@@ -145,8 +195,11 @@ function rename(image, key, oldName, newName) {
 }
 function df(image, key) {
   const f = readFs(image, key);
+  const freeBlocks = f.free.reduce((n, e) => n + e.sectors, 0);
+  const used = f.next - freeBlocks;
   console.log("DF capacity=" + f.capacity + " next=" + f.next +
-    " free=" + (f.capacity - f.next) + " files=" + f.files);
+    " free=" + (f.capacity - used) + " extents=" + f.free.length +
+    " files=" + f.files);
 }
 function readFileData(image, key, e) {
   const parts = [];
@@ -173,6 +226,9 @@ function rm(image, key, name) {
   const i = f.dirs.findIndex(d => d.name === name);
   if (i < 0) throw new Error("not found: " + name);
   const d = f.dirs[i];
+  const nf = f.free.map(e => ({ ...e }));
+  addFree(nf, d.lba, 1);
+  addFree(nf, d.start, d.sectors);
   if (i > 0) {
     const prev = f.dirs[i - 1];
     prev.b.writeUInt32LE(d.next, 8);
@@ -181,6 +237,7 @@ function rm(image, key, name) {
     f.first = d.next;
   }
   if (f.last === d.lba) f.last = i > 0 ? f.dirs[i - 1].lba : 0;
+  f.free = nf;
   f.files--;
   writeSuper(image, key, f);
   console.log("RM " + name);
@@ -216,6 +273,9 @@ function resize(image, key) {
   for (const e of f.dirs) {
     if (e.start < 2 || e.start + e.sectors > h.dataSectors) throw new Error("extent outside capacity");
   }
+  for (const e of f.free) {
+    if (e.start + e.sectors > h.dataSectors) throw new Error("free extent outside capacity");
+  }
   f.sb.writeUInt32LE(h.dataSectors, 16);
   putBlock(image, key, 0, f.sb);
   console.log("FS RESIZE capacity=" + h.dataSectors);
@@ -225,11 +285,22 @@ function check(image, key) {
   if (h.h[13] !== FS_MAGIC) { console.log("FS NO"); process.exit(1); }
   const f = readFs(image, key);
   if (f.capacity > h.dataSectors || f.next > f.capacity) throw new Error("bad geometry");
+  const used = [];
   for (const e of f.dirs) {
     if (e.start < 2 || e.start + e.sectors > f.capacity) throw new Error("bad extent: " + e.name);
     if (e.size > e.sectors * SECTOR) throw new Error("bad size: " + e.name);
+    used.push({ start: e.lba, sectors: 1 });
+    used.push({ start: e.start, sectors: e.sectors });
   }
-  console.log("FS OK files=" + f.files + " next=" + f.next + " capacity=" + f.capacity);
+  const all = used.concat(f.free).sort((a, b) => a.start - b.start);
+  for (let i = 0; i < all.length; i++) {
+    if (all[i].start < 1 || all[i].sectors < 1 || all[i].start + all[i].sectors > f.capacity) {
+      throw new Error("extent outside capacity");
+    }
+    if (i > 0 && all[i].start < all[i - 1].start + all[i - 1].sectors) throw new Error("overlapping extents");
+  }
+  console.log("FS OK files=" + f.files + " next=" + f.next + " free=" +
+    f.free.reduce((n, e) => n + e.sectors, 0) + " capacity=" + f.capacity);
 }
 
 if (require.main === module) {

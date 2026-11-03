@@ -27,6 +27,12 @@ crypt/nan0s_fs rm "$T/fs.img" "$KEY" f11.txt >/dev/null
 crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=9 '
 [ "$(crypt/nan0s_fs ls "$T/fs.img" "$KEY" | wc -l | tr -d ' ')" = "9" ]
 crypt/nan0s_fs df "$T/fs.img" "$KEY" | grep -q '^DF .* files=9$'
+crypt/nan0s_fs put "$T/fs.img" "$KEY" "$T/f1" reuse.txt >/dev/null
+crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=10 '
+crypt/nan0s_fs get "$T/fs.img" "$KEY" reuse.txt "$T/reuse.out"
+cmp "$T/f1" "$T/reuse.out"
+crypt/nan0s_fs rm "$T/fs.img" "$KEY" reuse.txt >/dev/null
+crypt/nan0s_fs check "$T/fs.img" "$KEY" | grep -q '^FS OK files=9 '
 crypt/nan0s_fs mv "$T/fs.img" "$KEY" f2.txt renamed.txt >/dev/null
 crypt/nan0s_fs get "$T/fs.img" "$KEY" renamed.txt "$T/renamed.out"
 cmp "$T/f2" "$T/renamed.out"
@@ -60,7 +66,7 @@ if command -v qemu-system-i386 >/dev/null 2>&1; then
     -display none -serial "file:$T/q.out" -no-reboot >/dev/null 2>&1 || true
   grep -q ' fs=00000001$' "$T/q.out" || {
     echo "nan0s_fs gate: FAIL (x86 fs marker)"; tail -6 "$T/q.out"; exit 1; }
-  echo "nan0s_fs gate: PASS (12 files, rename, compact, guest fs marker on C-core fd + x86 IDE)"
+  echo "nan0s_fs gate: PASS (12 files, rename, free-extent reuse, compact, guest fs marker on C-core fd + x86 IDE)"
 else
-  echo "nan0s_fs gate: PASS (12 files, rename, compact, guest fs marker on C-core fd; QEMU skipped)"
+  echo "nan0s_fs gate: PASS (12 files, rename, free-extent reuse, compact, guest fs marker on C-core fd; QEMU skipped)"
 fi

@@ -122,6 +122,8 @@ button can still open a host-linked image from shared storage.
 - each file has one `NDIR1` directory block in a chained list, carrying its
   name, payload start, sector count, byte size and flags
 - payload blocks are contiguous; file count is limited only by volume capacity
+- the superblock holds up to 58 free extents; `rm` returns directory/payload
+  runs and `put` uses first-fit reuse, coalescing adjacent extents
 - every block is sealed by NSPV; unused blocks stay sparse holes
 - header word 13 carries the unauthenticated `NAN0FS1` marker, word 15 the
   file count; the guest boot cart prints `fs=00000001`
@@ -136,7 +138,7 @@ crypt/nan0s_fs ls    image keyhex
 crypt/nan0s_fs rm    image keyhex name
 crypt/nan0s_fs mv    image keyhex old new
 crypt/nan0s_fs df    image keyhex
-crypt/nan0s_fs compact image keyhex   # reclaim deleted blocks
+crypt/nan0s_fs compact image keyhex   # defragment and collapse free extents
 crypt/nan0s_fs check image keyhex
 crypt/nan0s_fs resize image keyhex    # after volume grow
 ```
@@ -157,16 +159,17 @@ tools/nan0s_fs.sh boot --verify
 ```
 
 `boot --verify` verifies every nonzero tag **and** the `nan0s_fs` superblock,
-directory chain, extents and file count. `grow` preserves the file layer and
-resizes its superblock capacity. `compact` rewrites the live files into a fresh
-sparse image, reclaiming deleted directory and payload blocks. The Android
-**Fs** image is an NSPV volume without the encrypted file layer yet
-(`fs=00000000`); create a file layer on the host and open that image through
-**Disk**, or add the guest-side mkfs next.
+directory chain, extents, free list and file count. `grow` preserves the file
+layer and resizes its superblock capacity. `rm` releases extents to the
+superblock free list; `put` reuses the first fitting run. `compact` rewrites the
+live files into a fresh sparse image, collapsing fragmentation or a full free
+list. The Android **Fs** image is an NSPV volume without the encrypted file
+layer yet (`fs=00000000`); create a file layer on the host and open that image
+through **Disk**, or add the guest-side mkfs next.
 
-Limits: arbitrary file count up to volume capacity, flat namespace (no
-directories), `rm` only unlinks until `compact` runs, and the guest can
-boot/check the filesystem marker but does not mount files yet.
+Limits: arbitrary file count up to volume capacity, at most 58 free extents in
+the superblock (compact when exhausted), flat namespace (no directories), and
+the guest can boot/check the filesystem marker but does not mount files yet.
 
 ## Storage backends
 
