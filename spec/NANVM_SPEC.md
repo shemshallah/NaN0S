@@ -465,12 +465,15 @@ VGA retrace toggle at 0x3DA, OUT is ignored). TICK is the deterministic
 harness clock, `steps/1000`; KEY/KEYQ drain a key ring preloaded from a
 generated image include (default empty); KEY waits when the ring is empty.
 The guest image is a raw word blob (`.incbin`), so the shipped image loads
-directly. The gate runs eleven real programs plus the full work image
-differentially: the `nan0s.img` guest words built with a 3,000,000-step
-budget must produce byte-identical serial (`NaN/0S R26J READY MENU=S`).
-Remaining for the driver tests: raw PS/2, ATA, PIT and PCI port devices;
-then the Android integration that retires the C interpreter from the
-product.
+directly. The gate runs thirteen real programs plus the full work image
+differentially: s1_test, carry_probe, nalloc_test (3,156 allocator checks),
+a64_test (portable core self-test), the float edge-vector test, the
+device-boundary test, ring_test, the key-ring test, disasm_test (the
+disassembler), n16i_test (the self-hosting guest), n16de_test, a2_boot_test,
+nan16dump_test, and the `nan0s.img` work image built with a 3,000,000-step
+budget (byte-identical serial `NaN/0S R26J READY MENU=S`). Remaining for the
+raw driver tests: PS/2, ATA, PIT and PCI port devices; then the Android
+integration that retires the C interpreter from the product.
 
 ### 12.3 Android: bare-minimum C
 
