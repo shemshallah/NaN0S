@@ -28,6 +28,7 @@ jobs:
           sh tools/nlink.sh ls >/dev/null || exit 1
           sh tools/mkproof.sh src/tests/key_test.nas || exit 1
           sh tools/nrun.sh src/tests/a2_boot_test.nas | grep -qx 'A2 PASS' || exit 1
+          sh crypt/gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
   apk:
     needs: core-tests
     runs-on: ubuntu-latest

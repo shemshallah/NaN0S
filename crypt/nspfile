@@ -1,0 +1,8 @@
+#!/bin/sh
+# Public file-container helper. Suite 1 = NSP-7, suite 2 = NSP-8 (reference).
+set -e; cd "$(dirname "$0")/.."
+case "$1" in
+  seal) shift; exec node crypt/reference/nsp.cjs file-seal "$@" ;;
+  open) shift; exec node crypt/reference/nsp.cjs file-open "$@" ;;
+  *) echo "usage: crypt/nspfile seal <1|2> <in> <out> <keyhex> <noncehex>"; echo "       crypt/nspfile open <in> <out> <keyhex>"; exit 2 ;;
+esac

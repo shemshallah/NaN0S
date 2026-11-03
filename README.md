@@ -500,6 +500,14 @@ This one is designed to make them the main exhibit.
 ⭐ if you understood any of this.  
 ⭐⭐ if you didn’t, and it bothered you.
 
+## `> crypt`
+
+The public encryption suite lives in [`crypt/`](crypt/README.md): NSP-7/NSP-8
+capsule AEAD reference, the NSPF1 authenticated file container, and
+`crypt/nspfile`. Suites 3/4/5 (X25519+Ed25519, ML-KEM-768+ML-DSA-44,
+SLH-DSA) are planned and refused until implemented. Encrypted system boot
+is pending.
+
 <br/>
 
 <div align="center">
