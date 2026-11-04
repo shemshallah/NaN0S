@@ -55,6 +55,7 @@ sh crypt/storage_decrypt_gate.sh  # guest all-sector decrypt on C-core fd + QEMU
 sh crypt/storage_boot_gate.sh     # sparse 1 GiB: header + populated prefix, C-core + x86 IDE
 sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact, guest fs
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
+sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -71,6 +72,11 @@ prints `NAN0S_FS OK cap=<hex> used=<hex> suite=<hex> lazy=<bit> fs=<bit>`; it
 does not walk a 1 GiB image just to boot. The metadata cart
 (`crypt/guest/nan0s_fs_meta.nan`) decrypts logical block 0 and authenticates
 the `NAN0FS1` superblock/version/tag; a tampered data byte prints `VOL FAIL`.
+The directory cart (`crypt/guest/nan0s_fs_dir.nan`) decrypts every populated
+sector, counts authenticated `NDIR1` blocks, compares the count with the
+superblock file count, and prints `NAN0S_FS DIR OK files=<hex>`; a tampered
+directory byte prints `VOL FAIL`. It authenticates the directory set but does
+not print names or mount files yet.
 
 ## Sparse, arbitrary-size images
 
@@ -173,8 +179,9 @@ through **Disk**, or add the guest-side mkfs next.
 
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
-guest can check the outer header, the `fs` marker and the encrypted superblock,
-but does not list or mount files yet.
+guest can check the outer header, the `fs` marker, the encrypted superblock and
+the authenticated directory-block count, but does not list names or mount files
+yet.
 
 ## Storage backends
 
