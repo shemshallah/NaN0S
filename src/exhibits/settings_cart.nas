@@ -39,6 +39,12 @@ MOVI r6,0
 CALL #V_PUTS
 MOVI r1,@sg_menu4
 MOVI r2,800
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_menu5
+MOVI r2,960
 MOVI r3,0x0800
 MOVI r5,0
 MOVI r6,0
@@ -58,7 +64,15 @@ JMP[EQ] @sg_drv
 MOVI r4,51
 CMP r1,r4
 JMP[EQ] @sg_codec
+MOVI r4,52
+CMP r1,r4
+JMP[EQ] @sg_storage
 JMP @sg_menu
+sg_storage:
+MOVI r1,4800
+MOVI r2,10
+ST r2,r1,0
+JMP @sg_exit
 sg_exit:
 LD r15,r0,@sg_ret
 RET
@@ -326,6 +340,8 @@ sg_menu2:
 sg_menu3:
 .str "[3] CODEC MANAGER"
 sg_menu4:
+.str "[4] STORAGE (nsh)"
+sg_menu5:
 .str "ESC BACK"
 sg_net_t:
 .str " NANNET MANAGER"

@@ -21,6 +21,14 @@ grep -q '^FILE hello.txt start=00000002 sectors=00000001 size=0000000F$' "$T/ls.
   echo "nan0s_fs GUI gate: FAIL (ls)"; head -8 "$T/ls.out"; exit 1; }
 grep -q '^LS OK files=00000001$' "$T/ls.out" || { echo "nan0s_fs GUI gate: FAIL (ls status)"; exit 1; }
 
+# Settings subprogram path: museum menu 9 -> Settings [4] STORAGE -> nsh.
+S='@3000000,ESC,@1500000,9,@700000,4,@5000000,l,s,ENTER'
+aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 150000000 \
+  --keys "$S" --dump-text > "$T/settings.out" 2>/dev/null
+grep -q '^nsh> ls$' "$T/settings.out" || { echo "nan0s_fs GUI gate: FAIL (settings storage)"; head -8 "$T/settings.out"; exit 1; }
+grep -q '^FILE hello.txt start=00000002 sectors=00000001 size=0000000F$' "$T/settings.out" || {
+  echo "nan0s_fs GUI gate: FAIL (settings ls)"; exit 1; }
+
 W='@3000000,f,ENTER,@5000000,w,r,i,t,e,SPACE,h,e,l,l,o,.,t,x,t,ENTER,@1500000,n,e,w,SPACE,t,e,x,t,ESC,@1500000'
 aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 200000000 \
   --keys "$W" --dump-text > "$T/w.out" 2>/dev/null
@@ -45,4 +53,4 @@ crypt/nan0s_fs get "$T/fs.img" "$KEY" foo "$T/newfile" >/dev/null
 printf 'created' > "$T/created"
 cmp "$T/created" "$T/newfile" || { echo "nan0s_fs GUI gate: FAIL (new payload)"; exit 1; }
 node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
-echo "nan0s_fs GUI gate: PASS (desktop f -> VGA nsh -> ls/write/rm/new)"
+echo "nan0s_fs GUI gate: PASS (desktop f/Settings 4 -> VGA nsh -> ls/write/rm/new)"

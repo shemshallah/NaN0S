@@ -1228,9 +1228,10 @@ Spec: `spec/TRANSLATOR.md`.
       arrows/Home/End/Del, variable-size write/edit, rm tombstone, new from
       tombstone/chain head, stat, df, pwd, mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
-- [x] Desktop terminal `f` -> VGA `nsh` program (slot 10, hidden); `ls`/`write`
-      verified from the boot image with an attached encrypted volume; `exit`
-      returns to the shell menu. Full-screen program, not yet a WM window.
+- [x] Desktop terminal `f` and Settings `[4] STORAGE (nsh)` -> VGA `nsh`
+      program (slot 10, hidden); `ls`/`write`/`rm`/`new` verified from the boot
+      image with an attached encrypted volume; `exit` returns to the shell
+      menu. Full-screen program, not yet a WM window.
 - [x] Guest `nsh rm <name>`: authenticated tombstone, guest/host listings skip
       it, host `compact` reclaims; serial and desktop-launch gates PASS.
 - [x] Guest `nsh new <name>`: reuses a tombstone or allocates a new directory
