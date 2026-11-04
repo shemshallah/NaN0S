@@ -136,6 +136,22 @@ variable-size save, mount namespaces, and the GUI window-manager binding. The
 shell is a full-screen terminal UI over the encrypted volume, not yet a WM
 window.
 
+## Console hierarchy
+
+The intended interaction stack is:
+
+```
+boot -> desktop GUI -> terminal (CLI) -> program window -> subprogram
+```
+
+Today the boot target is the GUI desktop; the desktop's terminal is the CLI;
+its named/single-letter commands open real program windows (Settings, NANNET,
+utilities, monitor, hex, lattice), and Settings opens its NANNET/Driver/Codec
+manager subprograms. The encrypted storage shell (`nsh`) is the full-screen
+storage CLI and its `write`/`edit` editor is the first in-shell program GUI.
+The remaining integration is to launch `nsh` from the desktop terminal and
+render that shell/editor as a WM window instead of a full-screen serial TUI.
+
 ## Sparse, arbitrary-size images
 
 An NSPV image can be created at any size without allocating the whole file.
