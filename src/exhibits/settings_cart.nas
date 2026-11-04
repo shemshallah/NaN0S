@@ -51,6 +51,12 @@ MOVI r6,0
 CALL #V_PUTS
 MOVI r1,@sg_menu6
 MOVI r2,1120
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_menu7
+MOVI r2,1280
 MOVI r3,0x0800
 MOVI r5,0
 MOVI r6,0
@@ -76,7 +82,91 @@ JMP[EQ] @sg_storage
 MOVI r4,53
 CMP r1,r4
 JMP[EQ] @sg_nic
+MOVI r4,54
+CMP r1,r4
+JMP[EQ] @sg_svc
 JMP @sg_menu
+sg_svc:
+CALL #V_CLS
+MOVI r1,@sg_svc_t
+MOVI r2,0
+MOVI r3,0x1F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc1
+MOVI r2,320
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc2
+MOVI r2,480
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc3
+MOVI r2,640
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc4
+MOVI r2,800
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc5
+MOVI r2,960
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc6
+MOVI r2,1120
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_svc_bl
+MOVI r2,1280
+MOVI r3,0x0800
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+LD r1,r0,@sg_svc_bits
+MOVI r2,1520
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_svc_f
+MOVI r2,1600
+MOVI r3,0x0800
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL #V_KEY
+MOVI r4,255
+BOOL.8 r1,r1,r4
+MOVI r4,27
+CMP r1,r4
+JMP[EQ] @sg_menu
+MOVI r4,49
+CMP r1,r4
+JMP[LT] @sg_svc
+MOVI r4,54
+CMP r1,r4
+JMP[GT] @sg_svc
+MOVI r4,49
+SUB r1,r1,r4
+MOVI r2,@sg_svc_masks
+ADD r2,r2,r1
+LD r2,r2,0
+LD r1,r0,@sg_svc_bits
+BOOL.6 r1,r1,r2
+ST r1,r0,@sg_svc_bits
+JMP @sg_svc
 sg_storage:
 MOVI r1,4800
 MOVI r2,10
@@ -437,6 +527,24 @@ JMP @sg_codec
 
 sg_title:
 .str " SETTINGS"
+sg_svc_t:
+.str " SERVICE MANAGER"
+sg_svc1:
+.str "[1] TELNET 23  TCP PENDING"
+sg_svc2:
+.str "[2] QOTD 17    UDP PENDING"
+sg_svc3:
+.str "[3] FINGER 79  TCP PENDING"
+sg_svc4:
+.str "[4] GOPHER 70  TCP PENDING"
+sg_svc5:
+.str "[5] HTTP 80    TCP PENDING"
+sg_svc6:
+.str "[6] HTTPS 443  TLS PENDING"
+sg_svc_bl:
+.str "ENABLED BITS "
+sg_svc_f:
+.str "1-6 TOGGLE   ESC BACK"
 sg_nic_t:
 .str " NIC STATUS"
 sg_nic_y:
@@ -456,6 +564,8 @@ sg_menu4:
 sg_menu5:
 .str "[5] NIC STATUS"
 sg_menu6:
+.str "[6] SERVICE MANAGER"
+sg_menu7:
 .str "ESC BACK"
 sg_net_t:
 .str " NANNET MANAGER"
@@ -475,6 +585,10 @@ sg_net_ctrl:
 .str "1 LO UP 2 LO DOWN 3 ETH UP 4 ETH DOWN  ESC BACK"
 sg_num:
 .word 0
+sg_svc_bits:
+.word 0
+sg_svc_masks:
+.word 1,2,4,8,16,32
 sg_drv_t:
 .str " DRIVER MANAGER"
 sg_drv_h:
