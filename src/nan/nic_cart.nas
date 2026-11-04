@@ -373,6 +373,237 @@ JMP @narp
 narp_d:
 MOVI r1,10
 PUTC r1
+; Reset and reinitialize the RX ring before the next protocol step.
+LD r6,r0,@nc_base
+MOVI r5,0x37
+ADD r5,r6,r5
+MOVI r2,0x10
+OUTB r2,r5
+MOVI r8,10000
+pingrst:
+INB r1,r5
+MOVI r3,16
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[EQ] @pingrst_d
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @pingrst
+pingrst_d:
+MOVI r2,0x0C
+OUTB r2,r5
+MOVI r5,0x30
+ADD r5,r6,r5
+MOVI r1,0
+MOVHI r1,0x0100
+OUTL r1,r5
+MOVI r5,0x44
+ADD r5,r6,r5
+MOVI r1,0xF00F
+OUTL r1,r5
+MOVI r5,0x38
+ADD r5,r6,r5
+MOVI r2,0
+OUTB r2,r5
+; Build a 60-byte ICMP echo request.
+MOVI r9,0xF800
+MOVI r1,82
+STB r1,r9,0
+MOVI r1,85
+STB r1,r9,1
+MOVI r1,10
+STB r1,r9,2
+MOVI r1,0
+STB r1,r9,3
+MOVI r1,2
+STB r1,r9,4
+MOVI r1,2
+STB r1,r9,5
+MOVI r1,82
+STB r1,r9,6
+MOVI r1,84
+STB r1,r9,7
+MOVI r1,0
+STB r1,r9,8
+MOVI r1,18
+STB r1,r9,9
+MOVI r1,52
+STB r1,r9,10
+MOVI r1,86
+STB r1,r9,11
+MOVI r1,8
+STB r1,r9,12
+MOVI r1,0
+STB r1,r9,13
+MOVI r1,69
+STB r1,r9,14
+MOVI r1,0
+STB r1,r9,15
+MOVI r1,0
+STB r1,r9,16
+MOVI r1,44
+STB r1,r9,17
+MOVI r1,0
+STB r1,r9,18
+MOVI r1,1
+STB r1,r9,19
+MOVI r1,0
+STB r1,r9,20
+MOVI r1,0
+STB r1,r9,21
+MOVI r1,64
+STB r1,r9,22
+MOVI r1,1
+STB r1,r9,23
+MOVI r1,98
+STB r1,r9,24
+MOVI r1,192
+STB r1,r9,25
+MOVI r1,10
+STB r1,r9,26
+MOVI r1,0
+STB r1,r9,27
+MOVI r1,2
+STB r1,r9,28
+MOVI r1,15
+STB r1,r9,29
+MOVI r1,10
+STB r1,r9,30
+MOVI r1,0
+STB r1,r9,31
+MOVI r1,2
+STB r1,r9,32
+MOVI r1,2
+STB r1,r9,33
+MOVI r1,8
+STB r1,r9,34
+MOVI r1,0
+STB r1,r9,35
+MOVI r1,171
+STB r1,r9,36
+MOVI r1,2
+STB r1,r9,37
+MOVI r1,0
+STB r1,r9,38
+MOVI r1,1
+STB r1,r9,39
+MOVI r1,0
+STB r1,r9,40
+MOVI r1,1
+STB r1,r9,41
+MOVI r1,78
+STB r1,r9,42
+MOVI r1,65
+STB r1,r9,43
+MOVI r1,78
+STB r1,r9,44
+MOVI r1,48
+STB r1,r9,45
+MOVI r1,83
+STB r1,r9,46
+MOVI r1,45
+STB r1,r9,47
+MOVI r1,73
+STB r1,r9,48
+MOVI r1,67
+STB r1,r9,49
+MOVI r1,77
+STB r1,r9,50
+MOVI r1,80
+STB r1,r9,51
+MOVI r1,45
+STB r1,r9,52
+MOVI r1,84
+STB r1,r9,53
+MOVI r1,69
+STB r1,r9,54
+MOVI r1,83
+STB r1,r9,55
+MOVI r1,84
+STB r1,r9,56
+MOVI r1,33
+STB r1,r9,57
+MOVI r1,0
+STB r1,r9,58
+MOVI r1,0
+STB r1,r9,59
+; TXAD0
+MOVI r5,0x20
+ADD r5,r6,r5
+MOVI r1,0x0800
+MOVHI r1,0x0100
+OUTL r1,r5
+; TSD0
+MOVI r5,0x10
+ADD r5,r6,r5
+MOVI r2,60
+OUTL r2,r5
+MOVI r8,60000
+pingtx:
+INW r1,r5
+MOVI r3,0x8000
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @pingtxok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @pingtx
+MOVI r1,@t_pingno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+pingtxok:
+MOVI r1,@t_pingtx
+CALL @sputs
+MOVI r1,10
+PUTC r1
+MOVI r5,0x3E
+ADD r5,r6,r5
+MOVI r8,60000
+pingrx:
+INW r1,r5
+MOVI r3,1
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @pingrxok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @pingrx
+MOVI r1,@t_pingno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+pingrxok:
+MOVI r7,0xF000
+LDB r1,r7,16
+MOVI r3,8
+CMP r1,r3
+JMP[NE] @pingbad
+LDB r1,r7,17
+CMP r1,r0
+JMP[NE] @pingbad
+LDB r1,r7,27
+MOVI r3,1
+CMP r1,r3
+JMP[NE] @pingbad
+LDB r1,r7,38
+CMP r1,r0
+JMP[NE] @pingbad
+MOVI r1,@t_pingok
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+pingbad:
+MOVI r1,@t_pingno
+CALL @sputs
+MOVI r1,10
+PUTC r1
 LD r15,r0,@np_ret
 RET
 nicrx_plain:
@@ -469,6 +700,12 @@ t_rxno:
 .str "RX FAIL"
 t_arp:
 .str "ARP "
+t_pingok:
+.str "PING OK"
+t_pingno:
+.str "PING FAIL"
+t_pingtx:
+.str "PING TX"
 nc_ret:
 .word 0
 np_ret:
