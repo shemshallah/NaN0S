@@ -75,5 +75,18 @@ crypt/nan0s_fs ls "$T/fresh.img" "$KEY" | grep -qx 'foo 2 1 7' || {
   echo "nan0s_fs shell gate: FAIL (fresh metadata)"; exit 1; }
 crypt/nan0s_fs get "$T/fresh.img" "$KEY" foo "$T/freshfile" >/dev/null
 cmp "$T/created" "$T/freshfile" || { echo "nan0s_fs shell gate: FAIL (fresh payload)"; exit 1; }
+
+# Chained create: insert a second file at the head of the authenticated chain.
+CKEYS='n,e,w,SPACE,b,a,r,ENTER,t,w,o,ESC'
+aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fresh.img" \
+  --steps 150000000 --keys "$CKEYS" --serial > "$T/c.out" 2>/dev/null
+grep -q '^NEW OK$' "$T/c.out" || { echo "nan0s_fs shell gate: FAIL (chained new)"; tail -8 "$T/c.out"; exit 1; }
+crypt/nan0s_fs ls "$T/fresh.img" "$KEY" | grep -q '^foo 2 1 7$' || {
+  echo "nan0s_fs shell gate: FAIL (chained foo)"; exit 1; }
+crypt/nan0s_fs ls "$T/fresh.img" "$KEY" | grep -q '^bar 4 1 3$' || {
+  echo "nan0s_fs shell gate: FAIL (chained bar)"; exit 1; }
+crypt/nan0s_fs get "$T/fresh.img" "$KEY" bar "$T/barfile" >/dev/null
+printf 'two' > "$T/two"
+cmp "$T/two" "$T/barfile" || { echo "nan0s_fs shell gate: FAIL (chained payload)"; exit 1; }
 node crypt/volume.cjs verify "$T/fresh.img" "$KEY" | grep -qx 'VERIFY OK'
-echo "nan0s_fs shell gate: PASS (nsh ls/cat/edit/write/rm/new/first-create/df)"
+echo "nan0s_fs shell gate: PASS (nsh ls/cat/edit/write/rm/new/chained/first-create/df)"
