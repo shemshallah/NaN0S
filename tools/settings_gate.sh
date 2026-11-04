@@ -17,12 +17,15 @@ grep -q 'DRIVER MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (drive
 grep -q 'CODEC MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (codec entry)"; exit 1; }
 grep -q 'STORAGE (nsh)' "$T/settings.txt" || { echo "settings gate: FAIL (storage entry)"; exit 1; }
 grep -q 'NIC STATUS' "$T/settings.txt" || { echo "settings gate: FAIL (nic entry)"; exit 1; }
-grep -q 'SERVICE MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (service entry)"; exit 1; }
 
 menu "@3000000,ESC,@1000000,9,@500000,1" > "$T/nannet.txt"
 grep -q 'NANNET MANAGER' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET manager)"; exit 1; }
 grep -q '^LINKS' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET status)"; exit 1; }
 grep -q 'NIC NONE' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET NIC status)"; exit 1; }
+grep -q 'S SERVICES' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET services marker)"; exit 1; }
+menu "@3000000,ESC,@1000000,9,@500000,1,@300000,s" > "$T/services.txt"
+grep -q 'SERVICE MANAGER' "$T/services.txt" || { echo "settings gate: FAIL (NANNET services)"; exit 1; }
+grep -q 'QOTD 17' "$T/services.txt" || { echo "settings gate: FAIL (service list)"; exit 1; }
 menu "@3000000,ESC,@1000000,9,@500000,2" > "$T/driver.txt"
 grep -q 'DRIVER MANAGER' "$T/driver.txt" || { echo "settings gate: FAIL (driver manager)"; exit 1; }
 grep -q 'DN_UDP' "$T/driver.txt" || { echo "settings gate: FAIL (driver registry)"; exit 1; }
@@ -30,4 +33,4 @@ menu "@3000000,ESC,@1000000,9,@500000,3" > "$T/codec.txt"
 grep -q 'CODEC MANAGER' "$T/codec.txt" || { echo "settings gate: FAIL (codec manager)"; exit 1; }
 grep -q 'NSP-7' "$T/codec.txt" || { echo "settings gate: FAIL (codec registry)"; exit 1; }
 
-echo "settings gate: PASS (slot 9 Settings; NANNET/Driver/Codec/Storage/NIC/Service; no hidden extra slot)"
+echo "settings gate: PASS (slot 9 Settings; NANNET/Driver/Codec/Storage/NIC; NANNET services; no hidden extra slot)"

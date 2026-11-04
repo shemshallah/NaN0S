@@ -51,12 +51,6 @@ MOVI r6,0
 CALL #V_PUTS
 MOVI r1,@sg_menu6
 MOVI r2,1120
-MOVI r3,0x0F00
-MOVI r5,0
-MOVI r6,0
-CALL #V_PUTS
-MOVI r1,@sg_menu7
-MOVI r2,1280
 MOVI r3,0x0800
 MOVI r5,0
 MOVI r6,0
@@ -82,9 +76,6 @@ JMP[EQ] @sg_storage
 MOVI r4,53
 CMP r1,r4
 JMP[EQ] @sg_nic
-MOVI r4,54
-CMP r1,r4
-JMP[EQ] @sg_svc
 JMP @sg_menu
 sg_svc:
 CALL #V_CLS
@@ -151,7 +142,7 @@ MOVI r4,255
 BOOL.8 r1,r1,r4
 MOVI r4,27
 CMP r1,r4
-JMP[EQ] @sg_menu
+JMP[EQ] @sg_net
 MOVI r4,49
 CMP r1,r4
 JMP[LT] @sg_svc
@@ -371,6 +362,9 @@ JMP[EQ] @sg_et_up
 MOVI r4,52
 CMP r1,r4
 JMP[EQ] @sg_et_dn
+MOVI r4,115
+CMP r1,r4
+JMP[EQ] @sg_svc
 JMP @sg_net
 sg_lo_up:
 MOVI r1,0
@@ -564,8 +558,6 @@ sg_menu4:
 sg_menu5:
 .str "[5] NIC STATUS"
 sg_menu6:
-.str "[6] SERVICE MANAGER"
-sg_menu7:
 .str "ESC BACK"
 sg_net_t:
 .str " NANNET MANAGER"
@@ -582,7 +574,7 @@ sg_routes:
 sg_dns:
 .str "DNS "
 sg_net_ctrl:
-.str "1 LO UP 2 LO DOWN 3 ETH UP 4 ETH DOWN  ESC BACK"
+.str "1-4 LINK  S SERVICES  ESC BACK"
 sg_num:
 .word 0
 sg_svc_bits:
