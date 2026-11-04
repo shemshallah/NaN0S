@@ -1233,10 +1233,11 @@ Spec: `spec/TRANSLATOR.md`.
       returns to the shell menu. Full-screen program, not yet a WM window.
 - [x] Guest `nsh rm <name>`: authenticated tombstone, guest/host listings skip
       it, host `compact` reclaims; serial and desktop-launch gates PASS.
-- [x] Guest `nsh new <name>`: reuses a tombstone, seals payload and directory;
-      serial and desktop-launch gates create/read a new file.
-- [ ] `nsh` first-file creation without a tombstone, variable-size save,
-      render `nsh` as a WM window;
+- [x] Guest `nsh new <name>`: reuses a tombstone or allocates the first file
+      on an empty layer; seals payload/directory, updates superblock and lazy
+      `used`; serial and desktop-launch gates create/read files.
+- [ ] `nsh` chained create on a non-empty layer without a tombstone,
+      variable-size save, render `nsh` as a WM window;
       mount/directory layer;
       subdirectories; larger/better free map than 58 superblock extents; chunked
       NSPF1 file reader; encrypted boot; Android SAF wiring for the volume

@@ -11,7 +11,7 @@
 #     NOT a slot number, slot 9 is the Settings menu; hidden tooling is not listed.
 #
 # Cartridges are packed into the store from word 30000 upward in this file's order.
-# STORE MUST STAY ABOVE THE RUN SLOT (8192 + longest cart, nsh 12299 words).
+# STORE MUST STAY ABOVE THE RUN SLOT (8192 + longest cart, nsh 13113 words).
 1:src/nan/baby_cart.nan:1948:0:1:Manchester Baby (SSEM) - 21 June 1948
 2:src/nan/boole_cart.nan:1854:0:2:Boole - The Laws of Thought (16 functions, live) - 1854
 3:src/nan/sierpinski_cart.nan:1915:4:1:Sierpinski - Rule 90 (1915) - live fractal

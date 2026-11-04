@@ -62,4 +62,18 @@ crypt/nan0s_fs get "$T/fs.img" "$KEY" foo "$T/newfile" >/dev/null
 printf 'created' > "$T/created"
 cmp "$T/created" "$T/newfile" || { echo "nan0s_fs shell gate: FAIL (new payload)"; exit 1; }
 node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
-echo "nan0s_fs shell gate: PASS (nsh ls/cat/edit/write/rm/new/df on encrypted volume)"
+
+# Fresh volume: new allocates dir/payload, seals both, updates the superblock,
+# then advances the lazy header's used high-water mark.
+node crypt/volume.cjs create 1 "$T/fresh.img" "$KEY" "$NON" 64M --lazy >/dev/null
+crypt/nan0s_fs mkfs "$T/fresh.img" "$KEY" >/dev/null
+NKEYS='n,e,w,SPACE,f,o,o,ENTER,c,r,e,a,t,e,d,ESC'
+aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fresh.img" \
+  --steps 150000000 --keys "$NKEYS" --serial > "$T/f.out" 2>/dev/null
+grep -q '^NEW OK$' "$T/f.out" || { echo "nan0s_fs shell gate: FAIL (fresh new)"; tail -8 "$T/f.out"; exit 1; }
+crypt/nan0s_fs ls "$T/fresh.img" "$KEY" | grep -qx 'foo 2 1 7' || {
+  echo "nan0s_fs shell gate: FAIL (fresh metadata)"; exit 1; }
+crypt/nan0s_fs get "$T/fresh.img" "$KEY" foo "$T/freshfile" >/dev/null
+cmp "$T/created" "$T/freshfile" || { echo "nan0s_fs shell gate: FAIL (fresh payload)"; exit 1; }
+node crypt/volume.cjs verify "$T/fresh.img" "$KEY" | grep -qx 'VERIFY OK'
+echo "nan0s_fs shell gate: PASS (nsh ls/cat/edit/write/rm/new/first-create/df)"
