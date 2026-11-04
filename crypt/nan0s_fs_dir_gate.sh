@@ -17,7 +17,7 @@ aarch64/android/nan_cli --img crypt/guest/nan0s_fs_dir.nan --disk "$T/fs.img" \
   --steps 120000000 --serial > "$T/c.out" 2>/dev/null
 grep -q '^NAN0S_FS DIR OK files=0000000C$' "$T/c.out" || {
   echo "nan0s_fs dir gate: FAIL (C-core directory count)"; tail -4 "$T/c.out"; exit 1; }
-grep -q '^FILE f1$' "$T/c.out" && grep -q '^FILE f12$' "$T/c.out" || {
+grep -q '^FILE f1 start=00000002 ' "$T/c.out" && grep -q '^FILE f12 start=' "$T/c.out" || {
   echo "nan0s_fs dir gate: FAIL (C-core names)"; tail -8 "$T/c.out"; exit 1; }
 
 cp "$T/fs.img" "$T/tamper.img"
@@ -45,7 +45,7 @@ if command -v qemu-system-i386 >/dev/null 2>&1; then
     -display none -serial "file:$T/q.out" -no-reboot >/dev/null 2>&1 || true
   grep -q '^NAN0S_FS DIR OK files=0000000C$' "$T/q.out" || {
     echo "nan0s_fs dir gate: FAIL (x86 directory count)"; tail -6 "$T/q.out"; exit 1; }
-  grep -q '^FILE f1$' "$T/q.out" && grep -q '^FILE f12$' "$T/q.out" || {
+  grep -q '^FILE f1 start=00000002 ' "$T/q.out" && grep -q '^FILE f12 start=' "$T/q.out" || {
     echo "nan0s_fs dir gate: FAIL (x86 names)"; tail -8 "$T/q.out"; exit 1; }
   echo "nan0s_fs dir gate: PASS (12 authenticated names + tamper reject, C-core + x86 IDE)"
 else

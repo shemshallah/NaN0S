@@ -56,6 +56,7 @@ sh crypt/storage_boot_gate.sh     # sparse 1 GiB: header + populated prefix, C-c
 sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact, guest fs
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
+sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -73,10 +74,14 @@ does not walk a 1 GiB image just to boot. The metadata cart
 (`crypt/guest/nan0s_fs_meta.nan`) decrypts logical block 0 and authenticates
 the `NAN0FS1` superblock/version/tag; a tampered data byte prints `VOL FAIL`.
 The directory cart (`crypt/guest/nan0s_fs_dir.nan`) decrypts every populated
-sector, authenticates every `NDIR1` block, prints `FILE <name>` for each entry,
+sector, authenticates every `NDIR1` block, prints `FILE <name> start=<hex> sectors=<hex> size=<hex>` for each entry,
 compares the count with the superblock file count, and prints
 `NAN0S_FS DIR OK files=<hex>`; a tampered directory byte prints `VOL FAIL`.
-It lists authenticated names but does not read file contents or mount files yet.
+It lists authenticated names and extents but does not mount files yet. The file
+read cart (`crypt/guest/nan0s_fs_cat.nan`) authenticates the superblock and
+directory chain, finds the fixed target `hello.txt`, prints its payload, and
+finishes with `NAN0S_FS CAT OK` (missing target: `CAT NO`). The target name is
+compiled in for this proof; an interactive name shell is the next step.
 
 ## Sparse, arbitrary-size images
 
@@ -180,8 +185,8 @@ through **Disk**, or add the guest-side mkfs next.
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock,
-and the authenticated directory names, but cannot read file contents or mount
-the filesystem yet.
+and the authenticated directory names, and can read the fixed `hello.txt` payload
+through the cat cart; it has no interactive shell or mount yet.
 
 ## Storage backends
 
