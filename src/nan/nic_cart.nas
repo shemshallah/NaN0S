@@ -1304,6 +1304,49 @@ MOVI r1,@t_tack
 CALL @sputs
 MOVI r1,10
 PUTC r1
+; Wait for the first TCP data packet.
+MOVI r5,0x3E
+ADD r5,r6,r5
+MOVI r8,60000
+tdata_rx:
+INW r1,r5
+MOVI r3,1
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @tdata_ok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @tdata_rx
+MOVI r1,@t_datano
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@tack_ret
+RET
+tdata_ok:
+MOVI r7,0xF000
+LDB r1,r7,16
+MOVI r3,8
+CMP r1,r3
+JMP[NE] @tdata_bad
+LDB r1,r7,17
+CMP r1,r0
+JMP[NE] @tdata_bad
+LDB r1,r7,27
+MOVI r3,6
+CMP r1,r3
+JMP[NE] @tdata_bad
+MOVI r1,@t_dataok
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@tack_ret
+RET
+tdata_bad:
+MOVI r1,@t_datano
+CALL @sputs
+MOVI r1,10
+PUTC r1
 LD r15,r0,@tack_ret
 RET
 tcpbad:
@@ -1347,6 +1390,10 @@ t_tcpno:
 .str "TCP FAIL"
 t_tack:
 .str "TCP ACK"
+t_dataok:
+.str "TCP DATA"
+t_datano:
+.str "TCP NODATA"
 t_mac:
 .str "MAC "
 nc_ret:

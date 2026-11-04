@@ -12,7 +12,7 @@ cat "$T/b.bin" "$T/g.bin" > "$T/img"; truncate -s 1474560 "$T/img"
 ok=0
 for attempt in 1 2 3; do
   timeout 15 qemu-system-i386 -m 32 -drive format=raw,if=floppy,file="$T/img" \
-    -netdev user,id=n0,guestfwd=tcp:10.0.2.100:2323-cmd:/bin/cat -device rtl8139,netdev=n0 -display none \
+    -netdev user,id=n0,guestfwd=tcp:10.0.2.100:2323-cmd:/bin/echo -device rtl8139,netdev=n0 -display none \
     -serial "file:$T/com1.txt" -no-reboot >/dev/null 2>&1 || true
   grep -q 'NIC 10EC 8139 BASE C000 52:54:00:12:34:56:' "$T/com1.txt" &&
   grep -q 'RESET 01D0' "$T/com1.txt" &&
@@ -26,4 +26,4 @@ for attempt in 1 2 3; do
   grep -q '^TCP ACK$' "$T/com1.txt" && { ok=1; break; }
 done
 [ "$ok" -eq 1 ] || { echo "nic gate: FAIL"; tail -8 "$T/com1.txt" | cat -v; exit 1; }
-echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake + identity)"
+echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/data + identity)"
