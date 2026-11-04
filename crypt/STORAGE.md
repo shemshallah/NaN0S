@@ -73,10 +73,10 @@ does not walk a 1 GiB image just to boot. The metadata cart
 (`crypt/guest/nan0s_fs_meta.nan`) decrypts logical block 0 and authenticates
 the `NAN0FS1` superblock/version/tag; a tampered data byte prints `VOL FAIL`.
 The directory cart (`crypt/guest/nan0s_fs_dir.nan`) decrypts every populated
-sector, counts authenticated `NDIR1` blocks, compares the count with the
-superblock file count, and prints `NAN0S_FS DIR OK files=<hex>`; a tampered
-directory byte prints `VOL FAIL`. It authenticates the directory set but does
-not print names or mount files yet.
+sector, authenticates every `NDIR1` block, prints `FILE <name>` for each entry,
+compares the count with the superblock file count, and prints
+`NAN0S_FS DIR OK files=<hex>`; a tampered directory byte prints `VOL FAIL`.
+It lists authenticated names but does not read file contents or mount files yet.
 
 ## Sparse, arbitrary-size images
 
@@ -179,9 +179,9 @@ through **Disk**, or add the guest-side mkfs next.
 
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
-guest can check the outer header, the `fs` marker, the encrypted superblock and
-the authenticated directory-block count, but does not list names or mount files
-yet.
+guest can check the outer header, the `fs` marker, the encrypted superblock,
+and the authenticated directory names, but cannot read file contents or mount
+the filesystem yet.
 
 ## Storage backends
 
