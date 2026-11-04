@@ -109,6 +109,35 @@ MOVI r1,58
 PUTC r1
 JMP @nmac
 ndone:
+; RTL8139 reset and enable RX/TX, then read media status.
+LD r6,r0,@nc_base
+MOVI r5,0x37
+ADD r5,r6,r5
+MOVI r2,0x10
+OUTB r2,r5
+MOVI r8,10000
+nrst:
+INB r1,r5
+MOVI r3,16
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[EQ] @nrst_d
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @nrst
+nrst_d:
+MOVI r2,0x0C
+OUTB r2,r5
+MOVI r5,0x58
+ADD r5,r6,r5
+INW r1,r5
+ST r1,r0,@nc_msr
+MOVI r1,32
+PUTC r1
+MOVI r1,@t_reset
+CALL @sputs
+LD r1,r0,@nc_msr
+CALL @puthex4
 MOVI r1,10
 PUTC r1
 LD r15,r0,@np_ret
@@ -181,11 +210,15 @@ t_base:
 .str " BASE "
 t_none:
 .str "NIC NONE"
+t_reset:
+.str "RESET "
 nc_ret:
 .word 0
 np_ret:
 .word 0
 nc_base:
+.word 0
+nc_msr:
 .word 0
 ph4_ret:
 .word 0
