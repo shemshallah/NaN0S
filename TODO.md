@@ -1228,6 +1228,8 @@ Spec: `spec/TRANSLATOR.md`.
       arrows/Home/End/Del, variable-size write/edit, rm tombstone, new from
       tombstone/chain head, stat, df, pwd, mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
+- [x] NIC bring-up: RTL8139 PCI detection, I/O BAR mapping, MAC read; QEMU
+      gate PASS (`tools/nic_gate.sh`). Next: reset/ring descriptors, Ethernet.
 - [x] Paged cartridge catalog: 16-word entries at 22000, titles at 23600,
       87-entry limit, hidden-id flags, local 1-9 keys with `[`/`]` paging;
       12-visible-entry gate PASS.
