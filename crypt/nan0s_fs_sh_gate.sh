@@ -1,5 +1,5 @@
 #!/bin/sh
-# Guest shell gate: interactive nsh over the encrypted nan0s_fs volume.
+# Guest shell gate: nsh over the encrypted nan0s_fs volume (read/write/df).
 set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
 T="${TMPDIR:-/tmp}/nan0sfssh.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
 command -v node >/dev/null 2>&1 || { echo "nan0s_fs shell gate: node missing"; exit 77; }
@@ -18,7 +18,7 @@ grep -q '^FILE hello.txt start=00000002 sectors=00000001 size=0000000F$' "$T/out
 grep -q '^hello nan0s_fs$' "$T/out" || { echo "nan0s_fs shell gate: FAIL (cat payload)"; tail -8 "$T/out"; exit 1; }
 grep -q '^CAT OK$' "$T/out" || { echo "nan0s_fs shell gate: FAIL (cat status)"; tail -8 "$T/out"; exit 1; }
 
-WKEYS='w,r,i,t,e,SPACE,h,e,l,l,o,.,t,x,t,ENTER,n,e,w,SPACE,t,e,x,t,ENTER'
+WKEYS='w,r,i,t,e,SPACE,h,e,l,l,o,.,t,x,t,ENTER,n,e,w,SPACE,t,e,x,t,ESC'
 aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fs.img" \
   --steps 80000000 --keys "$WKEYS" --serial > "$T/w.out" 2>/dev/null
 grep -q '^WRITE OK$' "$T/w.out" || { echo "nan0s_fs shell gate: FAIL (write)"; tail -8 "$T/w.out"; exit 1; }

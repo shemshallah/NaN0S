@@ -93,19 +93,23 @@ nsh> cat hello.txt
 hello nan0s_fs
 CAT OK
 nsh> write hello.txt
-text> new text
+NaN nano: hello.txt
+----------------------------------------
+new text
+----------------------------------------
+Esc save   Backspace   Enter newline   printable insert
 WRITE OK
 nsh> df
 DF cap=0001D173 next=00000003 files=00000001
 ```
 
-It commands `ls`, `cat <name>` (FNV-1a name match), `write <name>` (overwrite an
-existing file with one text line, preserving its recorded size and zero-padding),
-`df` (capacity/next/file count from the authenticated superblock), `help`, and
-`exit`. Write goes through the guest capsule sealer, ATA CT write, and tag-table
-update; the gate verifies the result with host `get` and `nspvol verify`.
-Creating files, `rm`, the GUI terminal binding, and the mount layer are the next
-userland work.
+It commands `ls`, `cat <name>` (FNV-1a name match), `write <name>` (a
+full-screen nano-style editor: title/filename/help, multiline buffer, printable
+insert, Backspace, Enter, Esc save), `df` (capacity/next/file count from the
+authenticated superblock), `help`, and `exit`. Write goes through the guest
+capsule sealer, ATA CT write, and tag-table update; the gate verifies the result
+with host `get` and `nspvol verify`. Creating files, `rm`, cursor keys, the GUI
+window-manager binding, and the mount layer are the next userland work.
 
 ## Sparse, arbitrary-size images
 
