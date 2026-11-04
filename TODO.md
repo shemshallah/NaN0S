@@ -1225,8 +1225,8 @@ Spec: `spec/TRANSLATOR.md`.
       authenticated directory names/count (`nan0s_fs_dir.nan`), fixed-target
       guest file read (`nan0s_fs_cat.nan`) and interactive `nsh`
       (`nan0s_fs_sh.nan`: ls, cat <name>, edit <name>, nano-style write with
-      arrows/Home/End/Del, rm tombstone, new from tombstone, stat, df, pwd,
-      mount, clear, ver, help, exit),
+      arrows/Home/End/Del, variable-size write/edit, rm tombstone, new from
+      tombstone/chain head, stat, df, pwd, mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
 - [x] Desktop terminal `f` -> VGA `nsh` program (slot 10, hidden); `ls`/`write`
       verified from the boot image with an attached encrypted volume; `exit`
@@ -1236,7 +1236,9 @@ Spec: `spec/TRANSLATOR.md`.
 - [x] Guest `nsh new <name>`: reuses a tombstone or allocates a new directory
       and payload at the chain head; seals both, updates superblock and lazy
       `used`; first-create and chained-create gates PASS.
-- [ ] `nsh` variable-size save, guest free-list reuse, render `nsh` as a WM
+- [x] Guest `nsh` variable-size write/edit: save updates the authenticated
+      directory size to the editor length (grow/shrink within one sector).
+- [ ] `nsh` multi-sector growth, guest free-list reuse, render `nsh` as a WM
       window;
       mount/directory layer;
       subdirectories; larger/better free map than 58 superblock extents; chunked

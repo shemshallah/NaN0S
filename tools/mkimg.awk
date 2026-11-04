@@ -30,7 +30,7 @@ BEGIN {
   #   SLOT:FILE:YEAR:HALL:BADGE:TITLE   SLOT = menu key 1..10 (10 hidden)
   #   boot:FILE                         the system cart (GUI); not an exhibit slot
   # Titles are written into guest words at TITLE_BASE (16-word stride, 4 chars/word LE).
-  k = 0; top = 30000; haveboot = 0
+  k = 0; top = 25000; haveboot = 0
   while ((getline cl < CARTS) > 0){
     ci = index(cl, ";"); if (ci > 0) cl = substr(cl, 1, ci-1)
     ci = index(cl, "#"); if (ci > 0) cl = substr(cl, 1, ci-1)

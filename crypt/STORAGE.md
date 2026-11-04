@@ -57,7 +57,7 @@ sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
-sh crypt/nan0s_fs_sh_gate.sh      # nsh: ... rm + new + chained/first-create
+sh crypt/nan0s_fs_sh_gate.sh      # nsh: ... variable-size write/edit ...
 sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f -> VGA nsh -> ls/write/rm/new
 ```
 
@@ -128,11 +128,13 @@ separator, visible `|` cursor, and a help bar. Printable keys insert at the
 cursor; Left/Right/Up/Down move by line, Home/End go to line bounds, Delete
 removes the character under the cursor, Backspace removes before it, Enter
 inserts a newline, and Esc saves. The guest buffer is 512 bytes. `write` starts
-blank; `edit` loads the first 512 authenticated bytes. Save preserves the
-file's recorded size and zero-pads, so appends beyond that size are clipped
-until variable-size writes land. Write goes through the guest capsule sealer,
-ATA CT write, and tag-table update; the gate verifies the result with host
-`get` and `nspvol verify`.
+blank; `edit` loads the first 512 authenticated bytes. Save now writes the
+payload and updates the authenticated directory size to the editor's current
+length, so files grow or shrink within the 512-byte extent instead of keeping
+the old length and zero-padding. Files larger than 512 bytes are edited in
+their first sector and truncated on save. Write goes through the guest capsule
+sealer, ATA CT write, tag-table update, and a second authenticated directory
+update.
 
 `rm` zeroes the authenticated directory name and seals that directory block
 through the same tag path. The payload and extent stay allocated as a
@@ -149,12 +151,13 @@ It then updates the superblock `next/files/first/last` and advances the lazy
 header's `used` high-water mark so host reads see the new sectors. This works
 on a fresh volume and on a non-empty layer.
 
-Limits: each `new` file is one sector (the editor's 512-byte buffer); guest
-free-list reuse and variable-size growth are still pending. Tombstones still
-count in the superblock until host `compact`.
+Limits: each `new` file is one sector (the editor's 512-byte buffer); editing
+a larger file truncates it to the first 512 bytes. Guest free-list reuse and
+multi-sector growth are still pending. Tombstones still count in the
+superblock until host `compact`.
 
-Still pending: magic-number commands, line-number/status display,
-variable-size save, guest free-list reuse, mount namespaces, and rendering the
+Still pending: magic-number commands, line-number/status display, guest
+free-list reuse, multi-sector growth, mount namespaces, and rendering the
 shell as a WM window. The shell is a full-screen terminal UI over the
 encrypted volume.
 
@@ -280,8 +283,8 @@ Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock and
 authenticated directory names, and run `nsh` (`ls`, `cat`, `edit`, `write`,
-`rm`, `new`, `stat`, `df`); first-file creation, variable-size writes, mount
-namespaces, and the WM-window binding are still pending.
+`rm`, `new`, `stat`, `df`); multi-sector growth, mount namespaces, and the
+WM-window binding are still pending.
 
 ## Storage backends
 

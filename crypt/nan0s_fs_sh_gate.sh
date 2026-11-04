@@ -38,7 +38,7 @@ cmp -n 2 "$T/edit.new" "$T/edit.read" || { echo "nan0s_fs shell gate: FAIL (edit
 SKEYS='s,t,a,t,SPACE,h,e,l,l,o,.,t,x,t,ENTER'
 aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fs.img" \
   --steps 80000000 --keys "$SKEYS" --serial > "$T/s.out" 2>/dev/null
-grep -q '^STAT start=00000002 sectors=00000001 size=0000000F$' "$T/s.out" || { echo "nan0s_fs shell gate: FAIL (stat)"; tail -8 "$T/s.out"; exit 1; }
+grep -q '^STAT start=00000002 sectors=00000001 size=00000002$' "$T/s.out" || { echo "nan0s_fs shell gate: FAIL (stat)"; tail -8 "$T/s.out"; exit 1; }
 grep -q '^STAT OK$' "$T/s.out" || { echo "nan0s_fs shell gate: FAIL (stat status)"; exit 1; }
 
 node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
