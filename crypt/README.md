@@ -39,7 +39,7 @@ sh crypt/nspfile open <in> <out> <keyhex>
 Full container details: `FORMAT.md`.
 
 Storage volumes: NSPV1 sector format, host `nspvol`, sparse `nan0s_fs`
-images/devices, the encrypted `crypt/nan0s_fs` file layer, guest FS metadata, directory names, file-read proof, the boot header
+images/devices, the encrypted `crypt/nan0s_fs` file layer, guest FS metadata, directory names, file-read proof, nsh shell, the boot header
 check, the guest decrypt cart, and the ATA/fd probe for x86 HDD and Android
 storage are in `STORAGE.md`.
 Full container details: `FORMAT.md`.

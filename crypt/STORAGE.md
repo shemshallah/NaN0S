@@ -57,6 +57,7 @@ sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
+sh crypt/nan0s_fs_sh_gate.sh      # interactive nsh: ls + cat <name>
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -81,7 +82,21 @@ It lists authenticated names and extents but does not mount files yet. The file
 read cart (`crypt/guest/nan0s_fs_cat.nan`) authenticates the superblock and
 directory chain, finds the fixed target `hello.txt`, prints its payload, and
 finishes with `NAN0S_FS CAT OK` (missing target: `CAT NO`). The target name is
-compiled in for this proof; an interactive name shell is the next step.
+compiled in for this proof. `crypt/guest/nan0s_fs_sh.nan` is the interactive
+serial shell over the same authenticated volume:
+
+```text
+nsh> ls
+FILE hello.txt start=00000002 sectors=00000001 size=0000000F
+LS OK files=00000001
+nsh> cat hello.txt
+hello nan0s_fs
+CAT OK
+```
+
+It commands `ls`, `cat <name>` (FNV-1a name match), `help`, and `exit`. It is
+read-only today; the write path, GUI terminal binding, and mount layer are the
+next userland work.
 
 ## Sparse, arbitrary-size images
 
@@ -184,9 +199,9 @@ through **Disk**, or add the guest-side mkfs next.
 
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
-guest can check the outer header, the `fs` marker, the encrypted superblock,
-and the authenticated directory names, and can read the fixed `hello.txt` payload
-through the cat cart; it has no interactive shell or mount yet.
+guest can check the outer header, the `fs` marker, the encrypted superblock and
+authenticated directory names, and run the read-only `nsh` (`ls`, `cat <name>`);
+it has no write path, mount, or GUI terminal binding yet.
 
 ## Storage backends
 
