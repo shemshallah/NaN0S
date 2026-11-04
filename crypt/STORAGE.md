@@ -57,7 +57,7 @@ sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
-sh crypt/nan0s_fs_sh_gate.sh      # interactive nsh: ls + cat + write overwrite + df
+sh crypt/nan0s_fs_sh_gate.sh      # nsh: ls + cat + edit + write + stat + df
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -95,21 +95,46 @@ CAT OK
 nsh> write hello.txt
 NaN nano: hello.txt
 ----------------------------------------
-new text
+new text|
 ----------------------------------------
-Esc save   Backspace   Enter newline   printable insert
+Arrows move  Home/End  Del  Bksp  Esc save
 WRITE OK
 nsh> df
 DF cap=0001D173 next=00000003 files=00000001
 ```
 
-It commands `ls`, `cat <name>` (FNV-1a name match), `write <name>` (a
-full-screen nano-style editor: title/filename/help, multiline buffer, printable
-insert, Backspace, Enter, Esc save), `df` (capacity/next/file count from the
-authenticated superblock), `help`, and `exit`. Write goes through the guest
-capsule sealer, ATA CT write, and tag-table update; the gate verifies the result
-with host `get` and `nspvol verify`. Creating files, `rm`, cursor keys, the GUI
-window-manager binding, and the mount layer are the next userland work.
+It commands:
+
+```
+ls                   list authenticated files
+cat <name>           print a file
+edit <name>          load an existing file into the editor
+write <name>         start with a blank editor
+stat <name>          start/sectors/size metadata
+df                   capacity/next/file count from the superblock
+pwd                  print /
+mount                print the mounted NSPV volume
+clear                clear the terminal
+ver                  shell identity
+help                 command list
+exit                 leave nsh
+```
+
+`write` and `edit` open a full-screen nano-style editor with a title, filename,
+separator, visible `|` cursor, and a help bar. Printable keys insert at the
+cursor; Left/Right/Up/Down move by line, Home/End go to line bounds, Delete
+removes the character under the cursor, Backspace removes before it, Enter
+inserts a newline, and Esc saves. The guest buffer is 512 bytes. `write` starts
+blank; `edit` loads the first 512 authenticated bytes. Save preserves the
+file's recorded size and zero-pads, so appends beyond that size are clipped
+until variable-size writes land. Write goes through the guest capsule sealer,
+ATA CT write, and tag-table update; the gate verifies the result with host
+`get` and `nspvol verify`.
+
+Still pending: magic-number commands, line-number/status display, create/`rm`,
+variable-size save, mount namespaces, and the GUI window-manager binding. The
+shell is a full-screen terminal UI over the encrypted volume, not yet a WM
+window.
 
 ## Sparse, arbitrary-size images
 
@@ -213,8 +238,9 @@ through **Disk**, or add the guest-side mkfs next.
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock and
-authenticated directory names, and run `nsh` (`ls`, `cat <name>`, `write <name>` overwrite, `df`);
-creating files, `rm`, mount, and GUI terminal binding are still pending.
+authenticated directory names, and run `nsh` (`ls`, `cat`, `edit`, `write`, `stat`, `df`);
+creating files, `rm`, variable-size writes, mount namespaces, and the GUI
+terminal binding are still pending.
 
 ## Storage backends
 

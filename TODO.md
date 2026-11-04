@@ -1224,9 +1224,10 @@ Spec: `spec/TRANSLATOR.md`.
       boot marker, guest superblock decrypt/auth (`nan0s_fs_meta.nan`) and
       authenticated directory names/count (`nan0s_fs_dir.nan`), fixed-target
       guest file read (`nan0s_fs_cat.nan`) and interactive `nsh`
-      (`nan0s_fs_sh.nan`: ls, cat <name>, nano-style write <name>, df, help, exit),
+      (`nan0s_fs_sh.nan`: ls, cat <name>, edit <name>, nano-style write with
+      arrows/Home/End/Del, stat, df, pwd, mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
-- [ ] `nsh` create/`rm`, cursor-key editing, and GUI WM binding; mount/directory layer;
+- [ ] `nsh` create/`rm`, variable-size save, GUI WM binding; mount/directory layer;
       subdirectories; larger/better free map than 58 superblock extents; chunked
       NSPF1 file reader; encrypted boot; Android SAF wiring for the volume
       picker; real-HDD validation.
