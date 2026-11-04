@@ -45,6 +45,12 @@ MOVI r6,0
 CALL #V_PUTS
 MOVI r1,@sg_menu5
 MOVI r2,960
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_menu6
+MOVI r2,1120
 MOVI r3,0x0800
 MOVI r5,0
 MOVI r6,0
@@ -67,12 +73,92 @@ JMP[EQ] @sg_codec
 MOVI r4,52
 CMP r1,r4
 JMP[EQ] @sg_storage
+MOVI r4,53
+CMP r1,r4
+JMP[EQ] @sg_nic
 JMP @sg_menu
 sg_storage:
 MOVI r1,4800
 MOVI r2,10
 ST r2,r1,0
 JMP @sg_exit
+sg_nic:
+CALL #V_CLS
+MOVI r1,@sg_nic_t
+MOVI r2,0
+MOVI r3,0x1F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL @sg_nic_probe
+CMP r1,r0
+JMP[EQ] @sg_nic_no
+MOVI r1,@sg_nic_y
+JMP @sg_nic_pr
+sg_nic_no:
+MOVI r1,@sg_nic_n
+sg_nic_pr:
+MOVI r2,320
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_nic_f
+MOVI r2,960
+MOVI r3,0x0800
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL #V_KEY
+MOVI r4,255
+BOOL.8 r1,r1,r4
+MOVI r4,27
+CMP r1,r4
+JMP[EQ] @sg_menu
+JMP @sg_nic
+sg_nic_probe:
+MOVI r10,0
+sg_nic_l:
+MOVI r2,32
+CMP r10,r2
+JMP[GE] @sg_nic_none
+ADDI r1,r10,0
+SHL r1,r1,3
+MOVI r2,0
+CALL @sg_pci_rd
+MOVI r3,0xFFFF
+BOOL.8 r4,r1,r3
+MOVI r3,0x10EC
+CMP r4,r3
+JMP[NE] @sg_nic_next
+SHR r1,r1,16
+MOVI r3,0x8139
+CMP r1,r3
+JMP[EQ] @sg_nic_yes
+sg_nic_next:
+ADDI r10,r10,1
+JMP @sg_nic_l
+sg_nic_yes:
+MOVI r1,1
+RET
+sg_nic_none:
+MOVI r1,0
+RET
+sg_pci_rd:
+SHL r3,r1,8
+BOOL.14 r3,r3,r2
+MOVI r4,0
+MOVHI r4,0x8000
+BOOL.14 r3,r3,r4
+MOVI r5,0xCF8
+OUTL r3,r5
+MOVI r5,0xCFC
+INW r6,r5
+MOVI r5,0xCFE
+INW r7,r5
+SHL r7,r7,16
+BOOL.14 r1,r6,r7
+RET
 sg_exit:
 LD r15,r0,@sg_ret
 RET
@@ -333,6 +419,14 @@ JMP @sg_codec
 
 sg_title:
 .str " SETTINGS"
+sg_nic_t:
+.str " NIC STATUS"
+sg_nic_y:
+.str " RTL8139 FOUND"
+sg_nic_n:
+.str " NO RTL8139 ON PCI BUS 0"
+sg_nic_f:
+.str " ESC BACK"
 sg_menu1:
 .str "[1] NANNET MANAGER"
 sg_menu2:
@@ -342,6 +436,8 @@ sg_menu3:
 sg_menu4:
 .str "[4] STORAGE (nsh)"
 sg_menu5:
+.str "[5] NIC STATUS"
+sg_menu6:
 .str "ESC BACK"
 sg_net_t:
 .str " NANNET MANAGER"
