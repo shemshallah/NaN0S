@@ -1,6 +1,6 @@
 # NANNET — system network manager (M1/M2)
 
-NANNET is the network control plane, separate from NANNETSUITE. It owns link,
+NANNET is the network control plane, separate from private tooling. It owns link,
 address, route, DNS, driver-load and WiFi state. All logic is NaN16; the
 sources assemble with the normal `tools/nmk.awk` pipeline.
 

@@ -256,23 +256,6 @@ LD r2,r10,4
 LD r3,r10,5
 CALL @v_bcopy
 CALL 8192
-; ---- staged slot request from the cart that just returned (word 4784)
-LA r10,@suite_req
-LD r1,r10,0
-CMP r1,r0
-JMP[EQ] @shsr_done
-ST r0,r10,0
-MOVI r10,#TOC_BASE
-shsr_find:
-LD r2,r10,0
-CMP r2,r0
-JMP[EQ] @shsr_done
-CMP r2,r1
-JMP[EQ] @sh_run
-MOVI r4,16
-ADD r10,r10,r4
-JMP @shsr_find
-shsr_done:
 MOVI r13,1
 JMP @sh_redraw
 
@@ -556,10 +539,7 @@ toc:
 .org 4768
 boot_rec:
 ; system cart record (the GUI desktop), same 16-word shape. [0]=0 -> boot to menu.
-; NOT an exhibit slot: slot 9 stays free for a future exhibit (TempleOS).
-.org 4784
-suite_req:
-.word 0
+; NOT an exhibit slot: slot 9 is the Settings cart.
 .org 4864
 .org 5376
 sm_title:

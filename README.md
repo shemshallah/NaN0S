@@ -213,7 +213,7 @@ Nine exhibits are installed. Each shows the date of the event, who was involved 
 | **6** | 1984 · **Trust** — *Reflections on Trusting Trust* | INSPIRED |
 | **7** | 1991 · **Patriot Missile Failure**, Dhahran | RE-CREATION |
 | **8** | 2026 · **Paradox Engine** — an sNaN/qNaN contradiction oscillator | INSPIRED |
-| **9** | 2026 · **NaN/0S Desktop** — windows, terminal, pixels | RE-CREATION |
+| **9** | 2026 · **Settings** — NANNET, Driver and Codec managers | RE-CREATION |
 | **~** | the **Curator Console** — raw guest memory, four payloads per row, read-only | — |
 
 A few things worth knowing before you go in:
@@ -221,7 +221,7 @@ A few things worth knowing before you go in:
 - **#7** is a small lesson in what a clock tick cannot be: a tenth of a second has no finite binary expansion, so a 24-bit fixed-point conversion truncated a hair on every tick — and after about 100 hours of continuous operation the hair had become a missed interception. The plaque walks through the arithmetic and is honest about which figures are approximate.
 - **#8** flips a word between signaling and quiet and reads it from both ends. Watch `LE TIME` and `BE TIME` argue.
 - **#6** is the full paper *Trusting Trust in a Double-Endian NaN Machine* ([`spec/TRUST_PAPER.md`](spec/TRUST_PAPER.md)), scrollable, 376 wrapped lines.
-- **#9** is a real window manager with no native GUI code at all: eight windows, z-order, focus, a terminal, a Sierpinski window, a hex viewer, a monitor. In the terminal, `h` is help; `l` lattice, `m` monitor, `x` hex, `t` new terminal, `w` window count, `s` settings, `n` NaNNet, `u` utilities.
+- **#9** opens Settings: NANNET Manager (link controls and status), Driver Manager (13-driver registry and load toggles), and Codec Manager (storage codec catalog). The desktop is the system boot cart, not a slot.
 - **Next hall:** Hall 1, the Apollo AGC / DSKY port, is the flagship ([`spec/APOLLO_AGC_PLAN.md`](spec/APOLLO_AGC_PLAN.md)).
 
 <div align="center"><img src="assets/github/nan0s-rule.svg" alt="" width="100%"/></div>

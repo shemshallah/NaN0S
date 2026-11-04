@@ -1177,7 +1177,7 @@ Spec: `spec/TRANSLATOR.md`.
 - Roadmap: text-only browser (no image or script path). Image ingestion stays
   hard-blocked at the network edge until an in-network classifier exists.
 - Roadmap: a standalone NANNET manager owns links (wired/WiFi), addresses,
-  routes, DNS and driver load state; NANNETSUITE is a toolkit, not the control
+  routes, DNS and driver load state; NANNET is the control plane; private tooling is not listed in the public menu.
   plane. Config lives in `.nancfg` files.
 - NANNET M1/M2 landed: `src/nannet/` (interfaces, addresses, routes, DNS,
   WiFi scan/join/leave fixture, `.nancfg` apply/rollback); gates
