@@ -240,41 +240,41 @@ MOVI r1,2
 STB r1,r9,40
 MOVI r1,2
 STB r1,r9,41
-MOVI r1,0
+MOVI r1,76
 STB r1,r9,42
-MOVI r1,0
+MOVI r1,79
 STB r1,r9,43
-MOVI r1,0
+MOVI r1,32
 STB r1,r9,44
-MOVI r1,0
+MOVI r1,70
 STB r1,r9,45
-MOVI r1,0
+MOVI r1,82
 STB r1,r9,46
-MOVI r1,0
+MOVI r1,79
 STB r1,r9,47
-MOVI r1,0
+MOVI r1,77
 STB r1,r9,48
-MOVI r1,0
+MOVI r1,32
 STB r1,r9,49
-MOVI r1,0
+MOVI r1,78
 STB r1,r9,50
-MOVI r1,0
+MOVI r1,65
 STB r1,r9,51
-MOVI r1,0
+MOVI r1,78
 STB r1,r9,52
-MOVI r1,0
+MOVI r1,48
 STB r1,r9,53
-MOVI r1,0
+MOVI r1,83
 STB r1,r9,54
-MOVI r1,0
+MOVI r1,32
 STB r1,r9,55
-MOVI r1,0
+MOVI r1,49
 STB r1,r9,56
-MOVI r1,0
+MOVI r1,57
 STB r1,r9,57
-MOVI r1,0
+MOVI r1,54
 STB r1,r9,58
-MOVI r1,0
+MOVI r1,57
 STB r1,r9,59
 ; TXAD0 = raw physical 0x01000000
 MOVI r5,0x20
@@ -371,6 +371,10 @@ CALL @puthex2
 ADDI r8,r8,1
 JMP @narp
 narp_d:
+MOVI r1,10
+PUTC r1
+MOVI r1,@t_pad
+CALL @sputs
 MOVI r1,10
 PUTC r1
 ; Reset and reinitialize the RX ring before the next protocol step.
@@ -479,9 +483,9 @@ MOVI r1,8
 STB r1,r9,34
 MOVI r1,0
 STB r1,r9,35
-MOVI r1,171
+MOVI r1,241
 STB r1,r9,36
-MOVI r1,2
+MOVI r1,238
 STB r1,r9,37
 MOVI r1,0
 STB r1,r9,38
@@ -493,35 +497,35 @@ MOVI r1,1
 STB r1,r9,41
 MOVI r1,78
 STB r1,r9,42
-MOVI r1,65
+MOVI r1,97
 STB r1,r9,43
 MOVI r1,78
 STB r1,r9,44
-MOVI r1,48
+MOVI r1,32
 STB r1,r9,45
-MOVI r1,83
+MOVI r1,33
 STB r1,r9,46
-MOVI r1,45
+MOVI r1,61
 STB r1,r9,47
-MOVI r1,73
+MOVI r1,32
 STB r1,r9,48
-MOVI r1,67
+MOVI r1,78
 STB r1,r9,49
-MOVI r1,77
+MOVI r1,97
 STB r1,r9,50
-MOVI r1,80
+MOVI r1,78
 STB r1,r9,51
-MOVI r1,45
+MOVI r1,33
 STB r1,r9,52
-MOVI r1,84
+MOVI r1,32
 STB r1,r9,53
-MOVI r1,69
+MOVI r1,81
 STB r1,r9,54
-MOVI r1,83
+MOVI r1,79
 STB r1,r9,55
 MOVI r1,84
 STB r1,r9,56
-MOVI r1,33
+MOVI r1,68
 STB r1,r9,57
 MOVI r1,0
 STB r1,r9,58
@@ -594,6 +598,10 @@ LDB r1,r7,38
 CMP r1,r0
 JMP[NE] @pingbad
 MOVI r1,@t_pingok
+CALL @sputs
+MOVI r1,10
+PUTC r1
+MOVI r1,@t_host
 CALL @sputs
 MOVI r1,10
 PUTC r1
@@ -700,12 +708,16 @@ t_rxno:
 .str "RX FAIL"
 t_arp:
 .str "ARP "
+t_pad:
+.str "PAD LO FROM NAN0S 1969"
 t_pingok:
 .str "PING OK"
 t_pingno:
 .str "PING FAIL"
 t_pingtx:
 .str "PING TX"
+t_host:
+.str "HOST NaN0S  HINFO NaN-LATTICE NAN0S"
 nc_ret:
 .word 0
 np_ret:

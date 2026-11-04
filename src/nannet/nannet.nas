@@ -1587,3 +1587,107 @@ nn_cfg_status:
         MOVI r3,0
         RET
 
+
+; ---- identity / easter eggs ------------------------------------------------
+; DHCP hostname, DNS HINFO/TXT text, QOTD quote and Finger banner.
+nn_hostname:
+.str "NaN0S"
+nn_hinfo_cpu:
+.str "NaN-LATTICE"
+nn_hinfo_os:
+.str "NAN0S"
+nn_txt:
+.str "NaN0S: a temple that boots. NaN != NaN."
+nn_qotd_text:
+.str "There is a number that isn't one."
+nn_finger_text:
+.str "Login: nan0s  Name: NaN/0S  Project: NaN-LATTICE"
+nn_qotd_port:
+.word 17
+nn_finger_port:
+.word 79
+
+nn_identity:
+ST r15,r0,@ni_ret
+MOVI r1,72
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_hostname
+CALL @nn_puts
+MOVI r1,10
+PUTC r1
+MOVI r1,72
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,78
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_hinfo_cpu
+CALL @nn_puts
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_hinfo_os
+CALL @nn_puts
+MOVI r1,10
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,88
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_txt
+CALL @nn_puts
+MOVI r1,10
+PUTC r1
+MOVI r1,81
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_qotd_text
+CALL @nn_puts
+MOVI r1,10
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,78
+PUTC r1
+MOVI r1,71
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,82
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_finger_text
+CALL @nn_puts
+MOVI r1,10
+PUTC r1
+LD r15,r0,@ni_ret
+RET
+ni_ret:
+.word 0

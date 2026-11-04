@@ -51,6 +51,13 @@ wleave 2
 `dns` and `driver` are distinguished by the second letter. Interface, SSID
 and driver names are a later layer; the numeric ids are stable.
 
+## Identity / easter eggs
+
+`nn_identity` exposes the DHCP hostname (`NaN0S`), DNS HINFO
+(`NaN-LATTICE` / `NAN0S`), TXT text, QOTD quote and Finger banner. Ports 17
+(QOTD) and 79 (Finger) are reserved; actual UDP/TCP listeners wait for the
+transport stack.
+
 ## WiFi
 
 States: down -> scanning -> joining -> joined/failed. Until a radio driver

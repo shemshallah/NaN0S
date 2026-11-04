@@ -15,6 +15,7 @@ timeout 15 qemu-system-i386 -m 32 -drive format=raw,if=floppy,file="$T/img" \
 grep -q 'NIC 10EC 8139 BASE C000 52:54:00:12:34:56: RESET' "$T/com1.txt" &&
 grep -q '^TX OK$' "$T/com1.txt" &&
 grep -q '^ARP 0A000202$' "$T/com1.txt" &&
-grep -q '^PING OK$' "$T/com1.txt" || {
+grep -q '^PING OK$' "$T/com1.txt" &&
+grep -q '^HOST NaN0S  HINFO NaN-LATTICE NAN0S$' "$T/com1.txt" || {
   echo "nic gate: FAIL"; tail -8 "$T/com1.txt" | cat -v; exit 1; }
-echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP)"
+echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP + identity)"
