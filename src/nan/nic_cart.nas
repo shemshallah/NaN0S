@@ -109,6 +109,8 @@ MOVI r1,58
 PUTC r1
 JMP @nmac
 ndone:
+MOVI r1,10
+PUTC r1
 ; RTL8139 reset and enable RX/TX, then read media status.
 LD r6,r0,@nc_base
 MOVI r5,0x37
@@ -128,6 +130,41 @@ JMP[NE] @nrst
 nrst_d:
 MOVI r2,0x0C
 OUTB r2,r5
+; Locally administered MAC: 02:4E:41:4E:30:53 ("NAN0S").
+MOVI r5,0x00
+ADD r5,r6,r5
+MOVI r2,0x02
+OUTB r2,r5
+MOVI r5,0x01
+ADD r5,r6,r5
+MOVI r2,0x4E
+OUTB r2,r5
+MOVI r5,0x02
+ADD r5,r6,r5
+MOVI r2,0x41
+OUTB r2,r5
+MOVI r5,0x03
+ADD r5,r6,r5
+MOVI r2,0x4E
+OUTB r2,r5
+MOVI r5,0x04
+ADD r5,r6,r5
+MOVI r2,0x30
+OUTB r2,r5
+MOVI r5,0x05
+ADD r5,r6,r5
+MOVI r2,0x53
+OUTB r2,r5
+MOVI r1,@t_mac
+CALL @sputs
+MOVI r1,0x024E
+CALL @puthex4
+MOVI r1,0x414E
+CALL @puthex4
+MOVI r1,0x3053
+CALL @puthex4
+MOVI r1,10
+PUTC r1
 MOVI r5,0x58
 ADD r5,r6,r5
 INW r1,r5
@@ -168,17 +205,17 @@ MOVI r1,255
 STB r1,r9,4
 MOVI r1,255
 STB r1,r9,5
-MOVI r1,82
+MOVI r1,2
 STB r1,r9,6
-MOVI r1,84
+MOVI r1,78
 STB r1,r9,7
-MOVI r1,0
+MOVI r1,65
 STB r1,r9,8
-MOVI r1,18
+MOVI r1,78
 STB r1,r9,9
-MOVI r1,52
+MOVI r1,48
 STB r1,r9,10
-MOVI r1,86
+MOVI r1,83
 STB r1,r9,11
 MOVI r1,8
 STB r1,r9,12
@@ -200,17 +237,17 @@ MOVI r1,0
 STB r1,r9,20
 MOVI r1,1
 STB r1,r9,21
-MOVI r1,82
+MOVI r1,2
 STB r1,r9,22
-MOVI r1,84
+MOVI r1,78
 STB r1,r9,23
-MOVI r1,0
+MOVI r1,65
 STB r1,r9,24
-MOVI r1,18
+MOVI r1,78
 STB r1,r9,25
-MOVI r1,52
+MOVI r1,48
 STB r1,r9,26
-MOVI r1,86
+MOVI r1,83
 STB r1,r9,27
 MOVI r1,10
 STB r1,r9,28
@@ -423,17 +460,17 @@ MOVI r1,2
 STB r1,r9,4
 MOVI r1,2
 STB r1,r9,5
-MOVI r1,82
+MOVI r1,2
 STB r1,r9,6
-MOVI r1,84
+MOVI r1,78
 STB r1,r9,7
-MOVI r1,0
+MOVI r1,65
 STB r1,r9,8
-MOVI r1,18
+MOVI r1,78
 STB r1,r9,9
-MOVI r1,52
+MOVI r1,48
 STB r1,r9,10
-MOVI r1,86
+MOVI r1,83
 STB r1,r9,11
 MOVI r1,8
 STB r1,r9,12
@@ -718,6 +755,8 @@ t_pingtx:
 .str "PING TX"
 t_host:
 .str "HOST NaN0S  HINFO NaN-LATTICE NAN0S"
+t_mac:
+.str "MAC "
 nc_ret:
 .word 0
 np_ret:

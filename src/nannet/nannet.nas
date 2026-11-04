@@ -1592,6 +1592,8 @@ nn_cfg_status:
 ; DHCP hostname, DNS HINFO/TXT text, QOTD quote and Finger banner.
 nn_hostname:
 .str "NaN0S"
+nn_mac:
+.str "02:4E:41:4E:30:53"
 nn_hinfo_cpu:
 .str "NaN-LATTICE"
 nn_hinfo_os:
@@ -1620,6 +1622,10 @@ PUTC r1
 MOVI r1,32
 PUTC r1
 MOVI r1,@nn_hostname
+CALL @nn_puts
+MOVI r1,32
+PUTC r1
+MOVI r1,@nn_mac
 CALL @nn_puts
 MOVI r1,10
 PUTC r1
