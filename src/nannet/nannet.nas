@@ -1603,7 +1603,7 @@ nn_txt:
 nn_qotd_text:
 .str "There is a number that isn't one."
 nn_finger_text:
-.str "Login: nan0s  Name: NaN/0S  Project: NaN-LATTICE"
+.str "Login: nan0s  Name: NaN/0S  Project: NaN0S"
 nn_qotd_port:
 .word 17
 nn_finger_port:
