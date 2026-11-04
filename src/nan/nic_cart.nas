@@ -1200,6 +1200,7 @@ CALL @sputs
 MOVI r1,10
 PUTC r1
 CALL @tcp_ack
+CALL @tcp_wait_data
 LD r15,r0,@tcp_ret
 RET
 tcp_ack:
@@ -1273,14 +1274,18 @@ STB r2,r9,54
 MOVI r2,255
 BOOL.8 r1,r1,r2
 STB r1,r9,55
-; TX via descriptor 1
+; TX via selected descriptor
 LD r6,r0,@nc_base
-MOVI r5,0x24
+LD r2,r0,@tack_desc
+SHL r2,r2,2
+MOVI r5,0x20
+ADD r5,r5,r2
 ADD r5,r6,r5
 MOVI r1,0x0800
 MOVHI r1,0x0100
 OUTL r1,r5
-MOVI r5,0x14
+MOVI r5,0x10
+ADD r5,r5,r2
 ADD r5,r6,r5
 MOVI r2,60
 OUTL r2,r5
@@ -1305,6 +1310,10 @@ MOVI r1,@t_tack
 CALL @sputs
 MOVI r1,10
 PUTC r1
+LD r15,r0,@tack_ret
+RET
+tcp_wait_data:
+ST r15,r0,@td_ret
 ; Wait for the first TCP data packet.
 MOVI r5,0x3E
 ADD r5,r6,r5
@@ -1341,14 +1350,21 @@ MOVI r1,@t_dataok
 CALL @sputs
 MOVI r1,10
 PUTC r1
-LD r15,r0,@tack_ret
+MOVI r1,2
+ST r1,r0,@tack_desc
+CALL @tcp_ack
+MOVI r1,@t_dataack
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@td_ret
 RET
 tdata_bad:
 MOVI r1,@t_datano
 CALL @sputs
 MOVI r1,10
 PUTC r1
-LD r15,r0,@tack_ret
+LD r15,r0,@td_ret
 RET
 tcpbad:
 MOVI r1,@t_tcpno
@@ -1395,6 +1411,8 @@ t_dataok:
 .str "TCP DATA"
 t_datano:
 .str "TCP NODATA"
+t_dataack:
+.str "TCP DATA ACK"
 t_mac:
 .str "MAC "
 nc_ret:
@@ -1410,6 +1428,10 @@ dns_ret:
 tcp_ret:
 .word 0
 tack_ret:
+.word 0
+tack_desc:
+.word 1
+td_ret:
 .word 0
 ph4_ret:
 .word 0

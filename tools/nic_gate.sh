@@ -26,4 +26,4 @@ for attempt in 1 2 3; do
   grep -q '^TCP ACK$' "$T/com1.txt" && { ok=1; break; }
 done
 [ "$ok" -eq 1 ] || { echo "nic gate: FAIL"; tail -8 "$T/com1.txt" | cat -v; exit 1; }
-echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/data + identity)"
+echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/data/ACK + identity)"
