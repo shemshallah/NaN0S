@@ -1228,6 +1228,9 @@ Spec: `spec/TRANSLATOR.md`.
       arrows/Home/End/Del, variable-size write/edit, rm tombstone, new from
       tombstone/chain head, stat, df, pwd, mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
+- [x] Paged cartridge catalog: 16-word entries at 22000, titles at 23600,
+      87-entry limit, hidden-id flags, local 1-9 keys with `[`/`]` paging;
+      12-visible-entry gate PASS.
 - [x] Desktop terminal `f` and Settings `[4] STORAGE (nsh)` -> VGA `nsh`
       program (slot 10, hidden); `ls`/`write`/`rm`/`new` verified from the boot
       image with an attached encrypted volume; `exit` returns to the shell

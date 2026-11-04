@@ -27,9 +27,12 @@ BEGIN {
   if (LMAX == 0) die("no guest words in " GUEST)
   # ---- cartridges + builder-written TOC + boot record ----
   # carts.txt format (one line per cart, order = menu order):
-  #   SLOT:FILE:YEAR:HALL:BADGE:TITLE   SLOT = menu key 1..10 (10 hidden)
+  #   SLOT:FILE:YEAR:HALL:BADGE:TITLE   SLOT = unique catalog id; id 10 hidden
   #   boot:FILE                         the system cart (GUI); not an exhibit slot
-  # Titles are written into guest words at TITLE_BASE (16-word stride, 4 chars/word LE).
+  # Catalog: 16-word TOC entries at 22000, 16-word titles at 23600, store 25000.
+  # Titles are 4 chars/word LE, NUL padded. This admits 87 cartridges before the
+  # title area reaches the store; storage size remains the real limit.
+  TOCB = 22000; TITLEB = 23600; MAXCART = 87
   k = 0; top = 25000; haveboot = 0
   while ((getline cl < CARTS) > 0){
     ci = index(cl, ";"); if (ci > 0) cl = substr(cl, 1, ci-1)
@@ -58,30 +61,31 @@ BEGIN {
     hall = substr(rest, 1, p4-1); rest = substr(rest, p4+1)
     p5 = index(rest, ":"); if (p5 == 0) die("carts.txt needs BADGE:TITLE: " cl)
     badge = substr(rest, 1, p5-1); title = substr(rest, p5+1)
-    slot += 0; if (slot < 1 || slot > 10) die("slot must be 1..10: " cl)
+    slot += 0; if (slot < 1 || slot > MAXCART) die("slot must be 1.." MAXCART ": " cl)
     if (slot in SLOTSEEN) die("duplicate slot " slot)
     SLOTSEEN[slot] = 1
-    if (k >= 10) die("more than 10 menu entries")
+    if (k >= MAXCART) die("more than " MAXCART " catalog entries")
     st = top
     pay = storecart(cf, st)
     top = st + pay
-    tb = 4608 + 16*k
+    tb = TOCB + 16*k
     setw(tb+0, 0, slot); setw(tb+1, 0, yr+0); setw(tb+2, 0, hall+0); setw(tb+6, 0, badge+0)
-    setw(tb+4, 0, st); setw(tb+5, 0, pay); setw(tb+8, 0, CH); setw(tb+10, 0, CH2); setw(tb+11, 0, CC)
-    putstr(6000 + 16*k, title)
-    setw(tb+3, 0, 6000 + 16*k)
+    setw(tb+4, 0, st); setw(tb+5, 0, pay); setw(tb+7, 0, (slot == 10 ? 1 : 0))
+    setw(tb+8, 0, CH); setw(tb+10, 0, CH2); setw(tb+11, 0, CC)
+    putstr(TITLEB + 16*k, title)
+    setw(tb+3, 0, TITLEB + 16*k)
     if (top > LMAX) LMAX = top
     k++
   }
   close(CARTS)
   # terminator entry (id 0) right after the last slot entry
-  setw(4608 + 16*k, 0, 0)
+  setw(TOCB + 16*k, 0, 0)
   # boot record (same 16-word shape at 4784); [0] != 0 marks "a system cart exists"
   if (haveboot){
     setw(4784+0, 0, 1); setw(4784+4, 0, bstart); setw(4784+5, 0, blen)
     setw(4784+8, 0, bh); setw(4784+10, 0, bh2); setw(4784+11, 0, bcc)
   }
-  if (LMAX < 6000 + 16*k + 16) LMAX = 6000 + 16*k + 16
+  if (LMAX < TITLEB + 16*k + 16) LMAX = TITLEB + 16*k + 16
   if (LMAX < 4096) LMAX = 4096
   if (8*LMAX > 524288) die("guest region " 8*LMAX " bytes exceeds 524288")
   # ---- boot + kernel binary (8704 bytes: 512 boot, kernel zero-padded to 8192) ----

@@ -3,7 +3,7 @@
 ; r0=0, r13=1, r14=SP, r15=link.
 
 .equ SLOT 8192
-.equ TOC_BASE 4608
+.equ TOC_BASE 22000
 .equ STR_BASE 2048
 .equ BABY_STORE 3072
 
@@ -139,16 +139,71 @@ MOVI r5,0
 MOVI r6,0
 CALL @v_puts
 
-; ---- TOC-driven list: entry = 16 words (see TOC layout below); ends at id 0 ----
+; ---- count visible entries, derive pages, clamp page ----
+MOVI r10,#TOC_BASE
+MOVI r8,0
+shc_loop:
+LD r1,r10,0
+CMP r1,r0
+JMP[EQ] @shc_done
+LD r1,r10,7
+MOVI r4,1
+BOOL.8 r1,r1,r4
+CMP r1,r0
+JMP[NE] @shc_next
+ADDI r8,r8,1
+shc_next:
+MOVI r4,16
+ADD r10,r10,r4
+JMP @shc_loop
+shc_done:
+ADDI r1,r8,8
+MOVI r2,9
+DIVU r1,r1,r2
+CMP r1,r0
+JMP[NE] @shc_pages
+MOVI r1,1
+shc_pages:
+ST r1,r0,@sh_pages
+LD r1,r0,@sh_page
+LD r2,r0,@sh_pages
+CMP r1,r2
+JMP[LT] @shc_clamped
+SUB r2,r2,r13
+ST r2,r0,@sh_page
+shc_clamped:
+LD r1,r0,@sh_page
+MOVI r2,9
+MUL r1,r1,r2
+ST r1,r0,@sh_pstart
+ADDI r1,r1,9
+ST r1,r0,@sh_pend
+
+; ---- TOC-driven page: entry = 16 words (see TOC layout below); ends at id 0 ----
 MOVI r10,#TOC_BASE
 MOVI r11,324
+ST r0,r0,@sh_visidx
 shm_loop:
 LD r1,r10,0
 CMP r1,r0
 JMP[EQ] @shm_done
-MOVI r4,10
-CMP r1,r4
-JMP[EQ] @shm_next
+LD r2,r10,7
+MOVI r4,1
+BOOL.8 r2,r2,r4
+CMP r2,r0
+JMP[NE] @shm_hidden
+LD r2,r0,@sh_pstart
+LD r9,r0,@sh_visidx
+CMP r9,r2
+JMP[LT] @shm_skip
+LD r2,r0,@sh_pend
+LD r9,r0,@sh_visidx
+CMP r9,r2
+JMP[GE] @shm_done
+LD r2,r0,@sh_pstart
+LD r9,r0,@sh_visidx
+SUB r1,r9,r2
+ADDI r1,r1,1
 MOVI r4,0x0F5B
 VPOKE r4,r11
 ADD r2,r11,r13
@@ -178,11 +233,20 @@ MOVI r3,0x0B00
 MOVI r5,0
 MOVI r6,0
 CALL @v_puts
+MOVI r4,160
+ADD r11,r11,r4
+LD r1,r0,@sh_visidx
+ADDI r1,r1,1
+ST r1,r0,@sh_visidx
+JMP @shm_next
+shm_skip:
+LD r1,r0,@sh_visidx
+ADDI r1,r1,1
+ST r1,r0,@sh_visidx
+shm_hidden:
 shm_next:
 MOVI r4,16
 ADD r10,r10,r4
-MOVI r4,160
-ADD r11,r11,r4
 JMP @shm_loop
 shm_done:
 MOVI r1,@sh_more
@@ -191,6 +255,11 @@ MOVI r3,0x0800
 MOVI r5,0
 MOVI r6,0
 CALL @v_puts
+LD r1,r0,@sh_page
+ADDI r1,r1,1
+MOVI r2,1816
+MOVI r3,0x0800
+CALL @v_dec
 
 MOVI r1,@sh_foot
 MOVI r2,1840
@@ -213,18 +282,60 @@ JMP[EQ] @sh_curator
 MOVI r4,27
 CMP r1,r4
 JMP[EQ] @sh_redraw
+MOVI r4,93
+CMP r1,r4
+JMP[EQ] @sh_pgnext
+MOVI r4,91
+CMP r1,r4
+JMP[EQ] @sh_pgprev
+MOVI r4,48
+CMP r1,r4
+JMP[LT] @sh_key
+MOVI r4,57
+CMP r1,r4
+JMP[GT] @sh_key
 MOVI r4,48
 SUB r1,r1,r4
+SUB r1,r1,r13
+LD r2,r0,@sh_page
+MOVI r3,9
+MUL r2,r2,r3
+ADD r1,r1,r2
+ST r1,r0,@sh_target
 MOVI r10,#TOC_BASE
+MOVI r8,0
 shk_find:
 LD r2,r10,0
 CMP r2,r0
 JMP[EQ] @sh_key
-CMP r2,r1
+LD r3,r10,7
+MOVI r4,1
+BOOL.8 r3,r3,r4
+CMP r3,r0
+JMP[NE] @shk_skip
+LD r3,r0,@sh_target
+CMP r8,r3
 JMP[EQ] @sh_run
+ADDI r8,r8,1
+shk_skip:
 MOVI r4,16
 ADD r10,r10,r4
 JMP @shk_find
+sh_pgnext:
+LD r1,r0,@sh_page
+LD r2,r0,@sh_pages
+ADDI r3,r1,1
+CMP r3,r2
+JMP[GE] @sh_key
+ST r3,r0,@sh_page
+JMP @sh_redraw
+sh_pgprev:
+LD r1,r0,@sh_page
+CMP r1,r0
+JMP[EQ] @sh_key
+SUB r1,r1,r13
+ST r1,r0,@sh_page
+JMP @sh_redraw
 
 ; ---- load + seal-check + run the cartridge whose TOC entry is at r10 ----
 sh_run:
@@ -415,7 +526,7 @@ cu_foot:
 sh_banner:
 .str " NaN/0S  MUSEUM OF COMPUTING  (exhibit cartridges)  v40          "
 sh_more:
-.str "8 exhibits installed. Hall 1 Apollo AGC is next. See TODO.md"
+.str " PAGE "
 sh_btab:
 .word @sh_b0
 .word @sh_b1
@@ -440,7 +551,7 @@ sh_r3:
 sh_bad:
 .str "SEAL MISMATCH - cartridge REFUSED (not loaded, not run)"
 sh_foot:
-.str "ring 0, no host OS. press an exhibit number, ESC redraws. NaN/0S v40\n"
+.str "ring 0, no host OS. 1-9 run item; [ ] page; ESC redraw. NaN/0S v40\n"
 
 ; ---- System menu: settings, NaNNet, disk, memory, CPU ----
 sys_menu:
@@ -547,17 +658,14 @@ ss_ret:
 ss_body:
 .word 0
 
-; TOC. 16 words per entry, fully BUILT by tools/mkimg.awk from tools/carts.txt:
-; [0] slot (menu key 1-9; 0 = end of list) | [1] year | [2] hall | [3] title_ptr |
+; Catalog: 16 words per entry, BUILT by tools/mkimg.awk from tools/carts.txt:
+; [0] catalog id (0 = end of list) | [1] year | [2] hall | [3] title_ptr |
 ; [4] store addr | [5] len words | [6] badge (0 EXACT 1 RE-CREATION 2 INSPIRED) |
-; [7] flags | [8] seal A | [9] meta_ptr | [10] seal B | [11] seal C | [12-15] reserved
-; Titles are builder-written at TITLE_BASE (4 chars/word LE, NUL padded): slot number,
-; order and wording are edited in carts.txt only - no changes here for renumbering.
-.equ TOC_BASE 4608
+; [7] flags (bit0 hidden) | [8] seal A | [9] meta_ptr | [10] seal B | [11] seal C |
+; [12-15] reserved. Titles live at 23600 (16 words each); the catalog is paged
+; by the shell. Order and wording are edited in carts.txt only.
+.equ TOC_BASE 22000
 .equ BOOT_BASE 4784
-.org 4608
-toc:
-; (up to 10 builder-written entries; a bare museum.nan shows an empty menu)
 .org 4784
 boot_rec:
 ; system cart record (the GUI desktop), same 16-word shape. [0]=0 -> boot to menu.
@@ -566,6 +674,18 @@ boot_rec:
 nsh_req:
 .word 0
 .org 4864
+sh_page:
+.word 0
+sh_pages:
+.word 1
+sh_pstart:
+.word 0
+sh_pend:
+.word 9
+sh_target:
+.word 0
+sh_visidx:
+.word 0
 .org 5376
 sm_title:
 .str " NaN/0S  SYSTEM"
@@ -597,3 +717,7 @@ cpu_body:
 .str " Native core: x86, 5,800 bytes.\n Guest ISA: NaN16 double-endian, 16 truth-table classes.\n Clock: PIT TICK, 1,000 Hz class.\n AArch64 and RISC-V native cores: planned.\n Android root detection: host-only, not bare metal."
 
 
+
+; ---- paged cartridge catalog area (builder writes 16-word entries at 22000) ----
+.org 22000
+toc:

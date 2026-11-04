@@ -1,10 +1,10 @@
 # NaN/0S image manifest - the ONLY file to edit for slot number, order or wording.
 #
 #   SLOT:FILE:YEAR:HALL:BADGE:TITLE
-#     SLOT  = menu key 1..10 (10 is hidden). Change a number and the menu key follows;
-#             change the line order and the list order follows.
+#     SLOT  = unique catalog id 1..87. The menu shows paged local keys 1..9;
+#             line order is catalog order. Id 10 is the hidden storage cart.
 #     BADGE = 0 EXACT | 1 RE-CREATION | 2 INSPIRED
-#     TITLE = shown in the menu (up to ~69 cols; builder writes it into guest RAM)
+#     TITLE = shown in the menu (up to 63 cols; builder writes it into guest RAM)
 #
 #   boot:FILE
 #     the SYSTEM cart, started on cold boot (the GUI desktop). Not an exhibit and
