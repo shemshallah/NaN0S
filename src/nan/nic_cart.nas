@@ -140,6 +140,166 @@ LD r1,r0,@nc_msr
 CALL @puthex4
 MOVI r1,10
 PUTC r1
+; build a 60-byte Ethernet ARP request in the raw DMA window
+MOVI r9,0xF000
+MOVI r1,255
+STB r1,r9,0
+MOVI r1,255
+STB r1,r9,1
+MOVI r1,255
+STB r1,r9,2
+MOVI r1,255
+STB r1,r9,3
+MOVI r1,255
+STB r1,r9,4
+MOVI r1,255
+STB r1,r9,5
+MOVI r1,82
+STB r1,r9,6
+MOVI r1,84
+STB r1,r9,7
+MOVI r1,0
+STB r1,r9,8
+MOVI r1,18
+STB r1,r9,9
+MOVI r1,52
+STB r1,r9,10
+MOVI r1,86
+STB r1,r9,11
+MOVI r1,8
+STB r1,r9,12
+MOVI r1,6
+STB r1,r9,13
+MOVI r1,0
+STB r1,r9,14
+MOVI r1,1
+STB r1,r9,15
+MOVI r1,8
+STB r1,r9,16
+MOVI r1,0
+STB r1,r9,17
+MOVI r1,6
+STB r1,r9,18
+MOVI r1,4
+STB r1,r9,19
+MOVI r1,0
+STB r1,r9,20
+MOVI r1,1
+STB r1,r9,21
+MOVI r1,82
+STB r1,r9,22
+MOVI r1,84
+STB r1,r9,23
+MOVI r1,0
+STB r1,r9,24
+MOVI r1,18
+STB r1,r9,25
+MOVI r1,52
+STB r1,r9,26
+MOVI r1,86
+STB r1,r9,27
+MOVI r1,10
+STB r1,r9,28
+MOVI r1,0
+STB r1,r9,29
+MOVI r1,2
+STB r1,r9,30
+MOVI r1,15
+STB r1,r9,31
+MOVI r1,0
+STB r1,r9,32
+MOVI r1,0
+STB r1,r9,33
+MOVI r1,0
+STB r1,r9,34
+MOVI r1,0
+STB r1,r9,35
+MOVI r1,0
+STB r1,r9,36
+MOVI r1,0
+STB r1,r9,37
+MOVI r1,10
+STB r1,r9,38
+MOVI r1,0
+STB r1,r9,39
+MOVI r1,2
+STB r1,r9,40
+MOVI r1,2
+STB r1,r9,41
+MOVI r1,0
+STB r1,r9,42
+MOVI r1,0
+STB r1,r9,43
+MOVI r1,0
+STB r1,r9,44
+MOVI r1,0
+STB r1,r9,45
+MOVI r1,0
+STB r1,r9,46
+MOVI r1,0
+STB r1,r9,47
+MOVI r1,0
+STB r1,r9,48
+MOVI r1,0
+STB r1,r9,49
+MOVI r1,0
+STB r1,r9,50
+MOVI r1,0
+STB r1,r9,51
+MOVI r1,0
+STB r1,r9,52
+MOVI r1,0
+STB r1,r9,53
+MOVI r1,0
+STB r1,r9,54
+MOVI r1,0
+STB r1,r9,55
+MOVI r1,0
+STB r1,r9,56
+MOVI r1,0
+STB r1,r9,57
+MOVI r1,0
+STB r1,r9,58
+MOVI r1,0
+STB r1,r9,59
+; TXAD0 = raw physical 0x01000000
+MOVI r5,0x20
+ADD r5,r6,r5
+MOVI r1,0
+MOVHI r1,0x0100
+OUTL r1,r5
+; TCR = 0x03000700
+MOVI r5,0x40
+ADD r5,r6,r5
+MOVI r1,0x0700
+MOVHI r1,0x0300
+OUTL r1,r5
+; TSD0 = 60 bytes
+MOVI r5,0x10
+ADD r5,r6,r5
+MOVI r2,60
+OUTL r2,r5
+MOVI r8,60000
+nictx:
+INW r1,r5
+MOVI r3,0x8000
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @nictx_ok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @nictx
+MOVI r1,@t_txno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+nictx_ok:
+MOVI r1,@t_txok
+CALL @sputs
+MOVI r1,10
+PUTC r1
 LD r15,r0,@np_ret
 RET
 nnone:
@@ -212,6 +372,10 @@ t_none:
 .str "NIC NONE"
 t_reset:
 .str "RESET "
+t_txok:
+.str "TX OK"
+t_txno:
+.str "TX FAIL"
 nc_ret:
 .word 0
 np_ret:

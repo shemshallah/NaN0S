@@ -3,6 +3,8 @@
 .base 0x10000
 .code32
 .equ MASK 0x3FFFFF
+.equ RAW 0x01000000
+.equ RAWG 0xF000
 .equ MAXOP 0x45
 .equ G 0x200000
 .equ R 0x8000
@@ -700,6 +702,14 @@ h_addi:
 h_ldb:
   MOVZWL %AX,%EAX
   ADD %ECX,%EAX
+  CMP $RAWG,%EAX
+  JB @ldb_norm
+  CMP $0x10000,%EAX
+  JAE @ldb_norm
+  SUB $RAWG,%EAX
+  MOVZXB [RAW+EAX],%EBX
+  JMP @st
+ldb_norm:
   MOV %EAX,%ECX
   SHR $2,%EAX
   AND $MASK,%EAX
@@ -711,6 +721,15 @@ h_ldb:
 h_stb:
   MOVZWL %AX,%EAX
   ADD %ECX,%EAX
+  CMP $RAWG,%EAX
+  JB @stb_norm
+  CMP $0x10000,%EAX
+  JAE @stb_norm
+  SUB $RAWG,%EAX
+  MOVZXB [R+EBP],%EDX
+  MOVB %DL,[RAW+EAX]
+  JMP @loop
+stb_norm:
   MOV %EAX,%ECX
   SHL $3,%ECX
   SHR $2,%EAX
