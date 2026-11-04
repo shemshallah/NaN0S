@@ -140,8 +140,22 @@ LD r1,r0,@nc_msr
 CALL @puthex4
 MOVI r1,10
 PUTC r1
+; RX ring physical 0x01000000; TX frame lives at raw +0x800.
+MOVI r5,0x30
+ADD r5,r6,r5
+MOVI r1,0
+MOVHI r1,0x0100
+OUTL r1,r5
+MOVI r5,0x44
+ADD r5,r6,r5
+MOVI r1,0xF00F
+OUTL r1,r5
+MOVI r5,0x38
+ADD r5,r6,r5
+MOVI r2,0
+OUTB r2,r5
 ; build a 60-byte Ethernet ARP request in the raw DMA window
-MOVI r9,0xF000
+MOVI r9,0xF800
 MOVI r1,255
 STB r1,r9,0
 MOVI r1,255
@@ -265,7 +279,7 @@ STB r1,r9,59
 ; TXAD0 = raw physical 0x01000000
 MOVI r5,0x20
 ADD r5,r6,r5
-MOVI r1,0
+MOVI r1,0x0800
 MOVHI r1,0x0100
 OUTL r1,r5
 ; TCR = 0x03000700
@@ -297,6 +311,43 @@ LD r15,r0,@np_ret
 RET
 nictx_ok:
 MOVI r1,@t_txok
+CALL @sputs
+MOVI r1,10
+PUTC r1
+; Wait for RTL8139 ROK. The first 4 KB of the RX ring maps to F000.
+MOVI r5,0x3E
+ADD r5,r6,r5
+MOVI r8,60000
+nicrx:
+INW r1,r5
+MOVI r3,1
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @nicrx_ok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @nicrx
+MOVI r1,@t_rxno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+nicrx_ok:
+MOVI r7,0xF000
+LDB r1,r7,0
+MOVI r3,1
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[EQ] @nicrx_bad
+MOVI r1,@t_rxok
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+nicrx_bad:
+MOVI r1,@t_rxno
 CALL @sputs
 MOVI r1,10
 PUTC r1
@@ -376,6 +427,10 @@ t_txok:
 .str "TX OK"
 t_txno:
 .str "TX FAIL"
+t_rxok:
+.str "RX OK"
+t_rxno:
+.str "RX FAIL"
 nc_ret:
 .word 0
 np_ret:
