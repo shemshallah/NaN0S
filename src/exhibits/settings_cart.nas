@@ -117,6 +117,7 @@ CMP r1,r4
 JMP[EQ] @sg_menu
 JMP @sg_nic
 sg_nic_probe:
+ST r15,r0,@sg_nic_ret
 MOVI r10,0
 sg_nic_l:
 MOVI r2,32
@@ -140,9 +141,11 @@ ADDI r10,r10,1
 JMP @sg_nic_l
 sg_nic_yes:
 MOVI r1,1
+LD r15,r0,@sg_nic_ret
 RET
 sg_nic_none:
 MOVI r1,0
+LD r15,r0,@sg_nic_ret
 RET
 sg_pci_rd:
 SHL r3,r1,8
@@ -163,6 +166,8 @@ sg_exit:
 LD r15,r0,@sg_ret
 RET
 sg_ret:
+.word 0
+sg_nic_ret:
 .word 0
 
 ; ---- NANNET manager ------------------------------------------------------
@@ -239,6 +244,19 @@ LD r1,r0,@sg_num
 MOVI r2,880
 MOVI r3,0x0E00
 CALL #V_DEC
+CALL @sg_nic_probe
+CMP r1,r0
+JMP[EQ] @sg_net_nonic
+MOVI r1,@sg_net_nic_y
+JMP @sg_net_nic_p
+sg_net_nonic:
+MOVI r1,@sg_net_nic_n
+sg_net_nic_p:
+MOVI r2,960
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
 MOVI r1,@sg_net_ctrl
 MOVI r2,1120
 MOVI r3,0x0800
@@ -441,6 +459,10 @@ sg_menu6:
 .str "ESC BACK"
 sg_net_t:
 .str " NANNET MANAGER"
+sg_net_nic_y:
+.str "NIC RTL8139 LIVE"
+sg_net_nic_n:
+.str "NIC NONE"
 sg_links:
 .str "LINKS "
 sg_addrs:

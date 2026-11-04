@@ -21,6 +21,7 @@ grep -q 'NIC STATUS' "$T/settings.txt" || { echo "settings gate: FAIL (nic entry
 menu "@3000000,ESC,@1000000,9,@500000,1" > "$T/nannet.txt"
 grep -q 'NANNET MANAGER' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET manager)"; exit 1; }
 grep -q '^LINKS' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET status)"; exit 1; }
+grep -q 'NIC NONE' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET NIC status)"; exit 1; }
 menu "@3000000,ESC,@1000000,9,@500000,2" > "$T/driver.txt"
 grep -q 'DRIVER MANAGER' "$T/driver.txt" || { echo "settings gate: FAIL (driver manager)"; exit 1; }
 grep -q 'DN_UDP' "$T/driver.txt" || { echo "settings gate: FAIL (driver registry)"; exit 1; }
