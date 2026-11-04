@@ -1697,3 +1697,15 @@ LD r15,r0,@ni_ret
 RET
 ni_ret:
 .word 0
+
+; ---- browser service catalog (metadata only until TCP/TLS) ----------------
+nn_svc_catalog:
+.str "CHINET telnet://chinet.com:23\nTELEHACK telnet://telehack.com:23\nPROLINE telnet://prolinebbs.dyndns.org:23\nSDF telnet://sdf.org:23\nFLOODGAP gopher://gopher.floodgap.com:70\nFIDONET telnet://fidonet.org:23\nETERNAL-SEPTEMBER telnet://eternal-september.org:23\n"
+nn_services:
+ST r15,r0,@nsv_ret
+MOVI r1,@nn_svc_catalog
+CALL @nn_puts
+LD r15,r0,@nsv_ret
+RET
+nsv_ret:
+.word 0

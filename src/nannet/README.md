@@ -58,6 +58,12 @@ and driver names are a later layer; the numeric ids are stable.
 (QOTD) and 79 (Finger) are reserved; actual UDP/TCP listeners wait for the
 transport stack.
 
+## Browser service catalog
+
+`nn_services` names the browser subprograms: Chinet, Telehack, ProLine,
+SDF, Floodgap Gopher, Fidonet and Eternal September. These are protocol/port
+metadata entries; live telnet/Gopher needs the TCP stack.
+
 ## WiFi
 
 States: down -> scanning -> joining -> joined/failed. Until a radio driver
