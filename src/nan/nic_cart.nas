@@ -642,6 +642,7 @@ MOVI r1,@t_host
 CALL @sputs
 MOVI r1,10
 PUTC r1
+CALL @dns_run
 LD r15,r0,@np_ret
 RET
 pingbad:
@@ -731,6 +732,253 @@ t_nic:
 .str "NIC "
 t_base:
 .str " BASE "
+dns_run:
+ST r15,r0,@dns_ret
+LD r6,r0,@nc_base
+; Reset/reinit RX for the DNS exchange.
+MOVI r5,0x37
+ADD r5,r6,r5
+MOVI r2,0x10
+OUTB r2,r5
+MOVI r8,10000
+dnrst:
+INB r1,r5
+MOVI r3,16
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[EQ] @dnrst_d
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @dnrst
+dnrst_d:
+MOVI r2,0x0C
+OUTB r2,r5
+MOVI r5,0x30
+ADD r5,r6,r5
+MOVI r1,0
+MOVHI r1,0x0100
+OUTL r1,r5
+MOVI r5,0x44
+ADD r5,r6,r5
+MOVI r1,0xF00F
+OUTL r1,r5
+MOVI r5,0x38
+ADD r5,r6,r5
+MOVI r2,0
+OUTB r2,r5
+MOVI r9,0xF800
+MOVI r1,82
+STB r1,r9,0
+MOVI r1,85
+STB r1,r9,1
+MOVI r1,10
+STB r1,r9,2
+MOVI r1,0
+STB r1,r9,3
+MOVI r1,2
+STB r1,r9,4
+MOVI r1,2
+STB r1,r9,5
+MOVI r1,2
+STB r1,r9,6
+MOVI r1,78
+STB r1,r9,7
+MOVI r1,65
+STB r1,r9,8
+MOVI r1,78
+STB r1,r9,9
+MOVI r1,48
+STB r1,r9,10
+MOVI r1,83
+STB r1,r9,11
+MOVI r1,8
+STB r1,r9,12
+MOVI r1,0
+STB r1,r9,13
+MOVI r1,69
+STB r1,r9,14
+MOVI r1,0
+STB r1,r9,15
+MOVI r1,0
+STB r1,r9,16
+MOVI r1,57
+STB r1,r9,17
+MOVI r1,0
+STB r1,r9,18
+MOVI r1,2
+STB r1,r9,19
+MOVI r1,0
+STB r1,r9,20
+MOVI r1,0
+STB r1,r9,21
+MOVI r1,64
+STB r1,r9,22
+MOVI r1,17
+STB r1,r9,23
+MOVI r1,98
+STB r1,r9,24
+MOVI r1,161
+STB r1,r9,25
+MOVI r1,10
+STB r1,r9,26
+MOVI r1,0
+STB r1,r9,27
+MOVI r1,2
+STB r1,r9,28
+MOVI r1,15
+STB r1,r9,29
+MOVI r1,10
+STB r1,r9,30
+MOVI r1,0
+STB r1,r9,31
+MOVI r1,2
+STB r1,r9,32
+MOVI r1,3
+STB r1,r9,33
+MOVI r1,20
+STB r1,r9,34
+MOVI r1,233
+STB r1,r9,35
+MOVI r1,0
+STB r1,r9,36
+MOVI r1,53
+STB r1,r9,37
+MOVI r1,0
+STB r1,r9,38
+MOVI r1,37
+STB r1,r9,39
+MOVI r1,0
+STB r1,r9,40
+MOVI r1,0
+STB r1,r9,41
+MOVI r1,18
+STB r1,r9,42
+MOVI r1,52
+STB r1,r9,43
+MOVI r1,1
+STB r1,r9,44
+MOVI r1,0
+STB r1,r9,45
+MOVI r1,0
+STB r1,r9,46
+MOVI r1,1
+STB r1,r9,47
+MOVI r1,0
+STB r1,r9,48
+MOVI r1,0
+STB r1,r9,49
+MOVI r1,0
+STB r1,r9,50
+MOVI r1,0
+STB r1,r9,51
+MOVI r1,0
+STB r1,r9,52
+MOVI r1,0
+STB r1,r9,53
+MOVI r1,7
+STB r1,r9,54
+MOVI r1,101
+STB r1,r9,55
+MOVI r1,120
+STB r1,r9,56
+MOVI r1,97
+STB r1,r9,57
+MOVI r1,109
+STB r1,r9,58
+MOVI r1,112
+STB r1,r9,59
+MOVI r1,108
+STB r1,r9,60
+MOVI r1,101
+STB r1,r9,61
+MOVI r1,3
+STB r1,r9,62
+MOVI r1,99
+STB r1,r9,63
+MOVI r1,111
+STB r1,r9,64
+MOVI r1,109
+STB r1,r9,65
+MOVI r1,0
+STB r1,r9,66
+MOVI r1,0
+STB r1,r9,67
+MOVI r1,1
+STB r1,r9,68
+MOVI r1,0
+STB r1,r9,69
+MOVI r1,1
+STB r1,r9,70
+MOVI r5,0x20
+ADD r5,r6,r5
+MOVI r1,0x0800
+MOVHI r1,0x0100
+OUTL r1,r5
+MOVI r5,0x10
+ADD r5,r6,r5
+MOVI r2,71
+OUTL r2,r5
+MOVI r8,60000
+dnstx:
+INW r1,r5
+MOVI r3,0x8000
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @dnstxok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @dnstx
+MOVI r1,@t_dnsno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@dns_ret
+RET
+dnstxok:
+MOVI r5,0x3E
+ADD r5,r6,r5
+MOVI r8,60000
+dnsrx:
+INW r1,r5
+MOVI r3,1
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @dnsrxok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @dnsrx
+MOVI r1,@t_dnsno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@dns_ret
+RET
+dnsrxok:
+MOVI r7,0xF000
+LDB r1,r7,16
+MOVI r3,8
+CMP r1,r3
+JMP[NE] @dnsbad
+LDB r1,r7,17
+CMP r1,r0
+JMP[NE] @dnsbad
+LDB r1,r7,27
+MOVI r3,17
+CMP r1,r3
+JMP[NE] @dnsbad
+MOVI r1,@t_dnsok
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@dns_ret
+RET
+dnsbad:
+MOVI r1,@t_dnsno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@dns_ret
+RET
 t_none:
 .str "NIC NONE"
 t_reset:
@@ -755,6 +1003,10 @@ t_pingtx:
 .str "PING TX"
 t_host:
 .str "HOST NaN0S  HINFO NaN-LATTICE NAN0S"
+t_dnsok:
+.str "DNS OK"
+t_dnsno:
+.str "DNS FAIL"
 t_mac:
 .str "MAC "
 nc_ret:
@@ -764,6 +1016,8 @@ np_ret:
 nc_base:
 .word 0
 nc_msr:
+.word 0
+dns_ret:
 .word 0
 ph4_ret:
 .word 0

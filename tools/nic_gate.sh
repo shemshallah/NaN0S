@@ -18,6 +18,7 @@ grep -q '^TX OK$' "$T/com1.txt" &&
 grep -q '^ARP 0A000202$' "$T/com1.txt" &&
 grep -q '^PING OK$' "$T/com1.txt" &&
 grep -q '^MAC 024E414E3053$' "$T/com1.txt" &&
-grep -q '^HOST NaN0S  HINFO NaN-LATTICE NAN0S$' "$T/com1.txt" || {
+grep -q '^HOST NaN0S  HINFO NaN-LATTICE NAN0S$' "$T/com1.txt" &&
+grep -q '^DNS OK$' "$T/com1.txt" || {
   echo "nic gate: FAIL"; tail -8 "$T/com1.txt" | cat -v; exit 1; }
-echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP + identity)"
+echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS + identity)"
