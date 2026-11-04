@@ -340,6 +340,42 @@ MOVI r3,1
 BOOL.8 r1,r1,r3
 CMP r1,r0
 JMP[EQ] @nicrx_bad
+; RX header is 4 bytes; Ethernet frame starts at raw+4.
+LDB r1,r7,16
+MOVI r3,8
+CMP r1,r3
+JMP[NE] @nicrx_plain
+LDB r1,r7,17
+MOVI r3,6
+CMP r1,r3
+JMP[NE] @nicrx_plain
+; ARP opcode reply = 2 at frame+20 -> raw+24.
+LDB r1,r7,25
+MOVI r3,2
+CMP r1,r3
+JMP[NE] @nicrx_plain
+MOVI r1,@t_arp
+CALL @sputs
+MOVI r8,32
+narp:
+MOVI r9,36
+CMP r8,r9
+JMP[GE] @narp_d
+LDB r1,r7,0
+ADD r1,r1,r8
+; LDB has no register address; reload via a second base.
+MOVI r6,0xF000
+ADD r6,r6,r8
+LDB r1,r6,0
+CALL @puthex2
+ADDI r8,r8,1
+JMP @narp
+narp_d:
+MOVI r1,10
+PUTC r1
+LD r15,r0,@np_ret
+RET
+nicrx_plain:
 MOVI r1,@t_rxok
 CALL @sputs
 MOVI r1,10
@@ -431,6 +467,8 @@ t_rxok:
 .str "RX OK"
 t_rxno:
 .str "RX FAIL"
+t_arp:
+.str "ARP "
 nc_ret:
 .word 0
 np_ret:
