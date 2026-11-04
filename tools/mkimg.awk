@@ -27,10 +27,10 @@ BEGIN {
   if (LMAX == 0) die("no guest words in " GUEST)
   # ---- cartridges + builder-written TOC + boot record ----
   # carts.txt format (one line per cart, order = menu order):
-  #   SLOT:FILE:YEAR:HALL:BADGE:TITLE   SLOT = menu key 1..9 (unique)
+  #   SLOT:FILE:YEAR:HALL:BADGE:TITLE   SLOT = menu key 1..10 (10 hidden)
   #   boot:FILE                         the system cart (GUI); not an exhibit slot
   # Titles are written into guest words at TITLE_BASE (16-word stride, 4 chars/word LE).
-  k = 0; top = 40000; haveboot = 0
+  k = 0; top = 30000; haveboot = 0
   while ((getline cl < CARTS) > 0){
     ci = index(cl, ";"); if (ci > 0) cl = substr(cl, 1, ci-1)
     ci = index(cl, "#"); if (ci > 0) cl = substr(cl, 1, ci-1)
@@ -58,7 +58,7 @@ BEGIN {
     hall = substr(rest, 1, p4-1); rest = substr(rest, p4+1)
     p5 = index(rest, ":"); if (p5 == 0) die("carts.txt needs BADGE:TITLE: " cl)
     badge = substr(rest, 1, p5-1); title = substr(rest, p5+1)
-    slot += 0; if (slot < 1 || slot > 9) die("slot must be 1..9: " cl)
+    slot += 0; if (slot < 1 || slot > 10) die("slot must be 1..10: " cl)
     if (slot in SLOTSEEN) die("duplicate slot " slot)
     SLOTSEEN[slot] = 1
     if (k >= 10) die("more than 10 menu entries")
@@ -76,10 +76,10 @@ BEGIN {
   close(CARTS)
   # terminator entry (id 0) right after the last slot entry
   setw(4608 + 16*k, 0, 0)
-  # boot record (same 16-word shape at 4768); [0] != 0 marks "a system cart exists"
+  # boot record (same 16-word shape at 4784); [0] != 0 marks "a system cart exists"
   if (haveboot){
-    setw(4768+0, 0, 1); setw(4768+4, 0, bstart); setw(4768+5, 0, blen)
-    setw(4768+8, 0, bh); setw(4768+10, 0, bh2); setw(4768+11, 0, bcc)
+    setw(4784+0, 0, 1); setw(4784+4, 0, bstart); setw(4784+5, 0, blen)
+    setw(4784+8, 0, bh); setw(4784+10, 0, bh2); setw(4784+11, 0, bcc)
   }
   if (LMAX < 6000 + 16*k + 16) LMAX = 6000 + 16*k + 16
   if (LMAX < 4096) LMAX = 4096

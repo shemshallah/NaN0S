@@ -58,6 +58,7 @@ sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tam
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
 sh crypt/nan0s_fs_sh_gate.sh      # nsh: ls + cat + edit + write + stat + df
+sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f -> VGA nsh -> ls + write
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -144,13 +145,16 @@ The intended interaction stack is:
 boot -> desktop GUI -> terminal (CLI) -> program window -> subprogram
 ```
 
-Today the boot target is the GUI desktop; the desktop's terminal is the CLI;
-its named/single-letter commands open real program windows (Settings, NANNET,
-utilities, monitor, hex, lattice), and Settings opens its NANNET/Driver/Codec
-manager subprograms. The encrypted storage shell (`nsh`) is the full-screen
-storage CLI and its `write`/`edit` editor is the first in-shell program GUI.
-The remaining integration is to launch `nsh` from the desktop terminal and
-render that shell/editor as a WM window instead of a full-screen serial TUI.
+Today the boot target is the GUI desktop; the desktop's terminal is the CLI.
+`f` (files) in that terminal hands off to a VGA `nsh` program, which runs the
+encrypted storage shell and its `write`/`edit` editor; `Esc` from the editor
+returns to the shell, and `exit` returns to the system menu. The terminal's
+other commands open the Settings, NANNET, utilities, monitor, hex and lattice
+program windows, and Settings opens its NANNET/Driver/Codec manager
+subprograms.
+
+The remaining UI step is to render `nsh` as a WM window instead of a
+full-screen program; the launch handoff and in-shell editor are working.
 
 ## Sparse, arbitrary-size images
 

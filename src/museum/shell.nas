@@ -146,6 +146,9 @@ shm_loop:
 LD r1,r10,0
 CMP r1,r0
 JMP[EQ] @shm_done
+MOVI r4,10
+CMP r1,r4
+JMP[EQ] @shm_next
 MOVI r4,0x0F5B
 VPOKE r4,r11
 ADD r2,r11,r13
@@ -175,6 +178,7 @@ MOVI r3,0x0B00
 MOVI r5,0
 MOVI r6,0
 CALL @v_puts
+shm_next:
 MOVI r4,16
 ADD r10,r10,r4
 MOVI r4,160
@@ -256,6 +260,24 @@ LD r2,r10,4
 LD r3,r10,5
 CALL @v_bcopy
 CALL 8192
+; public program request: a desktop program can ask the shell to load a hidden slot
+LA r10,@nsh_req
+LD r1,r10,0
+CMP r1,r0
+JMP[EQ] @sh_after_prog
+ST r0,r10,0
+CALL @v_cls
+MOVI r10,#TOC_BASE
+shsr_find:
+LD r2,r10,0
+CMP r2,r0
+JMP[EQ] @sh_after_prog
+CMP r2,r1
+JMP[EQ] @sh_run
+MOVI r4,16
+ADD r10,r10,r4
+JMP @shsr_find
+sh_after_prog:
 MOVI r13,1
 JMP @sh_redraw
 
@@ -532,14 +554,17 @@ ss_body:
 ; Titles are builder-written at TITLE_BASE (4 chars/word LE, NUL padded): slot number,
 ; order and wording are edited in carts.txt only - no changes here for renumbering.
 .equ TOC_BASE 4608
-.equ BOOT_BASE 4768
+.equ BOOT_BASE 4784
 .org 4608
 toc:
 ; (up to 10 builder-written entries; a bare museum.nan shows an empty menu)
-.org 4768
+.org 4784
 boot_rec:
 ; system cart record (the GUI desktop), same 16-word shape. [0]=0 -> boot to menu.
 ; NOT an exhibit slot: slot 9 is the Settings cart.
+.org 4800
+nsh_req:
+.word 0
 .org 4864
 .org 5376
 sm_title:

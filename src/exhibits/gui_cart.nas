@@ -929,6 +929,9 @@ JMP[EQ] @tm_net
 MOVI r5,117
 CMP r4,r5
 JMP[EQ] @tm_utl
+MOVI r5,102
+CMP r4,r5
+JMP[EQ] @tm_nsh
 MOVI r2,@s_unk
 CALL @vc_puts
 JMP @tm_done
@@ -994,6 +997,13 @@ JMP @tm_done
 tm_quit:
 MOVI r1,1
 ST r1,r0,@g_quit
+JMP @tm_done
+tm_nsh:
+MOVI r1,4800
+MOVI r2,10
+ST r2,r1,0
+MOVI r1,1
+ST r1,r0,@g_quit
 tm_done:
 SUB r14,r14,r13
 LD r15,r14,0
@@ -1001,7 +1011,7 @@ RET
 tm_id:
 .word 0
 s_help:
-.str "h c v w  l m x t  s n u  q\nl lattice m monitor\nx hex t term w count\ns settings n nannet u utils\nq quit gui\n"
+.str "h c v w  l m x t  s n u  f  q\nl lattice m monitor x hex\nt term w count c clear v ver\ns settings (NANNET/Driver/Codec)\nn nannet u utils f files (nsh)\nq quit gui\n"
 s_ver:
 .str "NaN/0S GUI r26\npure NaN16 wm\n"
 s_wins:

@@ -1,7 +1,7 @@
 # NaN/0S image manifest - the ONLY file to edit for slot number, order or wording.
 #
 #   SLOT:FILE:YEAR:HALL:BADGE:TITLE
-#     SLOT  = menu key 1..9 (unique). Change a number and the menu key follows;
+#     SLOT  = menu key 1..10 (10 is hidden). Change a number and the menu key follows;
 #             change the line order and the list order follows.
 #     BADGE = 0 EXACT | 1 RE-CREATION | 2 INSPIRED
 #     TITLE = shown in the menu (up to ~69 cols; builder writes it into guest RAM)
@@ -10,8 +10,8 @@
 #     the SYSTEM cart, started on cold boot (the GUI desktop). Not an exhibit and
 #     NOT a slot number, slot 9 is the Settings menu; hidden tooling is not listed.
 #
-# Cartridges are packed into the store from word 40000 upward in this file's order.
-# STORE MUST STAY ABOVE THE RUN SLOT (8192 + longest cart, gui 7069 words).
+# Cartridges are packed into the store from word 30000 upward in this file's order.
+# STORE MUST STAY ABOVE THE RUN SLOT (8192 + longest cart, nsh 12299 words).
 1:src/nan/baby_cart.nan:1948:0:1:Manchester Baby (SSEM) - 21 June 1948
 2:src/nan/boole_cart.nan:1854:0:2:Boole - The Laws of Thought (16 functions, live) - 1854
 3:src/nan/sierpinski_cart.nan:1915:4:1:Sierpinski - Rule 90 (1915) - live fractal
@@ -21,4 +21,5 @@
 7:src/nan/about_nan0s_cart.nan:2026:7:2:About NaN/0S - the machine, the trust, the plan
 8:src/nan/about_dev_cart.nan:2026:7:2:About Shemshallah - the developer
 9:src/nan/settings_cart.nan:2026:10:0:Settings
+10:src/nan/nsh_cart.nan:2026:10:0:Storage (nsh)
 boot:src/nan/gui_cart.nan
