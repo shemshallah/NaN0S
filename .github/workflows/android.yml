@@ -40,6 +40,7 @@ jobs:
           sh crypt/nan0s_fs_cat_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
           sh crypt/nan0s_fs_sh_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
           sh crypt/nan0s_fs_sh_gui_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
+          sh crypt/nan0s_fs_sh_multi_gate.sh || { rc=$?; [ "$rc" -eq 77 ] || exit "$rc"; }
   apk:
     needs: core-tests
     runs-on: ubuntu-latest

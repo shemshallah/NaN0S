@@ -1239,8 +1239,10 @@ Spec: `spec/TRANSLATOR.md`.
       `used`; first-create and chained-create gates PASS.
 - [x] Guest `nsh` variable-size write/edit: save updates the authenticated
       directory size to the editor length (grow/shrink within one sector).
-- [ ] `nsh` multi-sector growth, guest free-list reuse, render `nsh` as a WM
-      window;
+- [x] `nsh new` multi-sector creation: 4096-byte editor buffer, contiguous
+      sectors, per-sector sealing, true sector count/byte size; 520-byte gate.
+- [ ] `nsh` multi-sector overwrite/edit (load all sectors), guest free-list
+      reuse, render `nsh` as a WM window;
       mount/directory layer;
       subdirectories; larger/better free map than 58 superblock extents; chunked
       NSPF1 file reader; encrypted boot; Android SAF wiring for the volume

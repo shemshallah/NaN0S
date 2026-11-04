@@ -59,6 +59,7 @@ sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper rej
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
 sh crypt/nan0s_fs_sh_gate.sh      # nsh: ... variable-size write/edit ...
 sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f or Settings [4] -> VGA nsh
+sh crypt/nan0s_fs_sh_multi_gate.sh # 520-byte new -> 2 sealed sectors
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -151,15 +152,18 @@ It then updates the superblock `next/files/first/last` and advances the lazy
 header's `used` high-water mark so host reads see the new sectors. This works
 on a fresh volume and on a non-empty layer.
 
-Limits: each `new` file is one sector (the editor's 512-byte buffer); editing
-a larger file truncates it to the first 512 bytes. Guest free-list reuse and
-multi-sector growth are still pending. Tombstones still count in the
-superblock until host `compact`.
+`new` uses a 4095-byte editor buffer. Files larger than 512 bytes allocate
+`ceil(size/512)` contiguous payload sectors, seal each sector, and record the
+real sector count and byte size in the directory. Fresh/chained `new` files can
+span multiple sectors; `write` and `edit` still work within the loaded 512-byte
+window and truncate larger files on save. Guest free-list reuse is still
+pending, and tombstones still count until host `compact`.
 
 Still pending: magic-number commands, line-number/status display, guest
-free-list reuse, multi-sector growth, mount namespaces, and rendering the
-shell as a WM window. The shell is a full-screen terminal UI over the
-encrypted volume.
+free-list reuse, multi-sector overwrite/edit (the editor only loads the first
+sector of an existing large file), mount namespaces, and rendering the shell
+as a WM window. The shell is a full-screen terminal UI over the encrypted
+volume.
 
 ## Console hierarchy
 
@@ -284,8 +288,8 @@ Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock and
 authenticated directory names, and run `nsh` (`ls`, `cat`, `edit`, `write`,
-`rm`, `new`, `stat`, `df`); multi-sector growth, mount namespaces, and the
-WM-window binding are still pending.
+`rm`, `new`, `stat`, `df`); multi-sector overwrite/edit, mount namespaces,
+and the WM-window binding are still pending.
 
 ## Storage backends
 
