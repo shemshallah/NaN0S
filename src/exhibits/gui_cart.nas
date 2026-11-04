@@ -211,6 +211,7 @@ kdef:
 .word 520,300,@t_set,0
 .word 520,260,@t_net,0
 .word 560,300,@t_util,0
+.word 560,340,@t_br,0
 t_term:
 .str "TERMINAL"
 t_lat:
@@ -227,6 +228,7 @@ kt:
 .word @st_init,@st_draw,@st_key,@st_tick
 .word @nn_init,@nn_draw,@nn_key,@nn_tick
 .word @ut_init,@ut_draw,@nop_k,@ut_tick
+.word @br_init,@br_draw,@br_key,@nop_k
 nop_k:
 RET
 ; ---- global key handling ----
@@ -932,6 +934,9 @@ JMP[EQ] @tm_utl
 MOVI r5,102
 CMP r4,r5
 JMP[EQ] @tm_nsh
+MOVI r5,98
+CMP r4,r5
+JMP[EQ] @tm_br
 MOVI r2,@s_unk
 CALL @vc_puts
 JMP @tm_done
@@ -998,6 +1003,10 @@ tm_quit:
 MOVI r1,1
 ST r1,r0,@g_quit
 JMP @tm_done
+tm_br:
+MOVI r1,7
+CALL @gui_open_new
+JMP @tm_done
 tm_nsh:
 MOVI r1,4800
 MOVI r2,10
@@ -1011,7 +1020,7 @@ RET
 tm_id:
 .word 0
 s_help:
-.str "h c v w  l m x t  s n u  f  q\nl lattice m monitor x hex\nt term w count c clear v ver\ns settings (NANNET/Driver/Codec)\nn nannet u utils f files (nsh)\nq quit gui\n"
+.str "h c v w b l m x t s n u f q\nb browser l lattice m monitor x hex\nt term w count c clear v ver\ns settings n nannet u utils\nf files (nsh) q quit gui\n"
 s_ver:
 .str "NaN/0S GUI r26\npure NaN16 wm\n"
 s_wins:
@@ -3887,4 +3896,111 @@ RET
 hk_id:
 .word 0
 hk_k:
+.word 0
+
+; ====================== BROWSER WINDOW (kind 7) ======================
+; Static service tabs; live TCP/Gopher sessions arrive after the TCP stack.
+t_br:
+.str "BROWSER"
+br_tabs:
+.str "BROWSER 1 CHINET 2 TELEHACK 3 PROLINE 4 SDF\n5 FLOODGAP 6 FIDONET 7 ETERNAL-SEPT\n"
+br_status:
+.str "NET: ARP IP ICMP UDP DNS LIVE; TCP/TLS PENDING\n"
+br_p0:
+.str "\nCHINET\nTELNET chinet.com:23\nFirst public-access UNIX system, 1982.\n"
+br_p1:
+.str "\nTELEHACK\ntelnet telehack.com:23\n26,600+ simulated hosts, circa 1985-1990.\n"
+br_p2:
+.str "\nPROLINE BBS\ntelnet prolinebbs.dyndns.org:23\nApple IIgs BBS, contemporary + historical Usenet.\n"
+br_p3:
+.str "\nSDF.ORG\ntelnet sdf.org:23\nPublic-access UNIX since 1987.\n"
+br_p4:
+.str "\nFLOODGAP GOPHER\ngopher gopher.floodgap.com:70\nTCP + Gopher pending.\n"
+br_p5:
+.str "\nFIDONET\ntelnet fidonet.org:23\nStore-and-forward mail network, 1984.\n"
+br_p6:
+.str "\nETERNAL SEPTEMBER\ntelnet eternal-september.org:23\nUsenet access; never September again.\n"
+br_pages:
+.word @br_p0,@br_p1,@br_p2,@br_p3,@br_p4,@br_p5,@br_p6
+br_id:
+.word 0
+br_tab:
+.word 0
+br_clear:
+ST r15,r0,@bc_ret
+LD r1,r0,@br_id
+CALL @wm_vbuf
+MOVI r2,0
+MOVI r3,8192
+BFILL r1,r2,r3
+LD r1,r0,@br_id
+CALL @wm_wbase
+ST r0,r1,#W_A2
+ST r0,r1,#W_A3
+LD r15,r0,@bc_ret
+RET
+br_show:
+ST r15,r0,@bs_ret
+CALL @br_clear
+LD r1,r0,@br_id
+MOVI r2,@br_tabs
+CALL @vc_puts
+LD r1,r0,@br_id
+MOVI r2,@br_status
+CALL @vc_puts
+LD r1,r0,@br_tab
+SHL r1,r1,2
+MOVI r2,@br_pages
+ADD r1,r1,r2
+LD r2,r1,0
+LD r1,r0,@br_id
+CALL @vc_puts
+LD r1,r0,@br_id
+CALL @term_draw
+LD r15,r0,@bs_ret
+RET
+br_init:
+ST r15,r0,@bi_ret
+ST r1,r0,@br_id
+MOVI r1,66
+PUTC r1
+MOVI r1,82
+PUTC r1
+CALL @term_fit
+MOVI r1,0
+ST r1,r0,@br_tab
+CALL @br_show
+LD r15,r0,@bi_ret
+RET
+br_draw:
+ST r15,r0,@bd2_ret
+ST r1,r0,@br_id
+CALL @br_show
+LD r15,r0,@bd2_ret
+RET
+br_key:
+ST r15,r0,@bk_ret
+ST r1,r0,@br_id
+MOVI r4,49
+CMP r3,r4
+JMP[LT] @bk_done
+MOVI r4,55
+CMP r3,r4
+JMP[GT] @bk_done
+MOVI r4,49
+SUB r3,r3,r4
+ST r3,r0,@br_tab
+CALL @br_show
+bk_done:
+LD r15,r0,@bk_ret
+RET
+bc_ret:
+.word 0
+bs_ret:
+.word 0
+bi_ret:
+.word 0
+bd2_ret:
+.word 0
+bk_ret:
 .word 0

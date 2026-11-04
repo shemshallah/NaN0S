@@ -1230,6 +1230,9 @@ Spec: `spec/TRANSLATOR.md`.
       gates PASS C-core + x86 IDE.
 - [x] NIC bring-up: RTL8139 PCI detection, I/O BAR mapping, MAC read, reset/RX-TX init, media status, raw-DMA TX/RX frame, ARP reply decode, IPv4/ICMP QOTD payload, ARP pad "LO FROM NAN0S 1969", identity; QEMU
       gate PASS (`tools/nic_gate.sh`). Next: reset/ring descriptors, Ethernet.
+- [x] Browser UI shell: separate kind-7 WM window, terminal `b` launcher,
+      in-window service tabs for Chinet/Telehack/ProLine/SDF/Floodgap/Fidonet/
+      Eternal September; tab content is catalog metadata until TCP/TLS.
 - [x] Paged cartridge catalog: 16-word entries at 22000, titles at 23600,
       87-entry limit, hidden-id flags, local 1-9 keys with `[`/`]` paging;
       12-visible-entry gate PASS.
