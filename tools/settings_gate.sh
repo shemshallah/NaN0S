@@ -17,6 +17,8 @@ grep -q 'DRIVER MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (drive
 grep -q 'CODEC MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (codec entry)"; exit 1; }
 grep -q 'STORAGE (nsh)' "$T/settings.txt" || { echo "settings gate: FAIL (storage entry)"; exit 1; }
 grep -q 'NIC STATUS' "$T/settings.txt" || { echo "settings gate: FAIL (nic entry)"; exit 1; }
+grep -q 'TIMING' "$T/settings.txt" || { echo "settings gate: FAIL (timing entry)"; exit 1; }
+grep -q 'CPU TIMING' "$T/settings.txt" || { echo "settings gate: FAIL (cpu timing entry)"; exit 1; }
 
 menu "@3000000,ESC,@1000000,9,@500000,1" > "$T/nannet.txt"
 grep -q 'NANNET MANAGER' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET manager)"; exit 1; }
@@ -33,4 +35,4 @@ menu "@3000000,ESC,@1000000,9,@500000,3" > "$T/codec.txt"
 grep -q 'CODEC MANAGER' "$T/codec.txt" || { echo "settings gate: FAIL (codec manager)"; exit 1; }
 grep -q 'NSP-7' "$T/codec.txt" || { echo "settings gate: FAIL (codec registry)"; exit 1; }
 
-echo "settings gate: PASS (slot 9 Settings; NANNET/Driver/Codec/Storage/NIC; NANNET services; no hidden extra slot)"
+echo "settings gate: PASS (slot 9 Settings; NANNET/Driver/Codec/Storage/NIC/Timing/CPU; NANNET services; no hidden extra slot)"

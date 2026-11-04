@@ -7,6 +7,7 @@
 .org 8192
 JMP @sg_entry
 .include "../nannet/nannet.nas"
+.include "../lib/timing.nas"
 sg_entry:
 ST r15,r0,@sg_ret
 MOVI r13,1
@@ -51,6 +52,18 @@ MOVI r6,0
 CALL #V_PUTS
 MOVI r1,@sg_menu6
 MOVI r2,1120
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_menu7
+MOVI r2,1280
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_menu8
+MOVI r2,1440
 MOVI r3,0x0800
 MOVI r5,0
 MOVI r6,0
@@ -76,6 +89,12 @@ JMP[EQ] @sg_storage
 MOVI r4,53
 CMP r1,r4
 JMP[EQ] @sg_nic
+MOVI r4,54
+CMP r1,r4
+JMP[EQ] @sg_tim
+MOVI r4,55
+CMP r1,r4
+JMP[EQ] @sg_cpu
 JMP @sg_menu
 sg_svc:
 CALL #V_CLS
@@ -158,6 +177,112 @@ LD r1,r0,@sg_svc_bits
 BOOL.6 r1,r1,r2
 ST r1,r0,@sg_svc_bits
 JMP @sg_svc
+sg_tim:
+CALL #V_CLS
+MOVI r1,@sg_tim_t
+MOVI r2,0
+MOVI r3,0x1F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_tim_l0
+MOVI r2,320
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+TICK r1
+MOVI r2,400
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_tim_l1
+MOVI r2,480
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL @tm_ping_get
+ST r1,r0,@sg_num
+LD r1,r0,@sg_num
+MOVI r2,560
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_tim_l2
+MOVI r2,640
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+LD r1,r0,@sg_num
+MOVI r2,720
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_tim_l3
+MOVI r2,800
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+LD r1,r0,@sg_num
+MOVI r2,880
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_tim_l4
+MOVI r2,1040
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,1000
+MOVI r2,2
+CALL @tm_rate
+MOVI r2,1120
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_tim_f
+MOVI r2,1280
+MOVI r3,0x0800
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL #V_KEY
+MOVI r4,255
+BOOL.8 r1,r1,r4
+MOVI r4,27
+CMP r1,r4
+JMP[EQ] @sg_menu
+JMP @sg_tim
+sg_cpu:
+CALL #V_CLS
+MOVI r1,@sg_cpu_t
+MOVI r2,0
+MOVI r3,0x1F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+MOVI r1,@sg_cpu_l
+MOVI r2,320
+MOVI r3,0x0F00
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL @tm_cpu_mhz
+MOVI r2,400
+MOVI r3,0x0E00
+CALL #V_DEC
+MOVI r1,@sg_cpu_f
+MOVI r2,960
+MOVI r3,0x0800
+MOVI r5,0
+MOVI r6,0
+CALL #V_PUTS
+CALL #V_KEY
+MOVI r4,255
+BOOL.8 r1,r1,r4
+MOVI r4,27
+CMP r1,r4
+JMP[EQ] @sg_menu
+JMP @sg_cpu
 sg_storage:
 MOVI r1,4800
 MOVI r2,10
@@ -521,6 +646,26 @@ JMP @sg_codec
 
 sg_title:
 .str " SETTINGS"
+sg_tim_t:
+.str " TIMING"
+sg_tim_l0:
+.str "TICK MS"
+sg_tim_l1:
+.str "PING COUNT"
+sg_tim_l2:
+.str "PING AVG MS"
+sg_tim_l3:
+.str "PING MAX MS"
+sg_tim_l4:
+.str "SAMPLE RATE 1000 BYTES/2MS"
+sg_tim_f:
+.str "ESC BACK"
+sg_cpu_t:
+.str " CPU TIMING"
+sg_cpu_l:
+.str "CPU MHZ"
+sg_cpu_f:
+.str "ESC BACK"
 sg_svc_t:
 .str " SERVICE MANAGER"
 sg_svc1:
@@ -558,6 +703,10 @@ sg_menu4:
 sg_menu5:
 .str "[5] NIC STATUS"
 sg_menu6:
+.str "[6] TIMING"
+sg_menu7:
+.str "[7] CPU TIMING"
+sg_menu8:
 .str "ESC BACK"
 sg_net_t:
 .str " NANNET MANAGER"
@@ -576,6 +725,8 @@ sg_dns:
 sg_net_ctrl:
 .str "1-4 LINK  S SERVICES  ESC BACK"
 sg_num:
+.word 0
+sg_tim_bits:
 .word 0
 sg_svc_bits:
 .word 0
