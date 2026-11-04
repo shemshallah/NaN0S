@@ -57,8 +57,8 @@ sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
-sh crypt/nan0s_fs_sh_gate.sh      # nsh: ls + cat + edit + write + stat + rm + df
-sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f -> VGA nsh -> ls + write + rm
+sh crypt/nan0s_fs_sh_gate.sh      # nsh: ls + cat + edit + write + stat + rm + new + df
+sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f -> VGA nsh -> ls/write/rm/new
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -112,6 +112,7 @@ cat <name>           print a file
 edit <name>          load an existing file into the editor
 write <name>         start with a blank editor
 rm <name>            tombstone a file entry
+new <name>           reuse a tombstone and create a file
 stat <name>          start/sectors/size metadata
 df                   capacity/next/file count from the superblock
 pwd                  print /
@@ -139,9 +140,18 @@ tombstone; guest and host listings skip it, and host `compact` drops it and
 reclaims the space. The superblock file count still includes tombstones until
 compaction.
 
-Still pending: magic-number commands, line-number/status display, create,
-variable-size save, mount namespaces, and rendering the shell as a WM window.
-The shell is a full-screen terminal UI over the encrypted volume.
+`new` reuses the first tombstone: it opens the blank editor, seals the new
+payload into the tombstone's payload extent, then seals the directory with the
+new name and size. This gives guest-side create without a free-list update,
+but it needs a tombstone (delete a file first), caps the new file at the old
+extent's first sector, and leaves the superblock count unchanged. Creating the
+first file on a fresh volume, variable-size growth, and freeing extents in the
+guest are still pending.
+
+Still pending: magic-number commands, line-number/status display, first-file
+creation without a tombstone, variable-size save, mount namespaces, and
+rendering the shell as a WM window. The shell is a full-screen terminal UI
+over the encrypted volume.
 
 ## Console hierarchy
 
@@ -265,8 +275,8 @@ Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock and
 authenticated directory names, and run `nsh` (`ls`, `cat`, `edit`, `write`,
-`rm`, `stat`, `df`); creating files, variable-size writes, mount namespaces,
-and the WM-window binding are still pending.
+`rm`, `new`, `stat`, `df`); first-file creation, variable-size writes, mount
+namespaces, and the WM-window binding are still pending.
 
 ## Storage backends
 

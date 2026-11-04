@@ -36,5 +36,13 @@ aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 150000000 \
 grep -q '^RM OK$' "$T/rm.out" || { echo "nan0s_fs GUI gate: FAIL (rm)"; tail -8 "$T/rm.out"; exit 1; }
 grep -q '^LS OK files=00000000$' "$T/rm.out" || { echo "nan0s_fs GUI gate: FAIL (rm ls)"; exit 1; }
 crypt/nan0s_fs ls "$T/fs.img" "$KEY" | grep -qx 'EMPTY' || { echo "nan0s_fs GUI gate: FAIL (host rm)"; exit 1; }
+
+N='@3000000,f,ENTER,@5000000,n,e,w,SPACE,f,o,o,ENTER,@1500000,c,r,e,a,t,e,d,ESC,@1500000'
+aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 180000000 \
+  --keys "$N" --dump-text > "$T/new.out" 2>/dev/null
+grep -q '^NEW OK$' "$T/new.out" || { echo "nan0s_fs GUI gate: FAIL (new)"; tail -8 "$T/new.out"; exit 1; }
+crypt/nan0s_fs get "$T/fs.img" "$KEY" foo "$T/newfile" >/dev/null
+printf 'created' > "$T/created"
+cmp "$T/created" "$T/newfile" || { echo "nan0s_fs GUI gate: FAIL (new payload)"; exit 1; }
 node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
-echo "nan0s_fs GUI gate: PASS (desktop f -> VGA nsh -> ls/write/rm)"
+echo "nan0s_fs GUI gate: PASS (desktop f -> VGA nsh -> ls/write/rm/new)"

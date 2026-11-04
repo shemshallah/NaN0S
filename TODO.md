@@ -1225,15 +1225,18 @@ Spec: `spec/TRANSLATOR.md`.
       authenticated directory names/count (`nan0s_fs_dir.nan`), fixed-target
       guest file read (`nan0s_fs_cat.nan`) and interactive `nsh`
       (`nan0s_fs_sh.nan`: ls, cat <name>, edit <name>, nano-style write with
-      arrows/Home/End/Del, rm tombstone, stat, df, pwd, mount, clear, ver,
-      help, exit),
+      arrows/Home/End/Del, rm tombstone, new from tombstone, stat, df, pwd,
+      mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
 - [x] Desktop terminal `f` -> VGA `nsh` program (slot 10, hidden); `ls`/`write`
       verified from the boot image with an attached encrypted volume; `exit`
       returns to the shell menu. Full-screen program, not yet a WM window.
 - [x] Guest `nsh rm <name>`: authenticated tombstone, guest/host listings skip
       it, host `compact` reclaims; serial and desktop-launch gates PASS.
-- [ ] `nsh` create, variable-size save, render `nsh` as a WM window;
+- [x] Guest `nsh new <name>`: reuses a tombstone, seals payload and directory;
+      serial and desktop-launch gates create/read a new file.
+- [ ] `nsh` first-file creation without a tombstone, variable-size save,
+      render `nsh` as a WM window;
       mount/directory layer;
       subdirectories; larger/better free map than 58 superblock extents; chunked
       NSPF1 file reader; encrypted boot; Android SAF wiring for the volume
