@@ -26,4 +26,7 @@ printf 'new text' > "$T/new"
 crypt/nan0s_fs get "$T/fs.img" "$KEY" hello.txt "$T/readback" >/dev/null
 cmp -n 8 "$T/new" "$T/readback" || { echo "nan0s_fs shell gate: FAIL (write payload)"; exit 1; }
 node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
-echo "nan0s_fs shell gate: PASS (nsh ls + cat + write overwrite on encrypted volume)"
+aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fs.img" \
+  --steps 80000000 --keys 'd,f,ENTER' --serial > "$T/df.out" 2>/dev/null
+grep -q '^DF cap=' "$T/df.out" || { echo "nan0s_fs shell gate: FAIL (df)"; tail -8 "$T/df.out"; exit 1; }
+echo "nan0s_fs shell gate: PASS (nsh ls/cat/write/df on encrypted volume)"

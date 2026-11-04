@@ -57,7 +57,7 @@ sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
-sh crypt/nan0s_fs_sh_gate.sh      # interactive nsh: ls + cat + write overwrite
+sh crypt/nan0s_fs_sh_gate.sh      # interactive nsh: ls + cat + write overwrite + df
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -95,14 +95,17 @@ CAT OK
 nsh> write hello.txt
 text> new text
 WRITE OK
+nsh> df
+DF cap=0001D173 next=00000003 files=00000001
 ```
 
 It commands `ls`, `cat <name>` (FNV-1a name match), `write <name>` (overwrite an
 existing file with one text line, preserving its recorded size and zero-padding),
-`help`, and `exit`. Write goes through the guest capsule sealer, ATA CT write,
-and tag-table update; the gate verifies the result with host `get` and `nspvol
-verify`. Creating files, `rm`, the GUI terminal binding, and the mount layer are
-the next userland work.
+`df` (capacity/next/file count from the authenticated superblock), `help`, and
+`exit`. Write goes through the guest capsule sealer, ATA CT write, and tag-table
+update; the gate verifies the result with host `get` and `nspvol verify`.
+Creating files, `rm`, the GUI terminal binding, and the mount layer are the next
+userland work.
 
 ## Sparse, arbitrary-size images
 
@@ -206,7 +209,7 @@ through **Disk**, or add the guest-side mkfs next.
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock and
-authenticated directory names, and run `nsh` (`ls`, `cat <name>`, `write <name>` overwrite);
+authenticated directory names, and run `nsh` (`ls`, `cat <name>`, `write <name>` overwrite, `df`);
 creating files, `rm`, mount, and GUI terminal binding are still pending.
 
 ## Storage backends
