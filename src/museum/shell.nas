@@ -561,7 +561,7 @@ net_body:
 disk_title:
 .str " NaN/0S  DISK UTILITY"
 disk_body:
-.str " ATA primary master: read PASS (sector 0 = NAN0).\n ATA write: blocked at one 16-bit word in v86.\n NaNFS RAM: format/alloc/write/read PASS.\n Image: 1.44 MB, guest 32,768 words.\n Next: DMA or IRQ write, then NaNFS on disk."
+.str " ATA primary master: read PASS (sector 0 = NAN0).\n ATA PIO write: C-core PASS (16-bit OUTW); QEMU/real pending.\n NaNFS RAM: format/alloc/write/read PASS.\n Image: 1.44 MB, guest 32,768 words.\n Next: QEMU/real write validation, then NaNFS on disk."
 mem_title:
 .str " NaN/0S  MEMORY UTILITY"
 mem_body:

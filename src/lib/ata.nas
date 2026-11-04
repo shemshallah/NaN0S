@@ -132,16 +132,14 @@ ata_write28:
   MOVI r1,#ATA_DATA
   MOVI r12,128
 aw_l:
-  LD r3,r11,0
   MOVI r4,0xFFFF
+  LD r3,r11,0
   BOOL.8 r3,r3,r4
-  LD r5,r11,1
-  BOOL.8 r5,r5,r4
-  SHL r5,r5,16
-  BOOL.14 r3,r3,r5
-  OUTL r3,r1
-  MOVI r4,2
-  ADD r11,r11,r4
+  OUTW r3,r1
+  LD r3,r11,1
+  BOOL.8 r3,r3,r4
+  OUTW r3,r1
+  ADDI r11,r11,2
   SUB r12,r12,r13
   JMP[NE] @aw_l
   MOVI r1,#ATA_CMD
