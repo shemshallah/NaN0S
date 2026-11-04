@@ -1199,7 +1199,112 @@ MOVI r1,@t_tcpok
 CALL @sputs
 MOVI r1,10
 PUTC r1
+CALL @tcp_ack
 LD r15,r0,@tcp_ret
+RET
+tcp_ack:
+ST r15,r0,@tack_ret
+MOVI r7,0xF000
+; server sequence raw+42..45
+LDB r8,r7,42
+SHL r8,r8,24
+LDB r9,r7,43
+SHL r9,r9,16
+BOOL.14 r8,r8,r9
+LDB r9,r7,44
+SHL r9,r9,8
+BOOL.14 r8,r8,r9
+LDB r9,r7,45
+BOOL.14 r8,r8,r9
+ADDI r10,r8,1
+; seq=1001, ack=server+1
+MOVI r1,0
+STB r1,r7,42
+STB r1,r7,43
+MOVI r1,3
+STB r1,r7,44
+MOVI r1,0xE9
+STB r1,r7,45
+SHR r8,r10,24
+STB r8,r7,46
+SHR r8,r10,16
+MOVI r2,255
+BOOL.8 r8,r8,r2
+STB r8,r7,47
+SHR r8,r10,8
+BOOL.8 r8,r8,r2
+STB r8,r7,48
+MOVI r2,255
+BOOL.8 r8,r10,r2
+STB r8,r7,49
+MOVI r1,0x50
+STB r1,r7,50
+MOVI r1,0x10
+STB r1,r7,51
+MOVI r1,0
+STB r1,r7,54
+STB r1,r7,55
+; checksum = fold(0x211D8 + ack_hi + ack_lo)
+MOVI r1,0x11D8
+MOVI r2,2
+SHL r2,r2,16
+BOOL.14 r1,r1,r2
+SHR r2,r10,16
+MOVI r3,0xFFFF
+BOOL.8 r2,r2,r3
+BOOL.14 r1,r1,r2
+MOVI r3,0xFFFF
+BOOL.8 r2,r10,r3
+BOOL.14 r1,r1,r2
+tack_fold:
+MOVI r3,0xFFFF
+BOOL.8 r2,r1,r3
+SHR r4,r1,16
+ADD r1,r2,r4
+SHR r4,r1,16
+CMP r4,r0
+JMP[NE] @tack_fold
+tack_fd:
+MOVI r2,0xFFFF
+BOOL.6 r1,r1,r2
+SHR r2,r1,8
+STB r2,r7,54
+MOVI r2,255
+BOOL.8 r1,r1,r2
+STB r1,r7,55
+; TX via descriptor 1
+LD r6,r0,@nc_base
+MOVI r5,0x24
+ADD r5,r6,r5
+MOVI r1,0x0800
+MOVHI r1,0x0100
+OUTL r1,r5
+MOVI r5,0x14
+ADD r5,r6,r5
+MOVI r2,60
+OUTL r2,r5
+MOVI r8,60000
+tack_tx:
+INW r1,r5
+MOVI r3,0x8000
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @tack_ok
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @tack_tx
+MOVI r1,@t_tcpno
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@tack_ret
+RET
+tack_ok:
+MOVI r1,@t_tack
+CALL @sputs
+MOVI r1,10
+PUTC r1
+LD r15,r0,@tack_ret
 RET
 tcpbad:
 MOVI r1,@t_tcpno
@@ -1240,6 +1345,8 @@ t_tcpok:
 .str "TCP SYNACK"
 t_tcpno:
 .str "TCP FAIL"
+t_tack:
+.str "TCP ACK"
 t_mac:
 .str "MAC "
 nc_ret:
@@ -1253,6 +1360,8 @@ nc_msr:
 dns_ret:
 .word 0
 tcp_ret:
+.word 0
+tack_ret:
 .word 0
 ph4_ret:
 .word 0
