@@ -197,9 +197,10 @@ function df(image, key) {
   const f = readFs(image, key);
   const freeBlocks = f.free.reduce((n, e) => n + e.sectors, 0);
   const used = f.next - freeBlocks;
+  const live = f.dirs.filter(e => e.name).length;
   console.log("DF capacity=" + f.capacity + " next=" + f.next +
     " free=" + (f.capacity - used) + " extents=" + f.free.length +
-    " files=" + f.files);
+    " files=" + live);
 }
 function readFileData(image, key, e) {
   const parts = [];
@@ -218,8 +219,9 @@ function get(image, key, name, out) {
 }
 function ls(image, key) {
   const f = readFs(image, key);
-  if (!f.dirs.length) { console.log("EMPTY"); return; }
-  for (const e of f.dirs) console.log(e.name + " " + e.start + " " + e.sectors + " " + e.size);
+  const live = f.dirs.filter(e => e.name);
+  if (!live.length) { console.log("EMPTY"); return; }
+  for (const e of live) console.log(e.name + " " + e.start + " " + e.sectors + " " + e.size);
 }
 function rm(image, key, name) {
   const f = readFs(image, key);
@@ -247,7 +249,7 @@ function compact(image, key) {
   if (!st.isFile()) throw new Error("compact requires an image file");
   const h = needHeader(image);
   const f = readFs(image, key);
-  const files = f.dirs.map(e => ({ name: e.name, data: readFileData(image, key, e) }));
+  const files = f.dirs.filter(e => e.name).map(e => ({ name: e.name, data: readFileData(image, key, e) }));
   const c = vol.createLazy(h.suite, h.nonce, st.size);
   if (!c) throw new Error("cannot recreate geometry");
   const tmp = image + ".compact." + process.pid;

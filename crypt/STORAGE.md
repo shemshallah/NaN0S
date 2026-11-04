@@ -57,8 +57,8 @@ sh crypt/nan0s_fs_gate.sh         # file layer: 12 files, rename, reuse, compact
 sh crypt/nan0s_fs_meta_gate.sh    # guest decrypt/auth of the FS superblock; tamper reject
 sh crypt/nan0s_fs_dir_gate.sh     # guest directory-block count/auth; tamper reject
 sh crypt/nan0s_fs_cat_gate.sh     # guest lookup + payload read (hello.txt)
-sh crypt/nan0s_fs_sh_gate.sh      # nsh: ls + cat + edit + write + stat + df
-sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f -> VGA nsh -> ls + write
+sh crypt/nan0s_fs_sh_gate.sh      # nsh: ls + cat + edit + write + stat + rm + df
+sh crypt/nan0s_fs_sh_gui_gate.sh  # desktop f -> VGA nsh -> ls + write + rm
 ```
 
 The decrypt cart (`crypt/guest/nspv_decrypt.nan`) walks `data_sectors` for a
@@ -111,6 +111,7 @@ ls                   list authenticated files
 cat <name>           print a file
 edit <name>          load an existing file into the editor
 write <name>         start with a blank editor
+rm <name>            tombstone a file entry
 stat <name>          start/sectors/size metadata
 df                   capacity/next/file count from the superblock
 pwd                  print /
@@ -132,10 +133,15 @@ until variable-size writes land. Write goes through the guest capsule sealer,
 ATA CT write, and tag-table update; the gate verifies the result with host
 `get` and `nspvol verify`.
 
-Still pending: magic-number commands, line-number/status display, create/`rm`,
-variable-size save, mount namespaces, and the GUI window-manager binding. The
-shell is a full-screen terminal UI over the encrypted volume, not yet a WM
-window.
+`rm` zeroes the authenticated directory name and seals that directory block
+through the same tag path. The payload and extent stay allocated as a
+tombstone; guest and host listings skip it, and host `compact` drops it and
+reclaims the space. The superblock file count still includes tombstones until
+compaction.
+
+Still pending: magic-number commands, line-number/status display, create,
+variable-size save, mount namespaces, and rendering the shell as a WM window.
+The shell is a full-screen terminal UI over the encrypted volume.
 
 ## Console hierarchy
 
@@ -258,9 +264,9 @@ through **Disk**, or add the guest-side mkfs next.
 Limits: arbitrary file count up to volume capacity, at most 58 free extents in
 the superblock (compact when exhausted), flat namespace (no directories). The
 guest can check the outer header, the `fs` marker, the encrypted superblock and
-authenticated directory names, and run `nsh` (`ls`, `cat`, `edit`, `write`, `stat`, `df`);
-creating files, `rm`, variable-size writes, mount namespaces, and the GUI
-terminal binding are still pending.
+authenticated directory names, and run `nsh` (`ls`, `cat`, `edit`, `write`,
+`rm`, `stat`, `df`); creating files, variable-size writes, mount namespaces,
+and the WM-window binding are still pending.
 
 ## Storage backends
 

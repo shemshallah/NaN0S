@@ -45,4 +45,13 @@ node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
 aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fs.img" \
   --steps 80000000 --keys 'd,f,ENTER' --serial > "$T/df.out" 2>/dev/null
 grep -q '^DF cap=' "$T/df.out" || { echo "nan0s_fs shell gate: FAIL (df)"; tail -8 "$T/df.out"; exit 1; }
-echo "nan0s_fs shell gate: PASS (nsh ls/cat/edit/write/stat/df on encrypted volume)"
+
+RKEYS='r,m,SPACE,h,e,l,l,o,.,t,x,t,ENTER,l,s,ENTER'
+aarch64/android/nan_cli --img crypt/guest/nan0s_fs_sh.nan --disk "$T/fs.img" \
+  --steps 100000000 --keys "$RKEYS" --serial > "$T/r.out" 2>/dev/null
+grep -q '^RM OK$' "$T/r.out" || { echo "nan0s_fs shell gate: FAIL (rm)"; tail -8 "$T/r.out"; exit 1; }
+grep -q '^LS OK files=00000000$' "$T/r.out" || { echo "nan0s_fs shell gate: FAIL (rm ls)"; tail -8 "$T/r.out"; exit 1; }
+grep -q '^FILE hello.txt' "$T/r.out" && { echo "nan0s_fs shell gate: FAIL (rm tombstone visible)"; exit 1; }
+crypt/nan0s_fs ls "$T/fs.img" "$KEY" | grep -qx 'EMPTY' || { echo "nan0s_fs shell gate: FAIL (host rm)"; exit 1; }
+node crypt/volume.cjs verify "$T/fs.img" "$KEY" | grep -qx 'VERIFY OK'
+echo "nan0s_fs shell gate: PASS (nsh ls/cat/edit/write/stat/rm/df on encrypted volume)"
