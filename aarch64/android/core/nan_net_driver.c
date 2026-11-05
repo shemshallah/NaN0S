@@ -17,7 +17,13 @@ int nan_net_send_frame_fd(int fd, const uint8_t *frame, size_t length) {
         length > NAN_NET_MAX_FRAME) return -1;
     size_t sent = 0;
     while (sent < length) {
-        ssize_t n = send(fd, frame + sent, length - sent, 0);
+        ssize_t n = send(fd, frame + sent, length - sent,
+#ifdef MSG_NOSIGNAL
+             MSG_NOSIGNAL
+#else
+             0
+#endif
+        );
         if (n < 0) { if (errno == EINTR) continue; return -1; }
         if (n == 0) return -1;
         sent += (size_t)n;
