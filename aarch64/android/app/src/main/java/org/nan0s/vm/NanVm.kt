@@ -17,6 +17,8 @@ class NanVm : AutoCloseable {
     fun load(data: ByteArray): String? = synchronized(lock) { if (h == 0L) null else NanNative.load(h, data) }
     fun reset() = synchronized(lock) { if (h != 0L) NanNative.reset(h) }
     fun writeBytes(address: Int, data: ByteArray): Boolean = synchronized(lock) { h != 0L && NanNative.writeBytes(h, address, data) }
+    fun stageNetworkFrame(address: Int, frame: ByteArray): Boolean = synchronized(lock) { h != 0L && NanNative.stageNetworkFrame(h, address, frame) }
+    fun extractNetworkFrame(address: Int, length: Int): ByteArray? = synchronized(lock) { if (h == 0L) null else NanNative.extractNetworkFrame(h, address, length) }
     fun run(steps: Int): Int = synchronized(lock) { if (h == 0L) HALTED else NanNative.run(h, steps) }
     fun setTime(ms: Int) = synchronized(lock) { if (h != 0L) NanNative.setTime(h, ms) }
     fun keyChar(c: Int) = synchronized(lock) { if (h != 0L) NanNative.keyChar(h, c) }
