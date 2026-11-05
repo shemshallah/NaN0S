@@ -6,7 +6,7 @@ CLI=aarch64/android/nan_cli
 [ -x "$CLI" ] || { echo "cart page gate: nan_cli missing"; exit 1; }
 T="${TMPDIR:-/tmp}/cartpage.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
 cp tools/carts.txt "$T/carts.txt"
-printf '11:src/nan/about_dev_cart.nan:2026:10:0:Extra Eleven\n12:src/nan/about_nan0s_cart.nan:2026:10:0:Extra Twelve\n' >> "$T/carts.txt"
+printf '4:src/nan/about_dev_cart.nan:2026:10:0:Extra Four\n5:src/nan/about_dev_cart.nan:2026:10:0:Extra Five\n6:src/nan/about_dev_cart.nan:2026:10:0:Extra Six\n7:src/nan/about_dev_cart.nan:2026:10:0:Extra Seven\n8:src/nan/about_dev_cart.nan:2026:10:0:Extra Eight\n9:src/nan/about_dev_cart.nan:2026:10:0:Extra Nine\n10:src/nan/about_dev_cart.nan:2026:10:0:Extra Ten\n11:src/nan/about_dev_cart.nan:2026:10:0:Extra Eleven\n12:src/nan/about_nan0s_cart.nan:2026:10:0:Extra Twelve\n' >> "$T/carts.txt"
 gawk -f tools/mkimg.awk -v GOLD=src/native/nan16_x86.nan -v GUEST=src/nan/museum.nan \
   -v CARTS="$T/carts.txt" -v OUTB="$T/b.bin" -v OUTG="$T/g.bin" >/dev/null 2>"$T/mk.err"
 cat "$T/b.bin" "$T/g.bin" > "$T/img"; truncate -s 1474560 "$T/img"
