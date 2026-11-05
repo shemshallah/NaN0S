@@ -86,8 +86,13 @@ int main(int argc, char **argv) {
       free(raw); return 2;
     }
     static const uint8_t header[] = "N16TXT/1\n";
-    int has_header = corpus_len >= sizeof(header) - 1 &&
-                     memcmp(raw, header, sizeof(header) - 1) == 0;
+    static const uint8_t magic[] = "N16TXT/1";
+    int has_header = corpus_len >= sizeof(magic) - 1 &&
+                     memcmp(raw, magic, sizeof(magic) - 1) == 0 &&
+                     (raw[sizeof(magic) - 1] == '\n' ||
+                      (raw[sizeof(magic) - 1] == '\r' &&
+                       corpus_len >= sizeof(magic) + 1 &&
+                       raw[sizeof(magic)] == '\n'));
     size_t framed_len = corpus_len + (has_header ? 0 : sizeof(header) - 1);
     uint8_t *framed = (uint8_t *)malloc(framed_len + 1);
     if (!framed) { free(raw); return 1; }
