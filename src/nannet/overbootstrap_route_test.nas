@@ -84,6 +84,8 @@ CALL @ob_point_to_route
 CMP r3,r0
 JMP[NE] @fail
 BOOL.14 r6,r1,r0
+BOOL.14 r7,r2,r0
+BOOL.14 r8,r4,r0
 MOVI r1,71
 PUTC r1
 MOVI r1,32
@@ -97,10 +99,10 @@ MOVI r4,0xA0FF
 CMP r1,r4
 JMP[NE] @fail
 MOVI r4,1
-CMP r2,r4
+CMP r7,r4
 JMP[NE] @fail
 MOVI r5,0xA002
-CMP r4,r5
+CMP r8,r5
 JMP[NE] @fail
 ; pass
 MOVI r1,79
