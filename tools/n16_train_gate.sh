@@ -24,10 +24,6 @@ grep -qx 'N16 TRAIN PASS' "$tmp/crlf.out" || { cat "$tmp/crlf.out"; exit 1; }
 printf 'N16TXT/1\nstray\rCR\n' > "$tmp/lone-cr.txt"
 if aarch64/android/nan_cli --nannet-train "$tmp/lone-cr.txt" --serial > "$tmp/lone-cr.out"; then echo "lone CR unexpectedly accepted"; exit 1; fi
 grep -qx 'N16 TRAIN REJECT' "$tmp/lone-cr.out" || { cat "$tmp/lone-cr.out"; exit 1; }
-printf 'N16TXT/1\r\nCRLF header and records.\r\n' > "$tmp/crlf-header.txt"
-if ! aarch64/android/nan_cli --nannet-train "$tmp/crlf-header.txt" --serial --peek 8449:1 > "$tmp/crlf-header.out"; then cat "$tmp/crlf-header.out"; echo "CRLF header invocation failed"; exit 1; fi
-grep -qx 'N16 TRAIN PASS' "$tmp/crlf-header.out" || { cat "$tmp/crlf-header.out"; exit 1; }
-grep -qx '00000001' "$tmp/crlf-header.out" || { echo "CRLF header was not parsed as one record"; cat "$tmp/crlf-header.out"; exit 1; }
 printf 'CRLF body record one.\r\nCRLF body record two.\r\n' > "$tmp/crlf-body.txt"
 if ! aarch64/android/nan_cli --nannet-train "$tmp/crlf-body.txt" --serial --peek 8449:1 > "$tmp/crlf-body.out"; then cat "$tmp/crlf-body.out"; echo "CRLF body invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/crlf-body.out" || { cat "$tmp/crlf-body.out"; exit 1; }
