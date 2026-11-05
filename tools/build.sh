@@ -5,6 +5,10 @@ cd "$(dirname "$0")/.."
 sh tools/mkbase.sh
 awk -f tools/nmk.awk -v CMD=emit src/museum/museum.nas > src/nan/museum.nan
 awk -f tools/nmk.awk -v CMD=emit src/exhibits/gui_cart.nas > src/nan/gui_cart.nan
+awk -f tools/nmk.awk -v CMD=emit src/exhibits/settings_cart.nas > src/nan/settings_cart.nan
+awk -f tools/nmk.awk -v CMD=emit src/exhibits/about_nan0s_cart.nas > src/nan/about_nan0s_cart.nan
+awk -f tools/nmk.awk -v CMD=emit src/exhibits/about_dev_cart.nas > src/nan/about_dev_cart.nan
+awk -f tools/nmk.awk -v CMD=emit src/nan/nannet_cart.nas > src/nan/nannet_cart.nan
 sh tools/mkall.sh
 # default NaNFS volume (raw ATA volume; guest reads it over ATA PIO LBA28 with nanfs_read):
 # third kind of disk, NOT one of the two bootable images in the image rule
