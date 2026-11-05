@@ -398,7 +398,7 @@ class MainActivity : Activity(), NanLoop.Listener {
     override fun onPause() {
         super.onPause()
         loop.paused = true; beeper.muted = true
-        vm.saveState()?.let { try { autosave.writeBytes(it) } catch (e: Exception) { } }
+        if (!trainingActive) vm.saveState()?.let { try { autosave.writeBytes(it) } catch (e: Exception) { } }
     }
     override fun onResume() {
         super.onResume()
