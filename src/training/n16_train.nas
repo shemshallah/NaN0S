@@ -53,6 +53,8 @@ scan:
 LDB r9,r4,0
 CMP r9,r0
 JMP[EQ] @finish
+CMP r14,r0
+JMP[NE] @utf8_cont
 MOVI r10,13
 CMP r9,r10
 JMP[EQ] @advance
@@ -62,12 +64,119 @@ JMP[EQ] @newline
 MOVI r10,32
 CMP r9,r10
 JMP[LT] @control
-JMP @accept
+MOVI r10,127
+CMP r9,r10
+JMP[LT] @ascii_accept
+JMP @utf8_start
 control:
 MOVI r10,9
 CMP r9,r10
 JMP[EQ] @accept
 JMP @reject
+ascii_accept:
+MOVI r3,0
+JMP @accept
+
+; Strict UTF-8 lead-byte ranges. r14 = continuation bytes remaining.
+; r3 carries a first-continuation restriction: 1 >=A0, 2 <=9F,
+; 3 >=90, 4 <=8F. This rejects overlong forms, surrogates and >U+10FFFF.
+utf8_start:
+MOVI r10,194
+CMP r9,r10
+JMP[LT] @utf8_three
+MOVI r10,223
+CMP r10,r9
+JMP[LT] @reject
+MOVI r14,1
+MOVI r3,0
+JMP @accept
+utf8_three:
+MOVI r10,224
+CMP r9,r10
+JMP[LT] @utf8_four
+MOVI r10,239
+CMP r10,r9
+JMP[LT] @reject
+MOVI r14,2
+MOVI r3,0
+MOVI r10,224
+CMP r9,r10
+JMP[EQ] @utf8_e0
+MOVI r10,237
+CMP r9,r10
+JMP[EQ] @utf8_ed
+JMP @accept
+utf8_e0:
+MOVI r3,1
+JMP @accept
+utf8_ed:
+MOVI r3,2
+JMP @accept
+utf8_four:
+MOVI r10,240
+CMP r9,r10
+JMP[LT] @reject
+MOVI r10,244
+CMP r10,r9
+JMP[LT] @reject
+MOVI r14,3
+MOVI r3,0
+MOVI r10,240
+CMP r9,r10
+JMP[EQ] @utf8_f0
+MOVI r10,244
+CMP r9,r10
+JMP[EQ] @utf8_f4
+JMP @accept
+utf8_f0:
+MOVI r3,3
+JMP @accept
+utf8_f4:
+MOVI r3,4
+JMP @accept
+
+utf8_cont:
+MOVI r10,128
+CMP r9,r10
+JMP[LT] @reject
+MOVI r10,191
+CMP r10,r9
+JMP[LT] @reject
+CMP r3,r0
+JMP[EQ] @utf8_cont_ok
+MOVI r10,1
+CMP r3,r10
+JMP[EQ] @utf8_min_a0
+MOVI r10,2
+CMP r3,r10
+JMP[EQ] @utf8_max_9f
+MOVI r10,3
+CMP r3,r10
+JMP[EQ] @utf8_min_90
+MOVI r10,143
+CMP r10,r9
+JMP[LT] @reject
+JMP @utf8_cont_ok
+utf8_min_a0:
+MOVI r10,160
+CMP r9,r10
+JMP[LT] @reject
+JMP @utf8_cont_ok
+utf8_max_9f:
+MOVI r10,159
+CMP r10,r9
+JMP[LT] @reject
+JMP @utf8_cont_ok
+utf8_min_90:
+MOVI r10,144
+CMP r9,r10
+JMP[LT] @reject
+utf8_cont_ok:
+MOVI r3,0
+MOVI r10,1
+SUB r14,r14,r10
+JMP @accept
+
 accept:
 ADDI r7,r7,1
 MOVI r10,4096
@@ -92,10 +201,14 @@ advance:
 ADDI r4,r4,1
 JMP @scan
 newline:
+CMP r14,r0
+JMP[NE] @reject
 CMP r7,r0
 JMP[EQ] @newline_advance
 ADDI r6,r6,1
 MOVI r7,0
+ADDI r4,r4,1
+JMP @scan
 newline_advance:
 ADDI r4,r4,1
 JMP @scan
