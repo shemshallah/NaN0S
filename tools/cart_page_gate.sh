@@ -1,5 +1,5 @@
 #!/bin/sh
-# Catalog gate: 12 visible entries (plus hidden storage) page correctly.
+# Catalog gate: compact system catalog plus sparse high slots pages correctly.
 set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
 command -v gawk >/dev/null 2>&1 || { echo "cart page gate: gawk missing"; exit 77; }
 CLI=aarch64/android/nan_cli
@@ -20,4 +20,4 @@ grep -q 'Storage (nsh)' "$T/page1" && { echo "cart page gate: FAIL (hidden stora
 grep -q '\[1\]  2026 Extra Eleven' "$T/page2" || { echo "cart page gate: FAIL (page2 first)"; exit 1; }
 grep -q '\[2\]  2026 Extra Twelve' "$T/page2" || { echo "cart page gate: FAIL (page2 second)"; exit 1; }
 grep -q ' PAGE .*2' "$T/page2" || { echo "cart page gate: FAIL (page2 marker)"; exit 1; }
-echo "cart page gate: PASS (12 visible entries, hidden storage skipped)"
+echo "cart page gate: PASS (compact catalog paging, hidden storage skipped)"
