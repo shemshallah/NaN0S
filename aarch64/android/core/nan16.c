@@ -74,6 +74,22 @@ uint32_t nan_reg(const nan_vm *v, int i) { return v->r[i & 15]; }
 uint32_t nan_pc(const nan_vm *v) { return v->pc; }
 uint64_t nan_word(const nan_vm *v, uint32_t i) { return v->mem[i & M]; }
 void nan_set_word(nan_vm *v, uint32_t i, uint64_t raw) { v->mem[i & M] = raw; }
+/* Host boundary: pack external bytes into NaN16 data words for guest LDB.
+   Corpus interpretation and all training decisions remain in the guest. */
+int nan_write_bytes(nan_vm *v, uint32_t byte_address, const uint8_t *data, size_t len) {
+  if (!v || (!data && len)) return -1;
+  const uint64_t cap = (uint64_t)NAN_WORDS * 4u;
+  if ((uint64_t)byte_address > cap || (uint64_t)len > cap - byte_address) return -1;
+  for (size_t i = 0; i < len; ++i) {
+    uint64_t at = (uint64_t)byte_address + i;
+    uint32_t wi = (uint32_t)(at >> 2);
+    uint32_t shift = (uint32_t)(at & 3u) * 8u;
+    uint32_t payload = (uint32_t)(v->mem[wi] >> 16);
+    payload = (payload & ~(0xFFu << shift)) | ((uint32_t)data[i] << shift);
+    v->mem[wi] = nan_mkword(payload, 10);
+  }
+  return 0;
+}
 void nan_set_reg(nan_vm *v, int i, uint32_t x) { v->r[i & 15] = x; }
 void nan_set_pc(nan_vm *v, uint32_t pc) { v->pc = pc; v->halted = 0; }
 int nan_flags(const nan_vm *v) { return v->k; }
