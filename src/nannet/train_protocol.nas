@@ -125,6 +125,44 @@ n16v_crc_done:
 MOVI r12,65535
 MOVHI r12,65535
 BOOL.6 r11,r11,r12
+; Lock the first validated 128-bit session id. Frames from another
+; session are rejected until the owning session explicitly resets state.
+LD r12,r0,@n16v_session_active
+CMP r12,r0
+JMP[NE] @n16v_session_check
+LD r4,r0,@n16v_base
+ADDI r4,r4,8
+LD r5,r4,0
+ST r5,r0,@n16v_session_0
+LD r5,r4,1
+ST r5,r0,@n16v_session_1
+LD r5,r4,2
+ST r5,r0,@n16v_session_2
+LD r5,r4,3
+ST r5,r0,@n16v_session_3
+MOVI r12,1
+ST r12,r0,@n16v_session_active
+JMP @n16v_session_ok
+n16v_session_check:
+LD r4,r0,@n16v_base
+ADDI r4,r4,8
+LD r5,r4,0
+LD r12,r0,@n16v_session_0
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LD r5,r4,1
+LD r12,r0,@n16v_session_1
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LD r5,r4,2
+LD r12,r0,@n16v_session_2
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LD r5,r4,3
+LD r12,r0,@n16v_session_3
+CMP r5,r12
+JMP[NE] @n16v_session_error
+n16v_session_ok:
 LD r4,r0,@n16v_base
 ADD r4,r4,r9
 MOVI r10,0
@@ -157,6 +195,9 @@ JMP @n16v_error
 n16v_sequence:
 MOVI r3,3
 JMP @n16v_error
+n16v_session_error:
+MOVI r3,5
+JMP @n16v_error
 n16v_crc_error:
 MOVI r3,4
 n16v_error:
@@ -178,6 +219,22 @@ n16v_payload:
 .word 0
 n16v_last_seq:
 .word 0
+n16v_session_active:
+.word 0
+n16v_session_0:
+.word 0
+n16v_session_1:
+.word 0
+n16v_session_2:
+.word 0
+n16v_session_3:
+.word 0
+; Reset only after the owning transport has closed/aborted its session.
+n16_session_reset:
+MOVI r4,0
+ST r4,r0,@n16v_session_active
+ST r4,r0,@n16v_last_seq
+RET
 n16_frame_route:
 ST r15,r0,@n16r_ret
 ST r1,r0,@n16r_base
