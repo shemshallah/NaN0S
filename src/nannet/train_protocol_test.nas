@@ -42,11 +42,9 @@ JMP[NE] @fail
 ; the currently owned session, even with a fresh sequence number.
 MOVI r1,0
 MOVHI r1,2
-ADDI r1,r1,1024
+ADDI r1,r1,256
 MOVI r2,38
 CALL @n16_frame_validate
-ADDI r1,r3,48
-PUTC r1
 MOVI r5,5
 CMP r3,r5
 JMP[NE] @fail
