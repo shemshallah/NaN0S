@@ -83,5 +83,6 @@ sh tools/nannet_service_gate.sh # slot-less cart record, SYSTEM launch, link/WiF
 
 M3 is live: the service cart is not a catalog slot and the SYSTEM menu launches
 it. The console shows link state, counters, the deterministic WiFi fixture and
-link toggles; it calls the same control-plane library as Settings. Live packet
+link toggles, and `P` applies a built-in `.nancfg` profile (lo+eth0, addr,
+route, DNS, driver 9). It calls the same control-plane library as Settings. Live packet
 transport and radio drivers remain M4/M6 work.

@@ -126,6 +126,12 @@ JMP[EQ] @svc_t03
 MOVI r4,52
 CMP r1,r4
 JMP[EQ] @svc_t04
+MOVI r4,80
+CMP r1,r4
+JMP[EQ] @svc_profile
+MOVI r4,112
+CMP r1,r4
+JMP[EQ] @svc_profile
 MOVI r4,83
 CMP r1,r4
 JMP[EQ] @svc_scan
@@ -176,6 +182,11 @@ svc_set0:
 MOVI r2,0
 svc_set:
 CALL @nn_link_set
+JMP @svc_redraw
+svc_profile:
+MOVI r1,@sv_profile_cfg
+SHL r1,r1,2
+CALL @nn_cfg_apply
 JMP @svc_redraw
 svc_scan:
 MOVI r1,2
@@ -419,4 +430,6 @@ sv_s1:
 sv_s2:
 .str "2 Lab       RSSI "
 sv_foot:
-.str "1-4 link  S scan  J join  L leave  R rollback  ESC"
+.str "1-4 link  P profile  S scan  J join  L leave  R rollback  ESC"
+sv_profile_cfg:
+.str "link 0 1\nlink 1 1\naddr 1 0x0A00 16\nroute 0x0000 0 0x0A01 1 1\ndns 0x0A01\ndriver 9 1\n"

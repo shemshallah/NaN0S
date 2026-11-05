@@ -11,7 +11,8 @@ T="${TMPDIR:-/tmp}/nnsvc.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
 "$CLI" --img build/nan0s.img --steps 6000000 --keys '@3000000' --peek '4816:1' >"$T/rec" 2>/dev/null
 rec=$(tail -1 "$T/rec")
 [ "$rec" = "00000001" ] || { echo "nannet service gate: FAIL (service record $rec)"; exit 1; }
-# GUI ESC -> museum -> s SYSTEM -> 2 NANNET; toggle wlan0 up, scan, join
+# GUI ESC -> museum -> s SYSTEM -> 2 NANNET; apply the built-in profile;
+# then relaunch and toggle wlan0 up, scan, join.
 "$CLI" --img build/nan0s.img --steps 60000000 \
   --keys '@3000000,ESC,@1000000,s,@1000000,2,@1000000,3,@300000,S,@300000,J,@1500000' \
   --dump-text >"$T/svc" 2>/dev/null
@@ -20,6 +21,12 @@ grep -q '^0 LO     loop   up$' "$T/svc" || { echo "nannet service gate: FAIL (lo
 grep -q '^2 WLAN0   wifi  ok$' "$T/svc" || { echo "nannet service gate: FAIL (wlan join)"; exit 1; }
 grep -q '^UP    2' "$T/svc" || { echo "nannet service gate: FAIL (link counter)"; exit 1; }
 grep -q '^0 HomeNet   RSSI  60$' "$T/svc" || { echo "nannet service gate: FAIL (scan fixture)"; exit 1; }
+# built-in profile: eth0 comes up, address/route/DNS rows fill
+"$CLI" --img build/nan0s.img --steps 60000000 \
+  --keys '@3000000,ESC,@1000000,s,@1000000,2,@1000000,P,@1500000' \
+  --dump-text >"$T/prof" 2>/dev/null
+grep -q '^1 ETH0    wired up$' "$T/prof" || { echo "nannet service gate: FAIL (profile link)"; exit 1; }
+grep -q '^UP    2        ADDR     1       ROUTE    1        DNS    1$' "$T/prof" || { echo "nannet service gate: FAIL (profile counts)"; exit 1; }
 # ESC leaves the service cart and lands back on the museum menu
 "$CLI" --img build/nan0s.img --steps 60000000 \
   --keys '@3000000,ESC,@1000000,s,@1000000,2,@1000000,ESC,@1500000' \

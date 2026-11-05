@@ -1212,8 +1212,9 @@ Spec: `spec/TRANSLATOR.md`.
   `tools/carts.txt` line `service:`; builder writes a 16-word service record at
   word 4816 (boot record 4784, nsh request 4800) and the shell SYSTEM menu [2] launches it.
   The cart uses the public NANNET library: link state, link toggles 1-4,
-  counters, WiFi scan/join/leave fixture, config rollback. ESC returns to the
-  museum menu. Settings slot 9 and the hidden-suite policy are unchanged.
+  counters, WiFi scan/join/leave fixture, config rollback and `P`/`p` applies
+  a built-in `.nancfg` profile (lo+eth0, addr, route, DNS, driver 9). ESC
+  returns to the museum menu. Settings slot 9 and the hidden-suite policy are unchanged.
 - Gate: `tools/nannet_service_gate.sh` PASS (record, launch, link+WiFi state,
   exit); boot/settings/cart/browser/boot gates PASS; `make seals` 64 pairs OK.
 - Image capacity: guest 61,858 / 65,536 words (service cart 2,152 words at
