@@ -167,7 +167,7 @@ class MainActivity : Activity(), NanLoop.Listener {
     private fun showTrainingSuite() {
         AlertDialog.Builder(this)
             .setTitle("NaNLMind Remote Training")
-            .setMessage("Run the shared NaN16 corpus trainer in this Android universe.")
+            .setMessage("Run the NaN16 corpus intake prototype. TXT is validated and profiled; model merging is not enabled yet.")
             .setPositiveButton("Choose TXT") { _, _ ->
                 if (prepareTraining()) {
                     val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -224,7 +224,7 @@ class MainActivity : Activity(), NanLoop.Listener {
         try {
             val guest = assets.open("n16_train.nan").use { it.readBytes() }
             if (vm.load(guest) == null) throw IllegalStateException("NaN16 training guest did not load")
-            val sample = "NaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n".toByteArray(Charsets.UTF_8)
+            val sample = "NaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe first pass computes a bounded corpus profile.\n".toByteArray(Charsets.UTF_8)
             val corpus = raw ?: sample
             val header = "N16TXT/1\n".toByteArray(Charsets.US_ASCII)
             val hasHeader = corpus.size >= header.size && corpus.copyOfRange(0, header.size).contentEquals(header)
