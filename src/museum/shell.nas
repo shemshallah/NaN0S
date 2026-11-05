@@ -276,9 +276,6 @@ BOOL.8 r1,r1,r4
 MOVI r4,115
 CMP r1,r4
 JMP[EQ] @sh_sys
-MOVI r4,0x7E
-CMP r1,r4
-JMP[EQ] @sh_curator
 MOVI r4,27
 CMP r1,r4
 JMP[EQ] @sh_redraw
@@ -524,7 +521,7 @@ cu_foot:
 
 ; ---- Data ----
 sh_banner:
-.str " NaN/0S  MUSEUM OF COMPUTING  (exhibit cartridges)  v40          "
+.str " NaN/0S  SYSTEM  -  NaN16                                           "
 sh_more:
 .str " PAGE "
 sh_btab:
