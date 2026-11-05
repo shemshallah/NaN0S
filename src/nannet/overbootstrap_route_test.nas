@@ -85,12 +85,14 @@ CMP r3,r0
 JMP[NE] @fail
 MOVI r1,71
 PUTC r1
+BOOL.14 r6,r1,r0
 MOVI r1,32
 PUTC r1
+BOOL.14 r1,r6,r0
 CALL @nn_puthex4
 MOVI r1,32
 PUTC r1
-MOVI r1,0xA0FF
+BOOL.14 r1,r6,r0
 MOVI r4,0xA0FF
 CMP r1,r4
 JMP[NE] @fail
