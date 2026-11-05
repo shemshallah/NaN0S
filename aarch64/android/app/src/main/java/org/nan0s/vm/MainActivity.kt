@@ -374,7 +374,7 @@ class MainActivity : Activity(), NanLoop.Listener {
             }
             Thread {
                 try { runTraining(readCorpus(uri)) }
-                catch (e: Exception) { finishTraining("Training failed: \${e.message}") }
+                catch (e: Exception) { finishTraining("Training failed: ${e.message}") }
             }.start()
             return
         }
