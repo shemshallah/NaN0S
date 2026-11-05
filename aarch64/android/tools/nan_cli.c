@@ -50,13 +50,14 @@ static uint8_t *build_training_guest(size_t *len) {
   return b;
 }
 int main(int argc, char **argv) {
-  const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL, *peek = NULL, *corpus = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
+  const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL, *peek = NULL, *corpus = NULL, *candidate_out = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
   int train_mode = 0;
   int dump_text = 0, serial = 0, trim = 1;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--img") && i + 1 < argc) img = argv[++i];
     else if (!strcmp(argv[i], "--nannet-train")) { train_mode = 1; if (i + 1 < argc && argv[i + 1][0] != '-') corpus = argv[++i]; }
     else if (!strcmp(argv[i], "--corpus") && i + 1 < argc) { train_mode = 1; corpus = argv[++i]; }
+    else if (!strcmp(argv[i], "--candidate-out") && i + 1 < argc) candidate_out = argv[++i];
     else if (!strcmp(argv[i], "--steps") && i + 1 < argc) steps = strtoull(argv[++i], 0, 0);
     else if (!strcmp(argv[i], "--keys") && i + 1 < argc) keys = argv[++i];
     else if (!strcmp(argv[i], "--dump-ppm") && i + 1 < argc) ppm = argv[++i];
@@ -153,5 +154,26 @@ int main(int argc, char **argv) {
   }
   fprintf(stderr, "[nan_cli] %s: %llu steps, rc=%d, pc=%u, trap='%s'\n", kind, (unsigned long long)nan_steps(v), rc, nan_pc(v), nan_trap_text(v));
   int train_ok = !train_mode || (rc == NAN_HALTED && (uint32_t)(nan_word(v, 8449u) >> 16) != 0);
+  if (candidate_out) {
+    if (!train_mode || !train_ok) {
+      fprintf(stderr, "candidate export requires a successful training run\\n");
+      train_ok = 0;
+    } else {
+      size_t state_len = nan_state_size(v);
+      uint8_t *state = (uint8_t *)malloc(state_len ? state_len : 1);
+      if (!state || !state_len || nan_save_state(v, state, state_len) != state_len) {
+        fprintf(stderr, "could not serialize candidate VM state\\n");
+        train_ok = 0;
+      } else {
+        FILE *out = fopen(candidate_out, "wb");
+        if (!out || fwrite(state, 1, state_len, out) != state_len || fclose(out) != 0) {
+          if (out) fclose(out);
+          fprintf(stderr, "could not write candidate checkpoint\\n");
+          train_ok = 0;
+        }
+      }
+      free(state);
+    }
+  }
   nan_destroy(v); return train_ok ? 0 : 1;
 }
