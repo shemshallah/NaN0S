@@ -3,5 +3,6 @@
 1:src/nan/about_nan0s_cart.nan:2026:7:2:About NaN/0S - the machine, the trust, the plan
 2:src/nan/about_dev_cart.nan:2026:7:2:About Shemshallah - the developer
 3:src/nan/settings_cart.nan:2026:10:0:Settings
+10:src/nan/nsh_cart.nan:2026:10:0:Storage shell (hidden)
 boot:src/nan/gui_cart.nan
 service:src/nan/nannet_cart.nan
