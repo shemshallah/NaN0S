@@ -101,6 +101,12 @@ JMP @reject
 utf8_two:
 MOVI r14,1
 MOVI r3,0
+MOVI r10,194
+CMP r9,r10
+JMP[EQ] @utf8_c2
+JMP @accept
+utf8_c2:
+MOVI r3,5
 JMP @accept
 utf8_three:
 MOVI r14,2
@@ -153,6 +159,9 @@ JMP[EQ] @utf8_max_9f
 MOVI r10,3
 CMP r3,r10
 JMP[EQ] @utf8_min_90
+MOVI r10,5
+CMP r3,r10
+JMP[EQ] @utf8_max_9f
 MOVI r10,143
 CMP r10,r9
 JMP[LT] @reject
