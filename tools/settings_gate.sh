@@ -1,5 +1,5 @@
 #!/bin/sh
-# Settings gate: slot 9 opens Settings; NANNET, Driver and Codec managers run;
+# Settings gate: slot 3 opens Settings; NANNET, Driver and Codec managers run;
 # the hidden tooling suite must not appear in the image.
 set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
 CLI=aarch64/android/nan_cli
@@ -13,7 +13,7 @@ grep -q 'Settings' "$T/menu.txt" || { echo "settings gate: FAIL (slot 9 title)";
 menu "@3000000,ESC,@1000000,s" > "$T/system.txt"
 grep -q "NANNET / BROWSER" "$T/system.txt" || { echo "settings gate: FAIL (compact system menu NANNET entry)"; exit 1; }
 if grep -Eq "\\[3\\] DISK|\\[4\\] MEMORY|\\[5\\] CPU" "$T/system.txt"; then echo "settings gate: FAIL (extra system utilities remain visible)"; exit 1; fi
-menu "@3000000,ESC,@1000000,9" > "$T/settings.txt"
+menu "@3000000,ESC,@1000000,3" > "$T/settings.txt"
 grep -q 'SETTINGS' "$T/settings.txt" || { echo "settings gate: FAIL (settings menu)"; exit 1; }
 grep -q 'NANNET MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (NANNET entry)"; exit 1; }
 grep -q 'DRIVER MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (driver entry)"; exit 1; }
