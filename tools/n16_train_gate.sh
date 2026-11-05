@@ -18,10 +18,10 @@ grep -qx 'N16 TRAIN PASS' "$tmp/launcher.out" || { cat "$tmp/launcher.out"; exit
 printf 'N16TXT/1\ncaf\303\251\nemoji \360\237\214\215\n' > "$tmp/utf8.txt"
 if ! aarch64/android/nan_cli --nannet-train "$tmp/utf8.txt" --serial > "$tmp/utf8.out"; then cat "$tmp/utf8.out"; echo "UTF-8 invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/utf8.out" || { cat "$tmp/utf8.out"; exit 1; }
-printf 'N16TXT/1\\r\\nCRLF record\\r\\n' > "$tmp/crlf.txt"
+printf 'N16TXT/1\r\nCRLF record\r\n' > "$tmp/crlf.txt"
 aarch64/android/nan_cli --nannet-train "$tmp/crlf.txt" --serial > "$tmp/crlf.out"
 grep -qx 'N16 TRAIN PASS' "$tmp/crlf.out" || { cat "$tmp/crlf.out"; exit 1; }
-printf 'N16TXT/1\\nstray\\rCR\\n' > "$tmp/lone-cr.txt"
+printf 'N16TXT/1\nstray\rCR\n' > "$tmp/lone-cr.txt"
 if aarch64/android/nan_cli --nannet-train "$tmp/lone-cr.txt" --serial > "$tmp/lone-cr.out"; then echo "lone CR unexpectedly accepted"; exit 1; fi
 grep -qx 'N16 TRAIN REJECT' "$tmp/lone-cr.out" || { cat "$tmp/lone-cr.out"; exit 1; }
 printf 'N16TXT/1\r\nCRLF header and records.\r\n' > "$tmp/crlf-header.txt"
