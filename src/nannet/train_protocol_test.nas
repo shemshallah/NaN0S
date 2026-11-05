@@ -40,8 +40,9 @@ CMP r3,r5
 JMP[NE] @fail
 ; A valid frame with a different 128-bit session id must not enter
 ; the currently owned session, even with a fresh sequence number.
-MOVI r1,1024
+MOVI r1,0
 MOVHI r1,2
+ADDI r1,r1,1024
 MOVI r2,38
 CALL @n16_frame_validate
 ADDI r1,r3,48
