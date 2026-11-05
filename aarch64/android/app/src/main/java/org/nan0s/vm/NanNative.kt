@@ -8,6 +8,8 @@ object NanNative {
     @JvmStatic external fun reset(h: Long)
     @JvmStatic external fun load(h: Long, data: ByteArray): String?
     @JvmStatic external fun writeBytes(h: Long, address: Int, data: ByteArray): Boolean
+    @JvmStatic external fun stageNetworkFrame(h: Long, address: Int, data: ByteArray): Boolean
+    @JvmStatic external fun extractNetworkFrame(h: Long, address: Int, length: Int): ByteArray?
     @JvmStatic external fun run(h: Long, steps: Int): Int
     @JvmStatic external fun setTime(h: Long, ms: Int)
     @JvmStatic external fun keyChar(h: Long, ch: Int)
