@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
       fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\\n");
       free(raw); return 2;
     }
-    static const uint8_t header[] = "N16TXT/1\\n";
+    static const uint8_t header[] = "N16TXT/1\n";
     int has_header = corpus_len >= sizeof(header) - 1 &&
                      memcmp(raw, header, sizeof(header) - 1) == 0;
     size_t framed_len = corpus_len + (has_header ? 0 : sizeof(header) - 1);
