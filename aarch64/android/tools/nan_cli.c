@@ -99,6 +99,16 @@ int main(int argc, char **argv) {
     int wrc = nan_write_bytes(v, 49152u, framed, framed_len + 1);
     free(framed); free(raw);
     if (wrc) { fprintf(stderr, "corpus does not fit the NaN16 guest buffer\\n"); return 1; }
+  } else if (train_mode) {
+    static const uint8_t sample[] =
+      "N16TXT/1\\n"
+      "NaN16 owns the corpus codec.\\n"
+      "Runner and Android share one trainer.\\n"
+      "The intake stages updates before merge.\\n";
+    if (nan_write_bytes(v, 49152u, sample, sizeof(sample))) {
+      fprintf(stderr, "built-in sample does not fit the NaN16 guest buffer\\n");
+      return 1;
+    }
   }
   if (train_mode) serial = 1;
   if (disk) { int fd = open(disk, O_RDWR); struct stat st; if (fd < 0 || fstat(fd, &st)) { perror(disk); return 1; } nan_attach_disk_fd(v, fd, (size_t)st.st_size); }
