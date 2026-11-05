@@ -76,15 +76,15 @@ int main(int argc, char **argv) {
   nan_vm *v = nan_create(); if (!v) { fprintf(stderr, "out of memory\n"); return 1; }
   const char *kind; if (nan_load_auto(v, data, len, &kind)) { fprintf(stderr, "cannot load %s (text error line %d)\n", img, nan_load_error(v)); return 1; }
 
-  if (train_mode) {
+  if (train_mode && corpus) {
     size_t corpus_len = 0;
     uint8_t *raw = slurp(corpus, &corpus_len);
     if (!raw) { perror(corpus); return 1; }
     if (corpus_len > 1048576u || memchr(raw, 0, corpus_len)) {
-      fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\n");
+      fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\\n");
       free(raw); return 2;
     }
-    static const uint8_t header[] = "N16TXT/1\n";
+    static const uint8_t header[] = "N16TXT/1\\n";
     int has_header = corpus_len >= sizeof(header) - 1 &&
                      memcmp(raw, header, sizeof(header) - 1) == 0;
     size_t framed_len = corpus_len + (has_header ? 0 : sizeof(header) - 1);
@@ -98,9 +98,9 @@ int main(int argc, char **argv) {
     framed[framed_len] = 0;
     int wrc = nan_write_bytes(v, 49152u, framed, framed_len + 1);
     free(framed); free(raw);
-    if (wrc) { fprintf(stderr, "corpus does not fit the NaN16 guest buffer\n"); return 1; }
-    serial = 1;
+    if (wrc) { fprintf(stderr, "corpus does not fit the NaN16 guest buffer\\n"); return 1; }
   }
+  if (train_mode) serial = 1;
   if (disk) { int fd = open(disk, O_RDWR); struct stat st; if (fd < 0 || fstat(fd, &st)) { perror(disk); return 1; } nan_attach_disk_fd(v, fd, (size_t)st.st_size); }
   char *kcopy = keys ? strdup(keys) : NULL; char *save = NULL; char *tok = kcopy ? strtok_r(kcopy, ",", &save) : NULL;
   uint64_t pause_until = 0; int rc = NAN_BUDGET;
