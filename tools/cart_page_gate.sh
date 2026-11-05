@@ -10,7 +10,7 @@ gawk -f tools/mkimg.awk -v GOLD=src/native/nan16_x86.nan -v GUEST=src/nan/museum
 cat "$T/b.bin" "$T/g.bin" > "$T/img"; truncate -s 1474560 "$T/img"
 "$CLI" --img "$T/img" --steps 12000000 --keys '@3000000,q,ENTER,@2000000' \
   --dump-text > "$T/page1" 2>/dev/null
-grep -q '\\[3\\]  2026 Settings' "$T/page1" || { echo "cart page gate: FAIL (Settings entry)"; cat "$T/page1"; exit 1; }
+grep -q '\[3\]  2026 Settings' "$T/page1" || { echo "cart page gate: FAIL (Settings entry)"; cat "$T/page1"; exit 1; }
 grep -q ' PAGE .*1' "$T/page1" || { echo "cart page gate: FAIL (page marker)"; exit 1; }
 grep -q 'Storage (nsh)' "$T/page1" && { echo "cart page gate: FAIL (hidden storage visible)"; exit 1; }
 echo "cart page gate: PASS (compact visible catalog; hidden storage skipped)"
