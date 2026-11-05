@@ -43,19 +43,8 @@ JMP[NE] @reject
 LDB r1,r4,8
 MOVI r2,10
 CMP r1,r2
-JMP[EQ] @header_lf
-MOVI r2,13
-CMP r1,r2
 JMP[NE] @reject
-LDB r1,r4,9
-MOVI r2,10
-CMP r1,r2
-JMP[NE] @reject
-ADDI r4,r4,10
-JMP @header_done
-header_lf:
 ADDI r4,r4,9
-header_done:
 MOVI r5,0
 MOVI r6,0
 MOVI r7,0
