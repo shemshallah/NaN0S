@@ -1,5 +1,5 @@
 #!/bin/sh
-# NANNET service gate: the slot-less service cart is packed at word 4800 and
+# NANNET service gate: the slot-less service cart is packed at word 4816 and
 # launched from the SYSTEM menu; link and WiFi controls mutate control-plane
 # state; ESC returns to the museum without a slot/catalog entry.
 set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
@@ -7,7 +7,7 @@ CLI=aarch64/android/nan_cli
 [ -x "$CLI" ] || { echo "nannet service gate: nan_cli missing"; exit 1; }
 [ -f build/nan0s.img ] || { echo "nannet service gate: build/nan0s.img missing"; exit 1; }
 T="${TMPDIR:-/tmp}/nnsvc.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
-# service record at word 4800 is live (record [0] = 1)
+# service record at word 4816 is live (record [0] = 1)
 "$CLI" --img build/nan0s.img --steps 6000000 --keys '@3000000' --peek '4816:1' >"$T/rec" 2>/dev/null
 rec=$(tail -1 "$T/rec")
 [ "$rec" = "00000001" ] || { echo "nannet service gate: FAIL (service record $rec)"; exit 1; }
