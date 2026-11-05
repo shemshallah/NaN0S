@@ -2,6 +2,7 @@
 ; Input: N16TXT/1 LF header followed by newline-delimited UTF-8 records.
 ; Host boundary writes bytes at byte address 49152 and appends NUL.
 ; All parsing, bounds, record accounting, frequency updates and digest work run here.
+; Candidate model: unigram[256] at 8192; bigram[256x256] at 16384.
 ; Output statistics: words 8448..8450 = content bytes, records, rolling digest.
 main:
 MOVI r13,1
@@ -50,6 +51,7 @@ MOVI r7,0
 MOVI r8,5381
 MOVI r11,8192
 MOVI r14,0
+ST r0,r0,@prev_valid
 MOVI r3,0
 scan:
 LDB r9,r4,0
@@ -195,6 +197,22 @@ ADD r12,r11,r9
 LD r10,r12,0
 ADDI r10,r10,1
 ST r10,r12,0
+; Candidate next-byte model: bigram[previous][current]++.
+LD r2,r0,@prev_valid
+CMP r2,r0
+JMP[EQ] @set_prev
+LD r2,r0,@prev_byte
+SHL r2,r2,8
+ADD r2,r2,r9
+MOVI r12,16384
+ADD r12,r12,r2
+LD r10,r12,0
+ADDI r10,r10,1
+ST r10,r12,0
+set_prev:
+ST r9,r0,@prev_byte
+MOVI r2,1
+ST r2,r0,@prev_valid
 advance:
 ADDI r4,r4,1
 JMP @scan
@@ -205,6 +223,7 @@ CMP r7,r0
 JMP[EQ] @newline_advance
 ADDI r6,r6,1
 MOVI r7,0
+ST r0,r0,@prev_valid
 ADDI r4,r4,1
 JMP @scan
 newline_advance:
@@ -297,6 +316,10 @@ freq:
 .org 8448
 stats:
 .word 0,0,0
+prev_byte:
+.word 0
+prev_valid:
+.word 0
 .org 12288
 corpus:
 .str "N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n"
