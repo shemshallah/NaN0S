@@ -1709,3 +1709,5 @@ LD r15,r0,@nsv_ret
 RET
 nsv_ret:
 .word 0
+
+.include "overbootstrap_route.nas"
