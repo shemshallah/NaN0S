@@ -104,6 +104,7 @@ uint32_t nan_pc(const nan_vm *v);
 uint64_t nan_word(const nan_vm *v, uint32_t index);
 /* Boundary-driver byte injection into guest memory; no guest policy is executed here. */
 int      nan_write_bytes(nan_vm *v, uint32_t byte_address, const uint8_t *data, size_t len);
+int      nan_read_bytes(const nan_vm *v, uint32_t byte_address, uint8_t *out, size_t len);
 void     nan_set_word(nan_vm *v, uint32_t index, uint64_t raw);
 void     nan_set_reg(nan_vm *v, int i, uint32_t val);
 void     nan_set_pc(nan_vm *v, uint32_t pc);
