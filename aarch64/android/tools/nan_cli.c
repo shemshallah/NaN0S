@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
       free(raw); return 2;
     }
     static const uint8_t header_lf[] = "N16TXT/1\n";
-    static const uint8_t header_crlf[] = "N16TXT/1\\r\n";
+    static const uint8_t header_crlf[] = "N16TXT/1\r\n";
     int has_header_lf = corpus_len >= sizeof(header_lf) - 1 &&
                         memcmp(raw, header_lf, sizeof(header_lf) - 1) == 0;
     int has_header_crlf = corpus_len >= sizeof(header_crlf) - 1 &&
