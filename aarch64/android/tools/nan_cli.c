@@ -91,16 +91,15 @@ int main(int argc, char **argv) {
                         memcmp(raw, header_lf, sizeof(header_lf) - 1) == 0;
     int has_header_crlf = corpus_len >= sizeof(header_crlf) - 1 &&
                           memcmp(raw, header_crlf, sizeof(header_crlf) - 1) == 0;
-    int has_header = has_header_lf || has_header_crlf;
     size_t header_len = sizeof(header_lf) - 1;
-    size_t framed_len = corpus_len + (has_header ? 0 : header_len);
+    size_t crlf_len = sizeof(header_crlf) - 1;
+    size_t body_offset = has_header_crlf ? crlf_len : (has_header_lf ? header_len : 0);
+    size_t body_len = corpus_len - body_offset;
+    size_t framed_len = header_len + body_len;
     uint8_t *framed = (uint8_t *)malloc(framed_len + 1);
     if (!framed) { free(raw); return 1; }
-    if (has_header) memcpy(framed, raw, corpus_len);
-    else {
-      memcpy(framed, header_lf, header_len);
-      memcpy(framed + header_len, raw, corpus_len);
-    }
+    memcpy(framed, header_lf, header_len);
+    memcpy(framed + header_len, raw + body_offset, body_len);
     framed[framed_len] = 0;
     int wrc = nan_write_bytes(v, 49152u, framed, framed_len + 1);
     free(framed); free(raw);
