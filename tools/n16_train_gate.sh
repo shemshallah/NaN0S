@@ -19,7 +19,8 @@ printf 'N16TXT/1\ncaf\303\251\nemoji \360\237\214\215\n' > "$tmp/utf8.txt"
 if ! aarch64/android/nan_cli --nannet-train "$tmp/utf8.txt" --serial > "$tmp/utf8.out"; then cat "$tmp/utf8.out"; echo "UTF-8 invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/utf8.out" || { cat "$tmp/utf8.out"; exit 1; }
 printf 'N16TXT/1\nbad \300\257\n' > "$tmp/invalid.txt"
-if aarch64/android/nan_cli --nannet-train "$tmp/invalid.txt" --serial > "$tmp/invalid.out"; then echo "invalid UTF-8 unexpectedly accepted"; exit 1; fi
+if aarch64/android/nan_cli --nannet-train "$tmp/invalid.txt" --serial --candidate-out "$tmp/rejected.nan1" > "$tmp/invalid.out"; then echo "invalid UTF-8 unexpectedly accepted"; exit 1; fi
+test ! -e "$tmp/rejected.nan1" || { echo "rejected corpus exported a candidate"; exit 1; }
 grep -qx 'N16 TRAIN REJECT' "$tmp/invalid.out" || { cat "$tmp/invalid.out"; exit 1; }
 printf 'N16TXT/1\ncontrol \302\200\n' > "$tmp/control.txt"
 if aarch64/android/nan_cli --nannet-train "$tmp/control.txt" --serial > "$tmp/control.out"; then echo "C1 control unexpectedly accepted"; exit 1; fi
