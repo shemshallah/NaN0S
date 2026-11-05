@@ -224,13 +224,13 @@ class MainActivity : Activity(), NanLoop.Listener {
         try {
             val guest = assets.open("n16_train.nan").use { it.readBytes() }
             if (vm.load(guest) == null) throw IllegalStateException("NaN16 training guest did not load")
-            if (raw != null) {
-                val header = "N16TXT/1\n".toByteArray(Charsets.US_ASCII)
-                val hasHeader = raw.size >= header.size && raw.copyOfRange(0, header.size).contentEquals(header)
-                val framed = if (hasHeader) raw else header + raw
-                if (!vm.writeBytes(49152, framed + byteArrayOf(0))) {
-                    throw IllegalStateException("Could not transfer corpus into NaN16 memory")
-                }
+            val sample = "NaN16 owns the corpus codec.\\nRunner and Android share one trainer.\\nThe intake stages updates before merge.\\n".toByteArray(Charsets.UTF_8)
+            val corpus = raw ?: sample
+            val header = "N16TXT/1\\n".toByteArray(Charsets.US_ASCII)
+            val hasHeader = corpus.size >= header.size && corpus.copyOfRange(0, header.size).contentEquals(header)
+            val framed = if (hasHeader) corpus else header + corpus
+            if (!vm.writeBytes(49152, framed + byteArrayOf(0))) {
+                throw IllegalStateException("Could not transfer corpus into NaN16 memory")
             }
             var rc = NanVm.BUDGET
             var rounds = 0
