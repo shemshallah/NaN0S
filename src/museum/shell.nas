@@ -604,6 +604,10 @@ sm_settings:
   CALL @sys_show
   JMP @sys_menu
 sm_net:
+  LA r10,@service_rec
+  LD r1,r10,0
+  CMP r1,r0
+  JMP[NE] @sh_run
   MOVI r1,@net_title
   MOVI r2,@net_body
   CALL @sys_show
@@ -666,6 +670,7 @@ ss_body:
 ; by the shell. Order and wording are edited in carts.txt only.
 .equ TOC_BASE 22000
 .equ BOOT_BASE 4784
+.equ SERVICE_BASE 4816
 .org 4784
 boot_rec:
 ; system cart record (the GUI desktop), same 16-word shape. [0]=0 -> boot to menu.
@@ -673,6 +678,9 @@ boot_rec:
 .org 4800
 nsh_req:
 .word 0
+.org 4816
+service_rec:
+; slot-less service cart record (SYSTEM menu [2]), same 16-word shape.
 .org 4864
 sh_page:
 .word 0
@@ -690,7 +698,7 @@ sh_visidx:
 sm_title:
 .str " NaN/0S  SYSTEM"
 sm_body:
-.str " [1] SETTINGS\n [2] NANNET\n [3] DISK UTILITY\n [4] MEMORY UTILITY\n [5] CPU / ARCHITECTURE\n\n ESC returns to the museum."
+.str " [1] SETTINGS\n [2] NANNET SERVICE\n [3] DISK UTILITY\n [4] MEMORY UTILITY\n [5] CPU / ARCHITECTURE\n\n ESC returns to the museum."
 sm_foot:
 .str "NaN/0S SYSTEM  1-5 open  ESC shell"
 sys_foot:

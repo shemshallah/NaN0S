@@ -29,16 +29,28 @@ BEGIN {
   # carts.txt format (one line per cart, order = menu order):
   #   SLOT:FILE:YEAR:HALL:BADGE:TITLE   SLOT = unique catalog id; id 10 hidden
   #   boot:FILE                         the system cart (GUI); not an exhibit slot
+  #   service:FILE                      slot-less service cart at word 4816
   # Catalog: 16-word TOC entries at 22000, 16-word titles at 23600, store 25000.
   # Titles are 4 chars/word LE, NUL padded. This admits 87 cartridges before the
   # title area reaches the store; storage size remains the real limit.
   TOCB = 22000; TITLEB = 23600; MAXCART = 87
-  k = 0; top = 25000; haveboot = 0
+  k = 0; top = 25000; haveboot = 0; havesvc = 0
   while ((getline cl < CARTS) > 0){
     ci = index(cl, ";"); if (ci > 0) cl = substr(cl, 1, ci-1)
     ci = index(cl, "#"); if (ci > 0) cl = substr(cl, 1, ci-1)
     gsub(/^[ \t]+|[ \t]+$/, "", cl)
     if (cl == "") continue
+    if (substr(cl, 1, 8) == "service:"){
+      cf = substr(cl, 9); gsub(/^[ \t]+|[ \t]+$/, "", cf)
+      if (havesvc) die("two service: lines in carts.txt")
+      if (cf == "") die("service: line without a file")
+      bs = top
+      svclen = storecart(cf, bs)
+      top = bs + svclen
+      svc_h = CH; svc_h2 = CH2; svc_cc = CC; havesvc = 1; svcstart = bs
+      if (top > LMAX) LMAX = top
+      continue
+    }
     if (substr(cl, 1, 5) == "boot:"){
       cf = substr(cl, 6); gsub(/^[ \t]+|[ \t]+$/, "", cf)
       if (haveboot) die("two boot: lines in carts.txt")
@@ -84,6 +96,11 @@ BEGIN {
   if (haveboot){
     setw(4784+0, 0, 1); setw(4784+4, 0, bstart); setw(4784+5, 0, blen)
     setw(4784+8, 0, bh); setw(4784+10, 0, bh2); setw(4784+11, 0, bcc)
+  }
+  # service record (same 16-word shape at 4816); [0] != 0 marks "a service cart exists"
+  if (havesvc){
+    setw(4816+0, 0, 1); setw(4816+4, 0, svcstart); setw(4816+5, 0, svclen)
+    setw(4816+8, 0, svc_h); setw(4816+10, 0, svc_h2); setw(4816+11, 0, svc_cc)
   }
   if (LMAX < TITLEB + 16*k + 16) LMAX = TITLEB + 16*k + 16
   if (LMAX < 4096) LMAX = 4096

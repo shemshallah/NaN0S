@@ -1,4 +1,4 @@
-# NANNET — system network manager (M1/M2)
+# NANNET — system network manager (M1/M2/M3)
 
 NANNET is the network control plane, separate from private tooling. It owns link,
 address, route, DNS, driver-load and WiFi state. All logic is NaN16; the
@@ -11,6 +11,8 @@ sources assemble with the normal `tools/nmk.awk` pipeline.
 - `link_test.nas` — state, bounds, longest-prefix lookup.
 - `wifi_test.nas` — scan/join/leave state machine.
 - `system.nancfg` — sample control-plane config.
+- `../nan/nannet_cart.nas` — slot-less service console (M3); packed at word
+  4816 and launched from the shell SYSTEM menu.
 
 ## ABI
 
@@ -76,7 +78,10 @@ Lab 30) so the state machine and config verbs are exercised for real.
 sh tools/nannet_gate.sh        # apply, lists, lookup, rollback, restore
 sh tools/nannet_link_gate.sh   # state, bounds, addr, longest-prefix, DNS
 sh tools/nannet_wifi_gate.sh   # scan/join/leave, fixtures, config round-trip
+sh tools/nannet_service_gate.sh # slot-less cart record, SYSTEM launch, link/WiFi state, exit
 ```
 
-Next: pack the manager as a slot-less service cart and surface it from the
-system menu/terminal.
+M3 is live: the service cart is not a catalog slot and the SYSTEM menu launches
+it. The console shows link state, counters, the deterministic WiFi fixture and
+link toggles; it calls the same control-plane library as Settings. Live packet
+transport and radio drivers remain M4/M6 work.

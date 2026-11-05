@@ -9,6 +9,8 @@
 #   boot:FILE
 #     the SYSTEM cart, started on cold boot (the GUI desktop). Not an exhibit and
 #     NOT a slot number, slot 9 is the Settings menu; hidden tooling is not listed.
+#   service:FILE
+#     slot-less service cart for the SYSTEM menu; loaded by the shell
 #
 # Cartridges are packed into the store from word 25000 upward in this file's order.
 # STORE MUST STAY ABOVE THE RUN SLOT (8192 + longest cart, nsh 13248 words).
@@ -23,3 +25,4 @@
 9:src/nan/settings_cart.nan:2026:10:0:Settings
 10:src/nan/nsh_cart.nan:2026:10:0:Storage (nsh)
 boot:src/nan/gui_cart.nan
+service:src/nan/nannet_cart.nan

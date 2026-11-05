@@ -1207,6 +1207,18 @@ Spec: `spec/TRANSLATOR.md`.
   pre-assembled listing; needs a generator rework or manual port), resident
   NIC stats visible from Settings (needs shared memory or NANNET ownership).
 
+## r26m status - NANNET service cart (Nov 4 2026)
+- DONE: `src/nan/nannet_cart.nas` (slot-less, no catalog id) packed by
+  `tools/carts.txt` line `service:`; builder writes a 16-word service record at
+  word 4816 (boot record 4784, nsh request 4800) and the shell SYSTEM menu [2] launches it.
+  The cart uses the public NANNET library: link state, link toggles 1-4,
+  counters, WiFi scan/join/leave fixture, config rollback. ESC returns to the
+  museum menu. Settings slot 9 and the hidden-suite policy are unchanged.
+- Gate: `tools/nannet_service_gate.sh` PASS (record, launch, link+WiFi state,
+  exit); boot/settings/cart/browser/boot gates PASS; `make seals` 64 pairs OK.
+- Image capacity: guest 61,858 / 65,536 words (service cart 2,152 words at
+  59,706). Next: GUI terminal command binding and resident packet service.
+
 ## CRYPT — public encryption suite
 - [x] NSP-7/NSP-8 capsule reference + frozen KATs (`crypt/vectors/capsule.txt`).
 - [x] NSPF1 authenticated file container + CLI + gate (`crypt/`; suites 1/2;
