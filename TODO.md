@@ -1191,6 +1191,22 @@ Spec: `spec/TRANSLATOR.md`.
   (VpnService/datagram + JNI) into NANNET. The APK build stays on the CI
   `gradle :app:assembleDebug` path.
 
+## r26l status - timing/throughput module (Nov 4 2026)
+- DONE: `src/lib/timing.nas` - importable timing/stats module for any cart:
+  `tm_start`/`tm_stop` (TICK ms + RDTSC hi/lo), `tm_rate` (bytes/ms -> B/s),
+  ping counters (count/sum/avg/min/max via `tm_ping_add`/`tm_ping_get`), TX/RX
+  and storage-read/storage-write byte counters (`tm_io_add`), `tm_cpu_mhz`
+  (~500 ms RDTSC window).
+- DONE: Settings `[6] TIMING` (TICK ms, ping count/avg/max, sample rate) and
+  `[7] CPU TIMING` (CPU MHz; 500 ms RDTSC probe). Gates: settings/cart/browser
+  PASS. NIC gate prints `PING MS` via the module.
+- DONE: `crypt/nan0s_fs bench <image> <keyhex> <name> <sizeMB>` - encrypted
+  put/get round-trip with MiB/s; removes its temp file; NSP-7 reference is
+  CPU-heavy (~0.03 MiB/s; use 1 MiB). x86 build + seals PASS.
+- NOT done: wiring the guest `nsh` to report storage MB/s (guest cart is a
+  pre-assembled listing; needs a generator rework or manual port), resident
+  NIC stats visible from Settings (needs shared memory or NANNET ownership).
+
 ## CRYPT — public encryption suite
 - [x] NSP-7/NSP-8 capsule reference + frozen KATs (`crypt/vectors/capsule.txt`).
 - [x] NSPF1 authenticated file container + CLI + gate (`crypt/`; suites 1/2;
