@@ -85,16 +85,21 @@ int main(int argc, char **argv) {
       fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\\n");
       free(raw); return 2;
     }
-    static const uint8_t header[] = "N16TXT/1\\n";
-    int has_header = corpus_len >= sizeof(header) - 1 &&
-                     memcmp(raw, header, sizeof(header) - 1) == 0;
-    size_t framed_len = corpus_len + (has_header ? 0 : sizeof(header) - 1);
+    static const uint8_t header_lf[] = "N16TXT/1\\n";
+    static const uint8_t header_crlf[] = "N16TXT/1\\r\\n";
+    int has_header_lf = corpus_len >= sizeof(header_lf) - 1 &&
+                        memcmp(raw, header_lf, sizeof(header_lf) - 1) == 0;
+    int has_header_crlf = corpus_len >= sizeof(header_crlf) - 1 &&
+                          memcmp(raw, header_crlf, sizeof(header_crlf) - 1) == 0;
+    int has_header = has_header_lf || has_header_crlf;
+    size_t header_len = sizeof(header_lf) - 1;
+    size_t framed_len = corpus_len + (has_header ? 0 : header_len);
     uint8_t *framed = (uint8_t *)malloc(framed_len + 1);
     if (!framed) { free(raw); return 1; }
     if (has_header) memcpy(framed, raw, corpus_len);
     else {
-      memcpy(framed, header, sizeof(header) - 1);
-      memcpy(framed + sizeof(header) - 1, raw, corpus_len);
+      memcpy(framed, header_lf, header_len);
+      memcpy(framed + header_len, raw, corpus_len);
     }
     framed[framed_len] = 0;
     int wrc = nan_write_bytes(v, 49152u, framed, framed_len + 1);
