@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   uint8_t *data = (!img && train_mode) ? build_training_guest(&len) : slurp(img, &len);
   if (!data) { perror(img ? img : "NaN16 training guest"); return 1; }
   nan_vm *v = nan_create(); if (!v) { fprintf(stderr, "out of memory\n"); return 1; }
-  const char *kind; if (nan_load_auto(v, data, len, &kind)) { fprintf(stderr, "cannot load %s (text error line %d)\n", img, nan_load_error(v)); return 1; }
+  const char *kind; if (nan_load_auto(v, data, len, &kind)) { fprintf(stderr, "cannot load %s (text error line %d)\n", img ? img : "<built trainer>", nan_load_error(v)); return 1; }
 
   if (train_mode && corpus) {
     size_t corpus_len = 0;
