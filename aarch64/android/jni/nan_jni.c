@@ -20,6 +20,14 @@ JNIEXPORT jstring JNICALL FN(load)(JNIEnv *e, jclass c, jlong h, jbyteArray data
   (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
   return rc == 0 ? (*e)->NewStringUTF(e, kind) : NULL;
 }
+JNIEXPORT jboolean JNICALL FN(writeBytes)(JNIEnv *e, jclass c, jlong h, jint address, jbyteArray data) {
+  (void)c; if (!data || address < 0) return JNI_FALSE;
+  jsize n = (*e)->GetArrayLength(e, data);
+  jbyte *p = (*e)->GetByteArrayElements(e, data, NULL); if (!p) return JNI_FALSE;
+  int rc = nan_write_bytes(VM(h), (uint32_t)address, (const uint8_t *)p, (size_t)n);
+  (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
+  return rc == 0 ? JNI_TRUE : JNI_FALSE;
+}
 JNIEXPORT jint JNICALL FN(run)(JNIEnv *e, jclass c, jlong h, jint steps) { (void)e; (void)c; return nan_run(VM(h), steps > 0 ? (uint32_t)steps : 0u); }
 JNIEXPORT void JNICALL FN(setTime)(JNIEnv *e, jclass c, jlong h, jint ms) { (void)e; (void)c; nan_set_time_ms(VM(h), (uint32_t)ms); }
 JNIEXPORT void JNICALL FN(keyChar)(JNIEnv *e, jclass c, jlong h, jint ch) { (void)e; (void)c; nan_key_char(VM(h), ch); }
