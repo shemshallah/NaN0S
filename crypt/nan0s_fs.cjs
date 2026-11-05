@@ -282,6 +282,27 @@ function resize(image, key) {
   putBlock(image, key, 0, f.sb);
   console.log("FS RESIZE capacity=" + h.dataSectors);
 }
+function bench(image, key, name, sizeMB) {
+  const mb = parseInt(sizeMB, 10);
+  if (!Number.isFinite(mb) || mb < 1 || mb > 512) throw new Error("size must be 1..512 MiB");
+  if (!name || Buffer.byteLength(name) > NAME_MAX) throw new Error("bench name too long");
+  const size = mb * 1024 * 1024;
+  const data = Buffer.alloc(size);
+  let t0 = process.hrtime.bigint();
+  putData(image, key, data, name);
+  let t1 = process.hrtime.bigint();
+  const f = readFs(image, key);
+  const e = findFile(f, name);
+  if (!e) throw new Error("bench file missing after put");
+  const out = readFileData(image, key, e);
+  let t2 = process.hrtime.bigint();
+  if (out.length !== size) throw new Error("bench readback length mismatch");
+  rm(image, key, name);
+  const putMs = Number(t1 - t0) / 1e6, getMs = Number(t2 - t1) / 1e6;
+  const mbs = ms => (mb / (ms / 1000)).toFixed(2);
+  console.log("BENCH PUT " + name + " bytes=" + size + " ms=" + putMs.toFixed(1) + " mbs=" + mbs(putMs));
+  console.log("BENCH GET " + name + " bytes=" + size + " ms=" + getMs.toFixed(1) + " mbs=" + mbs(getMs));
+}
 function check(image, key) {
   const h = needHeader(image);
   if (h.h[13] !== FS_MAGIC) { console.log("FS NO"); process.exit(1); }
@@ -320,6 +341,7 @@ if (require.main === module) {
     else if (cmd === "df") df(image, key);
     else if (cmd === "compact") compact(image, key);
     else if (cmd === "resize") resize(image, key);
+    else if (cmd === "bench") bench(image, key, a, b);
     else if (cmd === "check") check(image, key);
     else {
       console.error("usage: nan0s_fs mkfs <image> <keyhex>");
@@ -331,6 +353,7 @@ if (require.main === module) {
       console.error("       nan0s_fs df   <image> <keyhex>");
       console.error("       nan0s_fs compact <image> <keyhex>");
       console.error("       nan0s_fs resize <image> <keyhex>");
+      console.error("       nan0s_fs bench <image> <keyhex> <name> <sizeMB>");
       console.error("       nan0s_fs check <image> <keyhex>");
       process.exit(2);
     }

@@ -258,6 +258,7 @@ crypt/nan0s_fs df    image keyhex
 crypt/nan0s_fs compact image keyhex   # defragment and collapse free extents
 crypt/nan0s_fs check image keyhex
 crypt/nan0s_fs resize image keyhex    # after volume grow
+crypt/nan0s_fs bench image keyhex name sizeMB   # encrypted put/get round-trip
 ```
 
 Shortcuts through the default image:
@@ -277,7 +278,10 @@ tools/nan0s_fs.sh boot --verify
 
 `boot --verify` verifies every nonzero tag **and** the `nan0s_fs` superblock,
 directory chain, extents, free list and file count. `grow` preserves the file
-layer and resizes its superblock capacity. `rm` releases extents to the
+layer and resizes its superblock capacity. `bench` times an encrypted
+write+read round trip and prints `BENCH PUT`/`BENCH GET` with MiB/s; it creates
+and removes a temporary file named by `name`. The NSP-7 reference is CPU-heavy
+(~0.03 MiB/s per MiB on typical hosts), so benchmark 1 MiB, not tens of MiB. `rm` releases extents to the
 superblock free list; `put` reuses the first fitting run. `compact` rewrites the
 live files into a fresh sparse image, collapsing fragmentation or a full free
 list. The Android **Fs** image is an NSPV volume without the encrypted file
