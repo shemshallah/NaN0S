@@ -240,7 +240,9 @@ class MainActivity : Activity(), NanLoop.Listener {
             val sample = "NaN16 owns the corpus codec.\nRunner and Android share one trainer.\nA temporary candidate is built and the active universe is restored afterward.\n".toByteArray(Charsets.UTF_8)
             val corpus = raw ?: sample
             val header = "N16TXT/1\n".toByteArray(Charsets.US_ASCII)
-            val hasHeader = corpus.size >= header.size && corpus.copyOfRange(0, header.size).contentEquals(header)
+            val crlfHeader = "N16TXT/1\r\n".toByteArray(Charsets.US_ASCII)
+            val hasHeader = (corpus.size >= header.size && corpus.copyOfRange(0, header.size).contentEquals(header)) ||
+                (corpus.size >= crlfHeader.size && corpus.copyOfRange(0, crlfHeader.size).contentEquals(crlfHeader))
             val framed = if (hasHeader) corpus else header + corpus
             if (!vm.writeBytes(49152, framed + byteArrayOf(0))) {
                 throw IllegalStateException("Could not transfer corpus into NaN16 memory")
