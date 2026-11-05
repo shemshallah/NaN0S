@@ -17,4 +17,7 @@ grep -qx 'N16 TRAIN PASS' "$tmp/utf8.out" || { cat "$tmp/utf8.out"; exit 1; }
 printf 'N16TXT/1\nbad \300\257\n' > "$tmp/invalid.txt"
 if aarch64/android/nan_cli --nannet-train "$tmp/invalid.txt" --serial > "$tmp/invalid.out"; then echo "invalid UTF-8 unexpectedly accepted"; exit 1; fi
 grep -qx 'N16 TRAIN REJECT' "$tmp/invalid.out" || { cat "$tmp/invalid.out"; exit 1; }
+printf 'N16TXT/1\\ncontrol \\302\\200\\n' > "$tmp/control.txt"
+if aarch64/android/nan_cli --nannet-train "$tmp/control.txt" --serial > "$tmp/control.out"; then echo "C1 control unexpectedly accepted"; exit 1; fi
+grep -qx 'N16 TRAIN REJECT' "$tmp/control.out" || { cat "$tmp/control.out"; exit 1; }
 echo "N16 corpus trainer gate: PASS"
