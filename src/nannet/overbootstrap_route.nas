@@ -14,9 +14,8 @@ JMP[LT] @ob_page_bad
 MOVI r4,256
 CMP r4,r1
 JMP[LT] @ob_page_bad
+MOVI r4,1
 SUB r1,r1,r4
-; restore the one-based subtraction correctly: page = point - 1
-ADDI r1,r1,255
 MOVI r2,0
 CMP r1,r0
 JMP[EQ] @ob_page_runner
@@ -54,6 +53,8 @@ MOVHI r6,128
 CMP r5,r6
 JMP[GE] @ob_addr_bad
 LD r7,r0,@ob_addr_length
+CMP r7,r6
+JMP[GT] @ob_addr_bad
 ADD r8,r5,r7
 CMP r8,r6
 JMP[GT] @ob_addr_bad
