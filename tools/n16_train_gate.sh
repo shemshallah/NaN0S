@@ -11,6 +11,8 @@ grep -qx 'N16 TRAIN PASS' "$tmp/out" || { cat "$tmp/out"; exit 1; }
 grep -qx '00000001' "$tmp/out" || { echo "candidate bigram count missing"; cat "$tmp/out"; exit 1; }
 if ! aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"; then cat "$tmp/sample.out"; echo "sample invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/sample.out" || { cat "$tmp/sample.out"; exit 1; }
+sh tools/nannet-train.sh > "$tmp/launcher.out"
+grep -qx 'N16 TRAIN PASS' "$tmp/launcher.out" || { cat "$tmp/launcher.out"; exit 1; }
 printf 'N16TXT/1\ncaf\303\251\nemoji \360\237\214\215\n' > "$tmp/utf8.txt"
 if ! aarch64/android/nan_cli --nannet-train "$tmp/utf8.txt" --serial > "$tmp/utf8.out"; then cat "$tmp/utf8.out"; echo "UTF-8 invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/utf8.out" || { cat "$tmp/utf8.out"; exit 1; }
