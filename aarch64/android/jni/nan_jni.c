@@ -20,6 +20,17 @@ JNIEXPORT jstring JNICALL FN(load)(JNIEnv *e, jclass c, jlong h, jbyteArray data
   (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
   return rc == 0 ? (*e)->NewStringUTF(e, kind) : NULL;
 }
+JNIEXPORT jbyteArray JNICALL FN(readBytes)(JNIEnv *e, jclass c, jlong h, jint address, jint length) {
+  (void)c; if (address < 0 || length < 0 || length > 1048576) return NULL;
+  jbyteArray out = (*e)->NewByteArray(e, length); if (!out) return NULL;
+  if (length == 0) return out;
+  jbyte *buf = (jbyte *)malloc((size_t)length);
+  if (!buf) return NULL;
+  int rc = nan_read_bytes(VM(h), (uint32_t)address, (uint8_t *)buf, (size_t)length);
+  if (rc == 0) (*e)->SetByteArrayRegion(e, out, 0, length, buf);
+  free(buf);
+  return rc == 0 ? out : NULL;
+}
 JNIEXPORT jboolean JNICALL FN(writeBytes)(JNIEnv *e, jclass c, jlong h, jint address, jbyteArray data) {
   (void)c; if (!data || address < 0) return JNI_FALSE;
   jsize n = (*e)->GetArrayLength(e, data);
