@@ -31,5 +31,5 @@ grep -q '^UP    2        ADDR     1       ROUTE    1        DNS    1$' "$T/prof"
 "$CLI" --img build/nan0s.img --steps 60000000 \
   --keys '@3000000,ESC,@1000000,s,@1000000,2,@1000000,ESC,@1500000' \
   --dump-text >"$T/exit" 2>/dev/null
-grep -q 'MUSEUM OF COMPUTING' "$T/exit" || { echo "nannet service gate: FAIL (exit menu)"; exit 1; }
+grep -q 'NaN/0S  SYSTEM' "$T/exit" || { echo "nannet service gate: FAIL (exit menu)"; exit 1; }
 echo "nannet service gate: PASS (slot-less record, SYSTEM launch, link+WiFi state, exit)"
