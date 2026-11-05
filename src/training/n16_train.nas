@@ -49,6 +49,8 @@ MOVI r6,0
 MOVI r7,0
 MOVI r8,5381
 MOVI r11,8192
+MOVI r14,0
+MOVI r3,0
 scan:
 LDB r9,r4,0
 CMP r9,r0
@@ -81,22 +83,24 @@ JMP @accept
 ; r3 carries a first-continuation restriction: 1 >=A0, 2 <=9F,
 ; 3 >=90, 4 <=8F. This rejects overlong forms, surrogates and >U+10FFFF.
 utf8_start:
-MOVI r10,194
+MOVI r10,193
 CMP r9,r10
-JMP[LT] @utf8_three
+JMP[LE] @reject
 MOVI r10,223
-CMP r10,r9
-JMP[LT] @reject
+CMP r9,r10
+JMP[LE] @utf8_two
+MOVI r10,239
+CMP r9,r10
+JMP[LE] @utf8_three
+MOVI r10,244
+CMP r9,r10
+JMP[LE] @utf8_four
+JMP @reject
+utf8_two:
 MOVI r14,1
 MOVI r3,0
 JMP @accept
 utf8_three:
-MOVI r10,224
-CMP r9,r10
-JMP[LT] @utf8_four
-MOVI r10,239
-CMP r10,r9
-JMP[LT] @reject
 MOVI r14,2
 MOVI r3,0
 MOVI r10,224
@@ -113,12 +117,6 @@ utf8_ed:
 MOVI r3,2
 JMP @accept
 utf8_four:
-MOVI r10,240
-CMP r9,r10
-JMP[LT] @reject
-MOVI r10,244
-CMP r10,r9
-JMP[LT] @reject
 MOVI r14,3
 MOVI r3,0
 MOVI r10,240
@@ -213,6 +211,8 @@ newline_advance:
 ADDI r4,r4,1
 JMP @scan
 finish:
+CMP r14,r0
+JMP[NE] @reject
 CMP r7,r0
 JMP[EQ] @finish_counted
 ADDI r6,r6,1
