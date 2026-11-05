@@ -1,28 +1,7 @@
 # NaN/0S image manifest - the ONLY file to edit for slot number, order or wording.
-#
-#   SLOT:FILE:YEAR:HALL:BADGE:TITLE
-#     SLOT  = unique catalog id 1..87. The menu shows paged local keys 1..9;
-#             line order is catalog order. Id 10 is the hidden storage cart.
-#     BADGE = 0 EXACT | 1 RE-CREATION | 2 INSPIRED
-#     TITLE = shown in the menu (up to 63 cols; builder writes it into guest RAM)
-#
-#   boot:FILE
-#     the SYSTEM cart, started on cold boot (the GUI desktop). Not an exhibit and
-#     NOT a slot number, slot 9 is the Settings menu; hidden tooling is not listed.
-#   service:FILE
-#     slot-less service cart for the SYSTEM menu; loaded by the shell
-#
-# Cartridges are packed into the store from word 25000 upward in this file's order.
-# STORE MUST STAY ABOVE THE RUN SLOT (8192 + longest cart, nsh 13248 words).
-1:src/nan/baby_cart.nan:1948:0:1:Manchester Baby (SSEM) - 21 June 1948
-2:src/nan/boole_cart.nan:1854:0:2:Boole - The Laws of Thought (16 functions, live) - 1854
-3:src/nan/sierpinski_cart.nan:1915:4:1:Sierpinski - Rule 90 (1915) - live fractal
-4:src/nan/trust_cart.nan:1984:7:2:Trust - Reflections on Trusting Trust (1984) - paper
-5:src/nan/patriot_cart.nan:1991:7:1:Patriot Missile Failure - Dhahran 1991
-6:src/nan/paradox_cart.nan:2026:9:2:Paradox Engine - sNaN/qNaN contradiction oscillator
-7:src/nan/about_nan0s_cart.nan:2026:7:2:About NaN/0S - the machine, the trust, the plan
-8:src/nan/about_dev_cart.nan:2026:7:2:About Shemshallah - the developer
-9:src/nan/settings_cart.nan:2026:10:0:Settings
-10:src/nan/nsh_cart.nan:2026:10:0:Storage (nsh)
+# About pages, Settings, and the NaNNET service remain in the compact system menu.
+1:src/nan/about_nan0s_cart.nan:2026:7:2:About NaN/0S - the machine, the trust, the plan
+2:src/nan/about_dev_cart.nan:2026:7:2:About Shemshallah - the developer
+3:src/nan/settings_cart.nan:2026:10:0:Settings
 boot:src/nan/gui_cart.nan
 service:src/nan/nannet_cart.nan
