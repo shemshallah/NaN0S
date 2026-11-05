@@ -17,3 +17,6 @@ host.jar
 # local work areas
 staging/
 INCORPORATEANDDELETE/
+
+# private local suite
+**/nannetsuite/
