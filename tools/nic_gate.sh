@@ -4,6 +4,7 @@ set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
 T="${TMPDIR:-/tmp}/nicgate.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
 command -v gawk >/dev/null 2>&1 || { echo "nic gate: gawk missing"; exit 77; }
 command -v qemu-system-i386 >/dev/null 2>&1 || { echo "nic gate: qemu missing"; exit 77; }
+[ -x /bin/cat ] || { echo "nic gate: /bin/cat missing"; exit 77; }
 [ -f src/nan/nic_cart.nan ] || awk -f tools/nmk.awk -v CMD=emit src/nan/nic_cart.nas > src/nan/nic_cart.nan 2>/dev/null
 printf 'boot:src/nan/nic_cart.nan\n' > "$T/carts.txt"
 gawk -f tools/mkimg.awk -v GOLD=src/native/nan16_x86.nan -v GUEST=src/nan/museum.nan \
@@ -12,7 +13,7 @@ cat "$T/b.bin" "$T/g.bin" > "$T/img"; truncate -s 1474560 "$T/img"
 ok=0
 for attempt in 1 2 3; do
   timeout 15 qemu-system-i386 -m 32 -drive format=raw,if=floppy,file="$T/img" \
-    -netdev user,id=n0,guestfwd=tcp:10.0.2.100:2323-cmd:/bin/echo -device rtl8139,netdev=n0 -display none \
+    -netdev user,id=n0,guestfwd=tcp:10.0.2.100:2323-cmd:/bin/cat -device rtl8139,netdev=n0 -display none \
     -serial "file:$T/com1.txt" -no-reboot >/dev/null 2>&1 || true
   grep -q 'NIC 10EC 8139 BASE C000 52:54:00:12:34:56:' "$T/com1.txt" &&
   grep -q 'RESET 01D0' "$T/com1.txt" &&
@@ -24,7 +25,13 @@ for attempt in 1 2 3; do
   grep -q '^HOST NaN0S  HINFO NaN-LATTICE NAN0S$' "$T/com1.txt" &&
   grep -q '^DNS OK$' "$T/com1.txt" &&
   grep -q '^TCP SYNACK$' "$T/com1.txt" &&
-  grep -q '^TCP ACK$' "$T/com1.txt" && { ok=1; break; }
+  grep -q '^TCP ACK$' "$T/com1.txt" &&
+  grep -q '^TCP TX$' "$T/com1.txt" &&
+  grep -q '^TCP DATA$' "$T/com1.txt" &&
+  grep -q '^TCP ECHO OK$' "$T/com1.txt" &&
+  grep -q '^TCP DATA ACK$' "$T/com1.txt" &&
+  grep -q '^TCP FIN$' "$T/com1.txt" &&
+  grep -q '^TCP CLOSED$' "$T/com1.txt" && { ok=1; break; }
 done
 [ "$ok" -eq 1 ] || { echo "nic gate: FAIL"; tail -8 "$T/com1.txt" | cat -v; exit 1; }
-echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/data/ACK + identity + ping timing)"
+echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/echo/FIN + identity + ping timing)"

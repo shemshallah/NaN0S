@@ -1220,6 +1220,21 @@ Spec: `spec/TRANSLATOR.md`.
 - Image capacity: guest 61,858 / 65,536 words (service cart 2,152 words at
   59,706). Next: GUI terminal command binding and resident packet service.
 
+## r26n status - RTL8139 TCP echo/teardown (Nov 4 2026)
+- DONE: `src/nan/nic_cart.nas` runs a real single-flow TCP client on the
+  RTL8139: SYN, SYN-ACK parse, ACK, 6-byte payload TX, echo RX/compare, ACK,
+  FIN, peer FIN/RST handling, and CLOSED/RESET. State is per launch; there is
+  no resident stack or NANNET `eth0` binding yet.
+- Fixed RTL8139 RX ring accounting: absolute consumed offsets (`rx_off` plus a
+  rounded frame length), 4-byte status prefix, `CAPR = offset - 16`, ISR ROK
+  clear, and a CBR-vs-`rx_off` fallback for queued frames. Fixed QEMU TX
+  descriptor round-robin (`currTxDesc` order 0..3).
+- Gate: `tools/nic_gate.sh` uses `guestfwd ... -cmd:/bin/cat` and asserts
+  `TCP SYNACK`, `TCP ACK`, `TCP TX`, `TCP DATA`, `TCP ECHO OK`,
+  `TCP DATA ACK`, `TCP FIN`, and `TCP CLOSED`. PASS.
+- Limits: fixed local/remote ports and ISN, 4 KiB raw RX window, and no
+  retransmit/timestamps/options; live browser/TLS remains M4.
+
 ## CRYPT — public encryption suite
 - [x] NSP-7/NSP-8 capsule reference + frozen KATs (`crypt/vectors/capsule.txt`).
 - [x] NSPF1 authenticated file container + CLI + gate (`crypt/`; suites 1/2;
@@ -1257,8 +1272,12 @@ Spec: `spec/TRANSLATOR.md`.
       arrows/Home/End/Del, variable-size write/edit, rm tombstone, new from
       tombstone/chain head, stat, df, pwd, mount, clear, ver, help, exit),
       gates PASS C-core + x86 IDE.
-- [x] NIC bring-up: RTL8139 PCI detection, I/O BAR mapping, MAC read, reset/RX-TX init, media status, raw-DMA TX/RX frame, ARP reply decode, IPv4/ICMP QOTD payload, ARP pad "LO FROM NAN0S 1969", identity; QEMU
-      gate PASS (`tools/nic_gate.sh`). Next: reset/ring descriptors, Ethernet.
+- [x] NIC bring-up: RTL8139 PCI detection, I/O BAR mapping, MAC read,
+      reset/RX-TX init, media status, raw-DMA TX/RX frame, ARP reply decode,
+      IPv4/ICMP QOTD payload, ARP pad "LO FROM NAN0S 1969", identity, and a
+      single-flow TCP handshake/echo/FIN teardown; QEMU gate PASS
+      (`tools/nic_gate.sh`). Next: resident stack, RX ring wrap beyond the
+      4 KiB raw window, NANNET `eth0` binding.
 - [x] Browser UI shell: separate kind-7 WM window, terminal `b` launcher,
       in-window service tabs for Chinet/Telehack/ProLine/SDF/Floodgap/Fidonet/
       Eternal September; tab content is catalog metadata until TCP/TLS.

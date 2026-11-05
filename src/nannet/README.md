@@ -84,5 +84,9 @@ sh tools/nannet_service_gate.sh # slot-less cart record, SYSTEM launch, link/WiF
 M3 is live: the service cart is not a catalog slot and the SYSTEM menu launches
 it. The console shows link state, counters, the deterministic WiFi fixture and
 link toggles, and `P` applies a built-in `.nancfg` profile (lo+eth0, addr,
-route, DNS, driver 9). It calls the same control-plane library as Settings. Live packet
-transport and radio drivers remain M4/M6 work.
+route, DNS, driver 9). It calls the same control-plane library as Settings.
+
+The NIC boot cart now proves a real RTL8139 single-flow TCP handshake, echo and
+FIN teardown against QEMU `guestfwd` (`tools/nic_gate.sh`). That path is not yet
+resident, not bound to NANNET `eth0`, and has no TLS; live browser sessions and
+radio drivers remain M4/M6 work.

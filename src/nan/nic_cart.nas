@@ -1170,123 +1170,381 @@ PUTC r1
 LD r15,r0,@tcp_ret
 RET
 tcptxok:
-MOVI r5,0x3E
-ADD r5,r6,r5
-MOVI r8,60000
-tcprx:
-INW r1,r5
-MOVI r3,1
-BOOL.8 r1,r1,r3
-CMP r1,r0
-JMP[NE] @tcprxok
-SUB r8,r8,r13
-CMP r8,r0
-JMP[NE] @tcprx
-MOVI r1,@t_tcpno
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@tcp_ret
-RET
-tcprxok:
-MOVI r7,0xF000
-LDB r1,r7,16
-MOVI r3,8
-CMP r1,r3
-JMP[NE] @tcpbad
-LDB r1,r7,17
+; Wait for SYN-ACK, then send a real ACK with the peer sequence.
+CALL @tcp_rx_wait
 CMP r1,r0
 JMP[NE] @tcpbad
-LDB r1,r7,27
-MOVI r3,6
-CMP r1,r3
-JMP[NE] @tcpbad
-LDB r1,r7,51
+LD r1,r0,@rx_flags
 MOVI r3,0x12
 CMP r1,r3
 JMP[NE] @tcpbad
 MOVI r1,@t_tcpok
+CALL @pnl
+LD r1,r0,@rx_seq
+ADDI r1,r1,1
+ST r1,r0,@tcp_srv_ack
+MOVI r1,1001
+ST r1,r0,@tcp_my_seq
+; ACK the SYN-ACK.
+ST r1,r0,@seg_seq
+LD r1,r0,@tcp_srv_ack
+ST r1,r0,@seg_ack
+MOVI r1,0x10
+ST r1,r0,@seg_flags
+MOVI r1,0
+ST r1,r0,@seg_len
+CALL @tcp_build
+CALL @tcp_send
+CMP r1,r0
+JMP[NE] @tcpbad
+MOVI r1,@t_tack
+CALL @pnl
+; Send a 6-byte probe; /bin/cat echoes it back.
+MOVI r9,0xF836
+MOVI r1,78
+STB r1,r9,0
+MOVI r1,65
+STB r1,r9,1
+MOVI r1,78
+STB r1,r9,2
+MOVI r1,48
+STB r1,r9,3
+MOVI r1,83
+STB r1,r9,4
+MOVI r1,10
+STB r1,r9,5
+MOVI r1,0
+STB r1,r9,6
+STB r1,r9,7
+LD r1,r0,@tcp_my_seq
+ST r1,r0,@seg_seq
+LD r1,r0,@tcp_srv_ack
+ST r1,r0,@seg_ack
+MOVI r1,0x18
+ST r1,r0,@seg_flags
+MOVI r1,6
+ST r1,r0,@seg_len
+CALL @tcp_build
+CALL @tcp_send
+CMP r1,r0
+JMP[NE] @tcpbad
+MOVI r1,@t_tcptx
+CALL @pnl
+LD r1,r0,@tcp_my_seq
+ADDI r1,r1,6
+ST r1,r0,@tcp_my_seq
+; Wait for echoed data, skipping ACK-only segments.
+CALL @tcp_data_wait
+CMP r1,r0
+JMP[NE] @tcp_nodata
+LD r1,r0,@rx_len
+CMP r1,r0
+JMP[EQ] @tcp_nodata
+MOVI r1,@t_dataok
+CALL @pnl
+CALL @tcp_payload_cmp
+CMP r1,r0
+JMP[NE] @tcp_echobad
+MOVI r1,@t_echo
+CALL @pnl
+JMP @tcp_after_echo
+tcp_echobad:
+MOVI r1,@t_echono
+CALL @pnl
+tcp_after_echo:
+; ACK the echoed bytes: ack = rx_seq + rx_len.
+LD r1,r0,@rx_seq
+LD r2,r0,@rx_len
+ADD r1,r1,r2
+ST r1,r0,@tcp_srv_ack
+LD r1,r0,@tcp_my_seq
+ST r1,r0,@seg_seq
+LD r1,r0,@tcp_srv_ack
+ST r1,r0,@seg_ack
+MOVI r1,0x10
+ST r1,r0,@seg_flags
+MOVI r1,0
+ST r1,r0,@seg_len
+CALL @tcp_build
+CALL @tcp_send
+CMP r1,r0
+JMP[NE] @tcpbad
+MOVI r1,@t_dataack
+CALL @pnl
+; FIN-WAIT-1: our FIN consumes one sequence number.
+LD r1,r0,@tcp_my_seq
+ST r1,r0,@seg_seq
+LD r1,r0,@tcp_srv_ack
+ST r1,r0,@seg_ack
+MOVI r1,0x11
+ST r1,r0,@seg_flags
+MOVI r1,0
+ST r1,r0,@seg_len
+CALL @tcp_build
+CALL @tcp_send
+CMP r1,r0
+JMP[NE] @tcpbad
+MOVI r1,@t_fin
+CALL @pnl
+LD r1,r0,@tcp_my_seq
+ADDI r1,r1,1
+ST r1,r0,@tcp_my_seq
+CALL @tcp_finish
+LD r15,r0,@tcp_ret
+RET
+tcp_nodata:
+MOVI r1,@t_datano
+CALL @pnl
+LD r15,r0,@tcp_ret
+RET
+tcpbad:
+MOVI r1,@t_tcpno
+CALL @pnl
+LD r15,r0,@tcp_ret
+RET
+
+; Print one string plus newline.
+pnl:
+ST r15,r0,@pnl_ret
 CALL @sputs
 MOVI r1,10
 PUTC r1
-CALL @tcp_ack
-CALL @tcp_wait_data
-LD r15,r0,@tcp_ret
+LD r15,r0,@pnl_ret
 RET
-tcp_ack:
-ST r15,r0,@tack_ret
-MOVI r7,0xF000
-; server sequence raw+42..45
-LDB r8,r7,42
-SHL r8,r8,24
-LDB r9,r7,43
-SHL r9,r9,16
-BOOL.14 r8,r8,r9
-LDB r9,r7,44
-SHL r9,r9,8
-BOOL.14 r8,r8,r9
-LDB r9,r7,45
-BOOL.14 r8,r8,r9
-ADDI r10,r8,1
-MOVI r9,0xF800
-; seq=1001, ack=server+1
-MOVI r1,0
-STB r1,r9,42
-STB r1,r9,43
-MOVI r1,3
-STB r1,r9,44
-MOVI r1,0xE9
-STB r1,r9,45
-SHR r8,r10,24
-STB r8,r9,46
-SHR r8,r10,16
-MOVI r2,255
-BOOL.8 r8,r8,r2
-STB r8,r9,47
-SHR r8,r10,8
-BOOL.8 r8,r8,r2
-STB r8,r9,48
-MOVI r2,255
-BOOL.8 r8,r10,r2
-STB r8,r9,49
-MOVI r1,0x50
-STB r1,r9,50
-MOVI r1,0x10
-STB r1,r9,51
-MOVI r1,0
-STB r1,r9,54
-STB r1,r9,55
-; checksum = fold(0x211D8 + ack_hi + ack_lo)
-MOVI r1,0x11D8
-MOVI r2,2
+
+; Wait for one IPv4/TCP segment addressed to our socket.
+; Returns r1=0 and fills rx_seq/rx_flags/rx_len, or r1=1 on timeout.
+tcp_rx_wait:
+ST r15,r0,@trw_ret
+LD r6,r0,@nc_base
+MOVI r5,0x3E
+ADD r5,r6,r5
+MOVI r8,0
+MOVHI r8,0x0010
+trw_loop:
+INW r1,r5
+MOVI r3,1
+BOOL.8 r1,r1,r3
+CMP r1,r0
+JMP[NE] @trw_have
+; The ISR has one RxOK bit, so a packet queued before we cleared it can
+; lose its interrupt. CBR != rx_off still proves the ring has a frame.
+MOVI r2,0x3A
+ADD r2,r6,r2
+INW r3,r2
+LD r4,r0,@rx_off
+MOVI r2,0xFFFF
+BOOL.8 r4,r4,r2
+CMP r3,r4
+JMP[NE] @trw_have
+SUB r8,r8,r13
+CMP r8,r0
+JMP[NE] @trw_loop
+MOVI r1,1
+LD r15,r0,@trw_ret
+RET
+trw_have:
+; RTL8139 RX has a 4-byte status prefix before the Ethernet frame.
+; Read at rx_off; header length excludes the 4-byte prefix and includes FCS.
+LD r1,r0,@rx_off
+ST r1,r0,@rx_cur
+MOVI r8,0xF000
+ADD r7,r8,r1
+ST r7,r0,@rx_base
+LDB r1,r7,2
+LDB r2,r7,3
+SHL r2,r2,8
+BOOL.14 r1,r1,r2
+ADDI r1,r1,4
+ADDI r1,r1,3
+MOVI r3,0xFFFC
+BOOL.8 r1,r1,r3
+LD r2,r0,@rx_cur
+ADD r1,r1,r2
+ST r1,r0,@rx_off
+LDB r1,r7,16
+MOVI r3,8
+CMP r1,r3
+JMP[NE] @trw_bad
+LDB r1,r7,17
+CMP r1,r0
+JMP[NE] @trw_bad
+LDB r1,r7,27
+MOVI r3,6
+CMP r1,r3
+JMP[NE] @trw_bad
+; source port must be 2323
+LDB r1,r7,38
+SHL r1,r1,8
+LDB r2,r7,39
+BOOL.14 r1,r1,r2
+MOVI r3,0x0913
+CMP r1,r3
+JMP[NE] @trw_bad
+; destination port must be 40000 (0x9C40)
+LDB r1,r7,40
+SHL r1,r1,8
+LDB r2,r7,41
+BOOL.14 r1,r1,r2
+MOVI r3,0x9C40
+CMP r1,r3
+JMP[NE] @trw_bad
+; TCP sequence (prefix + 38)
+LDB r1,r7,42
+SHL r1,r1,24
+LDB r2,r7,43
 SHL r2,r2,16
 BOOL.14 r1,r1,r2
-SHR r2,r10,16
-MOVI r3,0xFFFF
+LDB r2,r7,44
+SHL r2,r2,8
+BOOL.14 r1,r1,r2
+LDB r2,r7,45
+BOOL.14 r1,r1,r2
+ST r1,r0,@rx_seq
+LDB r1,r7,51
+ST r1,r0,@rx_flags
+; payload length = IP total - 20 IP - 20 TCP (no options)
+LDB r1,r7,20
+SHL r1,r1,8
+LDB r2,r7,21
+BOOL.14 r1,r1,r2
+MOVI r2,40
+SUB r1,r1,r2
+ST r1,r0,@rx_len
+; publish the consumed ring offset, then clear RX OK
+LD r6,r0,@nc_base
+MOVI r5,0x38
+ADD r5,r6,r5
+LD r1,r0,@rx_off
+MOVI r2,16
+SUB r1,r1,r2
+OUTW r1,r5
+MOVI r5,0x3E
+ADD r5,r6,r5
+MOVI r2,1
+OUTW r2,r5
+MOVI r1,0
+LD r15,r0,@trw_ret
+RET
+trw_bad:
+MOVI r1,1
+LD r15,r0,@trw_ret
+RET
+
+; Build a 60-byte TCP segment in the raw TX window from seg_*.
+; Assumes even payload length; our probe is 6 bytes.
+tcp_build:
+ST r15,r0,@tb_ret
+MOVI r9,0xF800
+LD r3,r0,@seg_len
+ADDI r2,r3,40
+MOVI r1,0
+STB r1,r9,16
+STB r2,r9,17
+; IP checksum: base 0x625B for total length 40, minus payload length
+MOVI r1,0x625B
+SUB r1,r1,r3
+SHR r2,r1,8
+STB r2,r9,24
+MOVI r2,255
+BOOL.8 r1,r1,r2
+STB r1,r9,25
+; sequence
+LD r1,r0,@seg_seq
+SHR r2,r1,24
+STB r2,r9,38
+SHR r2,r1,16
+MOVI r3,255
 BOOL.8 r2,r2,r3
-BOOL.14 r1,r1,r2
-MOVI r3,0xFFFF
-BOOL.8 r2,r10,r3
-BOOL.14 r1,r1,r2
-tack_fold:
-MOVI r3,0xFFFF
+STB r2,r9,39
+SHR r2,r1,8
+BOOL.8 r2,r2,r3
+STB r2,r9,40
 BOOL.8 r2,r1,r3
+STB r2,r9,41
+; acknowledgement
+LD r1,r0,@seg_ack
+SHR r2,r1,24
+STB r2,r9,42
+SHR r2,r1,16
+MOVI r3,255
+BOOL.8 r2,r2,r3
+STB r2,r9,43
+SHR r2,r1,8
+BOOL.8 r2,r2,r3
+STB r2,r9,44
+BOOL.8 r2,r1,r3
+STB r2,r9,45
+MOVI r1,0x50
+STB r1,r9,46
+LD r1,r0,@seg_flags
+STB r1,r9,47
+MOVI r1,0
+STB r1,r9,50
+STB r1,r9,51
+; fixed pseudo-header + ports + TCP len20 + window = 0x1BDDF
+MOVI r1,0xBDDF
+MOVHI r1,1
+LD r2,r0,@seg_len
+ADD r1,r1,r2
+LD r3,r0,@seg_seq
+SHR r4,r3,16
+ADD r1,r1,r4
+MOVI r5,0xFFFF
+BOOL.8 r4,r3,r5
+ADD r1,r1,r4
+LD r3,r0,@seg_ack
+SHR r4,r3,16
+ADD r1,r1,r4
+BOOL.8 r4,r3,r5
+ADD r1,r1,r4
+LD r3,r0,@seg_flags
+MOVI r4,0x5000
+BOOL.14 r3,r3,r4
+ADD r1,r1,r3
+LD r2,r0,@seg_len
+MOVI r9,0xF836
+tb_pl:
+CMP r2,r0
+JMP[EQ] @tb_fold
+LDB r3,r9,0
+SHL r3,r3,8
+LDB r4,r9,1
+BOOL.14 r3,r3,r4
+ADD r1,r1,r3
+ADDI r9,r9,2
+SUB r2,r2,r13
+SUB r2,r2,r13
+JMP @tb_pl
+tb_fold:
+MOVI r5,0xFFFF
+tb_foldl:
+BOOL.8 r2,r1,r5
 SHR r4,r1,16
 ADD r1,r2,r4
 SHR r4,r1,16
 CMP r4,r0
-JMP[NE] @tack_fold
-tack_fd:
-MOVI r2,0xFFFF
-BOOL.6 r1,r1,r2
+JMP[NE] @tb_foldl
+BOOL.6 r1,r1,r5
+CMP r1,r0
+JMP[NE] @tb_st
+MOVI r1,0xFFFF
+tb_st:
+MOVI r9,0xF800
 SHR r2,r1,8
-STB r2,r9,54
+STB r2,r9,50
 MOVI r2,255
 BOOL.8 r1,r1,r2
-STB r1,r9,55
-; TX via selected descriptor
+STB r1,r9,51
+LD r15,r0,@tb_ret
+RET
+
+; Transmit the frame currently in the raw TX window.
+; Returns r1=0 on completion, r1=1 on timeout.
+tcp_send:
+ST r15,r0,@ts_ret
 LD r6,r0,@nc_base
-LD r2,r0,@tack_desc
+LD r2,r0,@tx_desc
 SHL r2,r2,2
 MOVI r5,0x20
 ADD r5,r5,r2
@@ -1300,89 +1558,148 @@ ADD r5,r6,r5
 MOVI r2,60
 OUTL r2,r5
 MOVI r8,60000
-tack_tx:
+ts_poll:
 INW r1,r5
 MOVI r3,0x8000
 BOOL.8 r1,r1,r3
 CMP r1,r0
-JMP[NE] @tack_ok
+JMP[NE] @ts_ok
 SUB r8,r8,r13
 CMP r8,r0
-JMP[NE] @tack_tx
-MOVI r1,@t_tcpno
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@tack_ret
+JMP[NE] @ts_poll
+MOVI r1,1
+LD r15,r0,@ts_ret
 RET
-tack_ok:
-MOVI r1,@t_tack
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@tack_ret
+ts_ok:
+LD r1,r0,@tx_desc
+ADDI r1,r1,1
+MOVI r2,3
+BOOL.8 r1,r1,r2
+ST r1,r0,@tx_desc
+MOVI r1,0
+LD r15,r0,@ts_ret
 RET
-tcp_wait_data:
-ST r15,r0,@td_ret
-; Wait for the first TCP data packet.
-MOVI r5,0x3E
-ADD r5,r6,r5
-MOVI r8,60000
-tdata_rx:
-INW r1,r5
+
+; Check that the 6 echoed bytes are "NAN0S\n".
+; Wait up to twelve segments for one with payload.
+tcp_data_wait:
+ST r15,r0,@tdw_ret
+MOVI r1,12
+ST r1,r0,@tdw_left
+tdw_loop:
+CALL @tcp_rx_wait
+CMP r1,r0
+JMP[NE] @tdw_none
+LD r1,r0,@rx_len
+CMP r1,r0
+JMP[NE] @tdw_ok
+LD r1,r0,@rx_flags
 MOVI r3,1
-BOOL.8 r1,r1,r3
+BOOL.8 r2,r1,r3
+CMP r2,r0
+JMP[NE] @tdw_none
+LD r1,r0,@tdw_left
+SUB r1,r1,r13
+ST r1,r0,@tdw_left
 CMP r1,r0
-JMP[NE] @tdata_ok
-SUB r8,r8,r13
-CMP r8,r0
-JMP[NE] @tdata_rx
-MOVI r1,@t_datano
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@tack_ret
+JMP[NE] @tdw_loop
+tdw_none:
+MOVI r1,1
+LD r15,r0,@tdw_ret
 RET
-tdata_ok:
-MOVI r7,0xF000
-LDB r1,r7,16
-MOVI r3,8
+tdw_ok:
+MOVI r1,0
+LD r15,r0,@tdw_ret
+RET
+
+tcp_payload_cmp:
+ST r15,r0,@pc_ret
+LD r7,r0,@rx_base
+LDB r1,r7,58
+MOVI r3,78
 CMP r1,r3
-JMP[NE] @tdata_bad
-LDB r1,r7,17
+JMP[NE] @pc_bad
+LDB r1,r7,59
+MOVI r3,65
+CMP r1,r3
+JMP[NE] @pc_bad
+LDB r1,r7,60
+MOVI r3,78
+CMP r1,r3
+JMP[NE] @pc_bad
+LDB r1,r7,61
+MOVI r3,48
+CMP r1,r3
+JMP[NE] @pc_bad
+LDB r1,r7,62
+MOVI r3,83
+CMP r1,r3
+JMP[NE] @pc_bad
+LDB r1,r7,63
+MOVI r3,10
+CMP r1,r3
+JMP[NE] @pc_bad
+MOVI r1,0
+LD r15,r0,@pc_ret
+RET
+pc_bad:
+MOVI r1,1
+LD r15,r0,@pc_ret
+RET
+
+; FIN-WAIT-2: accept up to three segments while looking for peer FIN/RST.
+tcp_finish:
+ST r15,r0,@tf_ret
+MOVI r1,3
+ST r1,r0,@tf_left
+tf_loop:
+CALL @tcp_rx_wait
 CMP r1,r0
-JMP[NE] @tdata_bad
-LDB r1,r7,27
-MOVI r3,6
-CMP r1,r3
-JMP[NE] @tdata_bad
-MOVI r1,@t_dataok
-CALL @sputs
-MOVI r1,10
-PUTC r1
-MOVI r1,2
-ST r1,r0,@tack_desc
-CALL @tcp_ack
-MOVI r1,@t_dataack
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@td_ret
+JMP[NE] @tf_none
+LD r1,r0,@rx_flags
+MOVI r3,1
+BOOL.8 r2,r1,r3
+CMP r2,r0
+JMP[NE] @tf_fin
+MOVI r3,4
+BOOL.8 r2,r1,r3
+CMP r2,r0
+JMP[NE] @tf_rst
+LD r1,r0,@tf_left
+SUB r1,r1,r13
+ST r1,r0,@tf_left
+CMP r1,r0
+JMP[NE] @tf_loop
+JMP @tf_none
+tf_fin:
+LD r1,r0,@rx_seq
+ADDI r1,r1,1
+ST r1,r0,@tcp_srv_ack
+LD r1,r0,@tcp_my_seq
+ST r1,r0,@seg_seq
+LD r1,r0,@tcp_srv_ack
+ST r1,r0,@seg_ack
+MOVI r1,0x10
+ST r1,r0,@seg_flags
+MOVI r1,0
+ST r1,r0,@seg_len
+CALL @tcp_build
+CALL @tcp_send
+MOVI r1,@t_closed
+CALL @pnl
+LD r15,r0,@tf_ret
 RET
-tdata_bad:
-MOVI r1,@t_datano
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@td_ret
+tf_rst:
+MOVI r1,@t_treset
+CALL @pnl
+LD r15,r0,@tf_ret
 RET
-tcpbad:
-MOVI r1,@t_tcpno
-CALL @sputs
-MOVI r1,10
-PUTC r1
-LD r15,r0,@tcp_ret
+tf_none:
+MOVI r1,@t_nofin
+CALL @pnl
+LD r15,r0,@tf_ret
 RET
+
 t_none:
 .str "NIC NONE"
 t_reset:
@@ -1425,6 +1742,20 @@ t_datano:
 .str "TCP NODATA"
 t_dataack:
 .str "TCP DATA ACK"
+t_tcptx:
+.str "TCP TX"
+t_echo:
+.str "TCP ECHO OK"
+t_echono:
+.str "TCP ECHO BAD"
+t_fin:
+.str "TCP FIN"
+t_nofin:
+.str "TCP NO FIN"
+t_closed:
+.str "TCP CLOSED"
+t_treset:
+.str "TCP RESET"
 t_mac:
 .str "MAC "
 nc_ret:
@@ -1439,11 +1770,49 @@ dns_ret:
 .word 0
 tcp_ret:
 .word 0
-tack_ret:
+seg_seq:
 .word 0
-tack_desc:
+seg_ack:
+.word 0
+seg_flags:
+.word 0
+seg_len:
+.word 0
+rx_seq:
+.word 0
+rx_flags:
+.word 0
+rx_len:
+.word 0
+rx_off:
+.word 0
+rx_base:
+.word 0
+rx_cur:
+.word 0
+tx_desc:
 .word 1
-td_ret:
+tcp_my_seq:
+.word 1001
+tcp_srv_ack:
+.word 0
+trw_ret:
+.word 0
+tb_ret:
+.word 0
+ts_ret:
+.word 0
+pc_ret:
+.word 0
+tf_ret:
+.word 0
+tf_left:
+.word 0
+tdw_ret:
+.word 0
+tdw_left:
+.word 0
+pnl_ret:
 .word 0
 ph4_ret:
 .word 0
