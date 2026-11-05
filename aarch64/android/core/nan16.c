@@ -90,6 +90,19 @@ int nan_write_bytes(nan_vm *v, uint32_t byte_address, const uint8_t *data, size_
   }
   return 0;
 }
+int nan_read_bytes(const nan_vm *v, uint32_t byte_address, uint8_t *out, size_t len) {
+  if (!v || (!out && len)) return -1;
+  const uint64_t cap = (uint64_t)NAN_WORDS * 4u;
+  if ((uint64_t)byte_address > cap || (uint64_t)len > cap - byte_address) return -1;
+  for (size_t i = 0; i < len; ++i) {
+    uint64_t at = (uint64_t)byte_address + i;
+    uint32_t wi = (uint32_t)(at >> 2);
+    uint32_t shift = (uint32_t)(at & 3u) * 8u;
+    out[i] = (uint8_t)(((uint32_t)(v->mem[wi] >> 16) >> shift) & 0xFFu);
+  }
+  return 0;
+}
+
 void nan_set_reg(nan_vm *v, int i, uint32_t x) { v->r[i & 15] = x; }
 void nan_set_pc(nan_vm *v, uint32_t pc) { v->pc = pc; v->halted = 0; }
 int nan_flags(const nan_vm *v) { return v->k; }
