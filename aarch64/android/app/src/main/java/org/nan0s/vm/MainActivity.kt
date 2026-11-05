@@ -21,6 +21,9 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
 import java.io.File
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 
 /** Thin shell: one NanVm, one run thread, the display view, a key row and a few buttons. Everything NaN16 lives in the C core. */
 class MainActivity : Activity(), NanLoop.Listener {
@@ -32,6 +35,9 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val reqImage = 1
     private val reqDisk = 2
     private val reqWifi = 3
+    private val reqTrain = 4
+    @Volatile private var trainingActive = false
+    private var trainingState: ByteArray? = null
     private val autosave get() = File(filesDir, "autosave.nan1")
     private val diskFile get() = File(filesDir, "disk.nanfs")
     private val fsFile get() = File(filesDir, "nan0s_fs.img")
@@ -154,7 +160,109 @@ class MainActivity : Activity(), NanLoop.Listener {
         row.addView(btn("Fit") { view.resetZoom() })
         row.addView(btn("Log") { showLog() })
         row.addView(btn("WiFi") { showWifi() })
+        row.addView(btn("NaNLMind Remote Training") { showTrainingSuite() })
         return HorizontalScrollView(this).apply { addView(row) }
+    }
+
+    private fun showTrainingSuite() {
+        AlertDialog.Builder(this)
+            .setTitle("NaNLMind Remote Training")
+            .setMessage("Run the shared NaN16 corpus trainer in this Android universe.")
+            .setPositiveButton("Choose TXT") { _, _ ->
+                if (prepareTraining()) {
+                    val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "text/plain"
+                    }
+                    startActivityForResult(i, reqTrain)
+                }
+            }
+            .setNeutralButton("Run sample") { _, _ ->
+                if (prepareTraining()) Thread { runTraining(null) }.start()
+            }
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
+    private fun prepareTraining(): Boolean {
+        if (trainingActive) return false
+        val saved = vm.saveState()
+        if (saved == null) {
+            Toast.makeText(this, "Could not snapshot the active universe", Toast.LENGTH_LONG).show()
+            return false
+        }
+        trainingState = saved
+        trainingActive = true
+        loop.paused = true
+        return true
+    }
+
+    private fun readCorpus(uri: android.net.Uri): ByteArray {
+        val out = ByteArrayOutputStream()
+        contentResolver.openInputStream(uri)!!.use { input ->
+            val buffer = ByteArray(8192)
+            while (true) {
+                val n = input.read(buffer)
+                if (n < 0) break
+                if (out.size() + n > 1_048_576) throw IllegalArgumentException("TXT corpus exceeds 1 MiB")
+                out.write(buffer, 0, n)
+            }
+        }
+        val raw = out.toByteArray()
+        if (raw.any { it.toInt() == 0 }) throw IllegalArgumentException("TXT corpus contains a NUL byte")
+        Charsets.UTF_8.newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(raw))
+        return raw
+    }
+
+    private fun runTraining(raw: ByteArray?) {
+        var result = "Training failed"
+        try {
+            val guest = assets.open("n16_train.nan").use { it.readBytes() }
+            if (vm.load(guest) == null) throw IllegalStateException("NaN16 training guest did not load")
+            if (raw != null) {
+                val header = "N16TXT/1\n".toByteArray(Charsets.US_ASCII)
+                val hasHeader = raw.size >= header.size && raw.copyOfRange(0, header.size).contentEquals(header)
+                val framed = if (hasHeader) raw else header + raw
+                if (!vm.writeBytes(49152, framed + byteArrayOf(0))) {
+                    throw IllegalStateException("Could not transfer corpus into NaN16 memory")
+                }
+            }
+            var rc = NanVm.BUDGET
+            var rounds = 0
+            while (rc == NanVm.BUDGET && rounds < 5000) {
+                rc = vm.run(100_000)
+                rounds++
+            }
+            val transcript = String(vm.serial(), Charsets.UTF_8).trim()
+            result = when {
+                rc != NanVm.HALTED -> "Training stopped before completion (VM result $rc)"
+                transcript.contains("N16 TRAIN PASS") -> "$transcript\nNaN16 corpus update staged successfully."
+                transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; active model was not changed."
+                else -> "Training guest halted without a success marker: $transcript"
+            }
+        } catch (e: Exception) {
+            result = "Training failed: \${e.message}"
+        }
+        finishTraining(result)
+    }
+
+    private fun finishTraining(message: String) {
+        val saved = trainingState
+        trainingState = null
+        trainingActive = false
+        val restored = saved != null && vm.restoreState(saved)
+        loop.paused = false
+        loop.rearm()
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle("NaNLMind Remote Training")
+                .setMessage(if (restored) message else "$message\nWarning: the previous VM snapshot could not be restored.")
+                .setPositiveButton("Close", null)
+                .show()
+        }
     }
 
     // ---- real WiFi: status, scan, connect request ----
@@ -234,6 +342,18 @@ class MainActivity : Activity(), NanLoop.Listener {
     @Deprecated("kept to avoid an androidx dependency")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == reqTrain) {
+            val uri = data?.data
+            if (resultCode != RESULT_OK || uri == null) {
+                finishTraining("Training cancelled")
+                return
+            }
+            Thread {
+                try { runTraining(readCorpus(uri)) }
+                catch (e: Exception) { finishTraining("Training failed: \${e.message}") }
+            }.start()
+            return
+        }
         val uri = data?.data ?: return
         if (resultCode != RESULT_OK) return
         Thread {
@@ -280,7 +400,7 @@ class MainActivity : Activity(), NanLoop.Listener {
     }
     override fun onResume() {
         super.onResume()
-        loop.paused = false; beeper.muted = false; loop.poke(); view.invalidate()
+        loop.paused = trainingActive; beeper.muted = false; loop.poke(); view.invalidate()
     }
     override fun onDestroy() {
         super.onDestroy()
