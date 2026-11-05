@@ -23,6 +23,32 @@ static int keycode(const char *t) {
 static void drain(nan_vm *v, int echo) {
   char b[512]; size_t n; while ((n = nan_serial_read(v, b, sizeof b))) if (echo) fwrite(b, 1, n, stdout);
 }
+static uint8_t *build_training_guest(size_t *len) {
+  const char *cmd = access("tools/nmk.awk", R_OK) == 0
+      ? "awk -f tools/nmk.awk -v CMD=emit src/training/n16_train.nas"
+      : "awk -f ../../tools/nmk.awk -v CMD=emit ../../src/training/n16_train.nas";
+  FILE *p = popen(cmd, "r");
+  if (!p) return NULL;
+  size_t cap = 65536, n = 0;
+  uint8_t *b = (uint8_t *)malloc(cap);
+  if (!b) { pclose(p); return NULL; }
+  for (;;) {
+    if (n == cap) {
+      if (cap >= 4u * 1024u * 1024u) { free(b); pclose(p); return NULL; }
+      cap *= 2;
+      uint8_t *next = (uint8_t *)realloc(b, cap);
+      if (!next) { free(b); pclose(p); return NULL; }
+      b = next;
+    }
+    size_t got = fread(b + n, 1, cap - n, p);
+    n += got;
+    if (got == 0) break;
+  }
+  int status = pclose(p);
+  if (status != 0 || n == 0) { free(b); return NULL; }
+  *len = n;
+  return b;
+}
 int main(int argc, char **argv) {
   const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL, *peek = NULL, *corpus = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
   int train_mode = 0;
@@ -41,10 +67,12 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--dump-text")) dump_text = 1;
     else if (!strcmp(argv[i], "--no-trim")) trim = 0;
     else if (!strcmp(argv[i], "--serial")) serial = 1;
-    else { fprintf(stderr, "usage: nan_cli --img f [--nannet-train corpus.txt] [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--peek ADDR[:LEN]] [--disk f] [--clock steps:N]\n"); return 2; }
+    else { fprintf(stderr, "usage: nan_cli [--img f] [--nannet-train corpus.txt] [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--peek ADDR[:LEN]] [--disk f] [--clock steps:N]\n"); return 2; }
   }
-  if (!img) { fprintf(stderr, "need --img\n"); return 2; }
-  size_t len; uint8_t *data = slurp(img, &len); if (!data) { perror(img); return 1; }
+  if (!img && !train_mode) { fprintf(stderr, "need --img or --nannet-train\\n"); return 2; }
+  size_t len = 0;
+  uint8_t *data = (!img && train_mode) ? build_training_guest(&len) : slurp(img, &len);
+  if (!data) { perror(img ? img : "NaN16 training guest"); return 1; }
   nan_vm *v = nan_create(); if (!v) { fprintf(stderr, "out of memory\n"); return 1; }
   const char *kind; if (nan_load_auto(v, data, len, &kind)) { fprintf(stderr, "cannot load %s (text error line %d)\n", img, nan_load_error(v)); return 1; }
 
