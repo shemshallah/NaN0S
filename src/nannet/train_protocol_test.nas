@@ -113,6 +113,8 @@ MOVI r1,10
 PUTC r1
 HALT
 .include "nannet.nas"
+.include "overbootstrap_route.nas"
+.include "train_protocol.nas"
 .org 32768
 frame:
 .word 0x5436314E,0x00010001,0,0,0,0,1,2,0xF5B70002,0x00006DAD
