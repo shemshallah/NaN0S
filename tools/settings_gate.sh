@@ -10,6 +10,9 @@ menu() { "$CLI" --img build/nan0s.img --steps 40000000 --keys "$1" --dump-text 2
 
 menu "@3000000,ESC" > "$T/menu.txt"
 grep -q 'Settings' "$T/menu.txt" || { echo "settings gate: FAIL (slot 9 title)"; exit 1; }
+menu "@3000000,ESC,@1000000,s" > "$T/system.txt"
+grep -q "NANNET / BROWSER" "$T/system.txt" || { echo "settings gate: FAIL (compact system menu NANNET entry)"; exit 1; }
+if grep -Eq "\\[3\\] DISK|\\[4\\] MEMORY|\\[5\\] CPU" "$T/system.txt"; then echo "settings gate: FAIL (extra system utilities remain visible)"; exit 1; fi
 menu "@3000000,ESC,@1000000,9" > "$T/settings.txt"
 grep -q 'SETTINGS' "$T/settings.txt" || { echo "settings gate: FAIL (settings menu)"; exit 1; }
 grep -q 'NANNET MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (NANNET entry)"; exit 1; }
