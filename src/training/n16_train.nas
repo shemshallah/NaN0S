@@ -161,7 +161,7 @@ CMP r3,r10
 JMP[EQ] @utf8_min_90
 MOVI r10,5
 CMP r3,r10
-JMP[EQ] @utf8_max_9f
+JMP[EQ] @utf8_min_a0
 MOVI r10,143
 CMP r10,r9
 JMP[LT] @reject
