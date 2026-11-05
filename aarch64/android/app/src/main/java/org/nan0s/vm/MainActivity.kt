@@ -266,10 +266,11 @@ class MainActivity : Activity(), NanLoop.Listener {
         } catch (e: Exception) {
             result = "Training failed: ${e.message}"
         }
-        finishTraining(result)
+        val candidate = if (result.startsWith("N16 TRAIN PASS")) vm.saveState() else null
+        finishTraining(result, candidate)
     }
 
-    private fun finishTraining(message: String) {
+    private fun finishTraining(message: String, candidate: ByteArray? = null) {
         val saved = trainingState
         trainingState = null
         trainingActive = false
@@ -277,11 +278,22 @@ class MainActivity : Activity(), NanLoop.Listener {
         loop.paused = false
         loop.rearm()
         runOnUiThread {
-            AlertDialog.Builder(this)
+            val dialog = AlertDialog.Builder(this)
                 .setTitle("NaNLMind Remote Training")
                 .setMessage(if (restored) message else "$message\nWarning: the previous VM snapshot could not be restored.")
                 .setPositiveButton("Close", null)
-                .show()
+            if (restored && candidate != null) {
+                dialog.setNeutralButton("Save candidate") { _, _ ->
+                    pendingCandidate = candidate
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/octet-stream"
+                        putExtra(Intent.EXTRA_TITLE, "nan16-candidate.nan1")
+                    }
+                    startActivityForResult(intent, reqCandidate)
+                }
+            }
+            dialog.show()
         }
     }
 
@@ -375,7 +387,23 @@ class MainActivity : Activity(), NanLoop.Listener {
             return
         }
         if (requestCode == reqCandidate) {
-            val uri = data?.data ?: return
+            if (requestCode == reqCandidate) {
+            val bytes = pendingCandidate
+            pendingCandidate = null
+            val uri = data?.data
+            if (resultCode == RESULT_OK && uri != null && bytes != null) {
+                Thread {
+                    try {
+                        contentResolver.openOutputStream(uri, "w")!!.use { it.write(bytes) }
+                        runOnUiThread { Toast.makeText(this, "Candidate checkpoint saved", Toast.LENGTH_LONG).show() }
+                    } catch (_: Exception) {
+                        runOnUiThread { Toast.makeText(this, "Candidate export failed", Toast.LENGTH_LONG).show() }
+                    }
+                }.start()
+            }
+            return
+        }
+        val uri = data?.data ?: return
             if (resultCode != RESULT_OK) return
             Thread {
                 val copied = try {
