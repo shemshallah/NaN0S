@@ -686,7 +686,7 @@ sh_visidx:
 sm_title:
 .str " NaN/0S  SYSTEM"
 sm_body:
-.str " [1] SETTINGS\n [2] NANNET SERVICE\n [3] DISK UTILITY\n [4] MEMORY UTILITY\n [5] CPU / ARCHITECTURE\n\n ESC returns to the museum."
+.str " [1] SETTINGS\n [2] NANNET / BROWSER\n\n ESC returns to the main menu."
 sm_foot:
 .str "NaN/0S SYSTEM  1-2 open  ESC main menu"
 sys_foot:
