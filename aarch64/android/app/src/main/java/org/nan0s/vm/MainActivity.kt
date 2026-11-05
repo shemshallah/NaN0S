@@ -167,7 +167,7 @@ class MainActivity : Activity(), NanLoop.Listener {
     private fun showTrainingSuite() {
         AlertDialog.Builder(this)
             .setTitle("NaNLMind Remote Training")
-            .setMessage("Run the NaN16 corpus intake prototype. TXT is validated and profiled; model merging is not enabled yet.")
+            .setMessage("Run the NaN16 corpus trainer in an isolated VM snapshot. It builds a temporary byte-bigram candidate; merging into the active universe is not enabled yet.")
             .setPositiveButton("Choose TXT") { _, _ ->
                 if (prepareTraining()) {
                     val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -224,7 +224,7 @@ class MainActivity : Activity(), NanLoop.Listener {
         try {
             val guest = assets.open("n16_train.nan").use { it.readBytes() }
             if (vm.load(guest) == null) throw IllegalStateException("NaN16 training guest did not load")
-            val sample = "NaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe first pass computes a bounded corpus profile.\n".toByteArray(Charsets.UTF_8)
+            val sample = "NaN16 owns the corpus codec.\nRunner and Android share one trainer.\nA temporary candidate is built and the active universe is restored afterward.\n".toByteArray(Charsets.UTF_8)
             val corpus = raw ?: sample
             val header = "N16TXT/1\n".toByteArray(Charsets.US_ASCII)
             val hasHeader = corpus.size >= header.size && corpus.copyOfRange(0, header.size).contentEquals(header)
@@ -241,8 +241,8 @@ class MainActivity : Activity(), NanLoop.Listener {
             val transcript = String(vm.serial(), Charsets.UTF_8).trim()
             result = when {
                 rc != NanVm.HALTED -> "Training stopped before completion (VM result $rc)"
-                transcript.contains("N16 TRAIN PASS") -> "$transcript\nNaN16 corpus profile computed."
-                transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; no training state was changed."
+                transcript.contains("N16 TRAIN PASS") -> "$transcript\nNaN16 temporary byte-bigram candidate computed; active universe restored."
+                transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; active universe restored unchanged."
                 else -> "Training guest halted without a success marker: $transcript"
             }
         } catch (e: Exception) {
