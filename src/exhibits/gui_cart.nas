@@ -992,8 +992,8 @@ MOVI r1,4
 CALL @gui_single
 JMP @tm_done
 tm_net:
-MOVI r1,5
-CALL @gui_single
+MOVI r1,7
+CALL @gui_open_new
 JMP @tm_done
 tm_utl:
 MOVI r1,6
