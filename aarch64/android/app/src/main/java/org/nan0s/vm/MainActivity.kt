@@ -269,8 +269,7 @@ class MainActivity : Activity(), NanLoop.Listener {
         } catch (e: Exception) {
             result = "Training failed: ${e.message}"
         }
-        val candidate = if (result.startsWith("N16 TRAIN PASS")) vm.saveState() else null
-        finishTraining(result, candidate)
+        finishTraining(result)
     }
 
     private fun finishTraining(message: String) {
