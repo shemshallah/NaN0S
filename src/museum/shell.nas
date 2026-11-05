@@ -588,15 +588,6 @@ sm_key:
   MOVI r4,50
   CMP r1,r4
   JMP[EQ] @sm_net
-  MOVI r4,51
-  CMP r1,r4
-  JMP[EQ] @sm_disk
-  MOVI r4,52
-  CMP r1,r4
-  JMP[EQ] @sm_mem
-  MOVI r4,53
-  CMP r1,r4
-  JMP[EQ] @sm_cpu
   JMP @sm_key
 sm_settings:
   MOVI r1,@st_title
@@ -700,7 +691,7 @@ sm_title:
 sm_body:
 .str " [1] SETTINGS\n [2] NANNET SERVICE\n [3] DISK UTILITY\n [4] MEMORY UTILITY\n [5] CPU / ARCHITECTURE\n\n ESC returns to the museum."
 sm_foot:
-.str "NaN/0S SYSTEM  1-5 open  ESC shell"
+.str "NaN/0S SYSTEM  1-2 open  ESC main menu"
 sys_foot:
 .str "NaN/0S  any key returns to the system menu"
 st_title:
