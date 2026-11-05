@@ -31,7 +31,8 @@ MOVI r5,0xA002
 CMP r8,r5
 JMP[NE] @fail
 ; The same sequence number must be rejected as a replay.
-MOVI r1,131072
+MOVI r1,0
+MOVHI r1,2
 MOVI r2,38
 CALL @n16_frame_validate
 MOVI r5,3
