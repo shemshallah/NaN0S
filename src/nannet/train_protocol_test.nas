@@ -12,7 +12,8 @@ MOVI r5,1
 CALL @nn_route_add
 CMP r3,r0
 JMP[NE] @fail
-MOVI r1,131072
+MOVI r1,0
+MOVHI r1,2
 MOVI r2,38
 CALL @n16_frame_route
 CMP r3,r0
