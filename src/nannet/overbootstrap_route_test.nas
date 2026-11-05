@@ -11,6 +11,8 @@ CMP r2,r4
 JMP[NE] @fail
 CMP r3,r0
 JMP[NE] @fail
+MOVI r1,65
+PUTC r1
 ; point #2 is page 1 / Android test universe
 MOVI r1,2
 CALL @ob_point_to_page
@@ -20,6 +22,8 @@ JMP[NE] @fail
 MOVI r4,2
 CMP r2,r4
 JMP[NE] @fail
+MOVI r1,66
+PUTC r1
 ; point #2 offset maps to page 1 + byte offset
 MOVI r1,2
 MOVI r2,1234
@@ -34,12 +38,16 @@ CMP r2,r4
 JMP[NE] @fail
 CMP r3,r0
 JMP[NE] @fail
+MOVI r1,67
+PUTC r1
 ; point #256 maps to page 255
 MOVI r1,256
 CALL @ob_point_to_page
 MOVI r4,255
 CMP r1,r4
 JMP[NE] @fail
+MOVI r1,68
+PUTC r1
 ; reject page-crossing range
 MOVI r1,2
 MOVI r2,0xFFF8
@@ -55,6 +63,8 @@ CALL @ob_point_to_page
 MOVI r4,1
 CMP r3,r4
 JMP[NE] @fail
+MOVI r1,69
+PUTC r1
 ; connect the point translator to the existing NaNNET route table
 CALL @nn_tables_reset
 MOVI r1,1
@@ -67,10 +77,14 @@ MOVI r5,1
 CALL @nn_route_add
 CMP r3,r0
 JMP[NE] @fail
+MOVI r1,70
+PUTC r1
 MOVI r1,2
 CALL @ob_point_to_route
 CMP r3,r0
 JMP[NE] @fail
+MOVI r1,71
+PUTC r1
 MOVI r4,0xA0FF
 CMP r1,r4
 JMP[NE] @fail
