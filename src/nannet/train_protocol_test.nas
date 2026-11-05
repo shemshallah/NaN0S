@@ -38,6 +38,15 @@ CALL @n16_frame_validate
 MOVI r5,3
 CMP r3,r5
 JMP[NE] @fail
+; A valid frame with a different 128-bit session id must not enter
+; the currently owned session, even with a fresh sequence number.
+MOVI r1,0
+MOVHI r1,2
+MOVI r2,38
+CALL @n16_frame_validate
+MOVI r5,5
+CMP r3,r5
+JMP[NE] @fail
 ; pass
 MOVI r1,78
 PUTC r1
@@ -120,3 +129,7 @@ HALT
 .org 32768
 frame:
 .word 0x5436314E,0x00010001,0,0,0,0,1,2,0xF5B70002,0x00006DAD
+
+.org 33024
+other_session_frame:
+.word 0x5436314E,0x00010001,0x00000001,0,0,0,2,2,0xE8230002,0x00006187
