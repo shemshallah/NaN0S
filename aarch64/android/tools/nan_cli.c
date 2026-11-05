@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--serial")) serial = 1;
     else { fprintf(stderr, "usage: nan_cli [--img f] [--nannet-train [corpus.txt]] [--candidate-out state.nan1] [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--peek ADDR[:LEN]] [--disk f] [--clock steps:N]\n"); return 2; }
   }
-  if (!img && !train_mode) { fprintf(stderr, "need --img or --nannet-train\\n"); return 2; }
+  if (!img && !train_mode) { fprintf(stderr, "need --img or --nannet-train\n"); return 2; }
   size_t len = 0;
   uint8_t *data = (!img && train_mode) ? build_training_guest(&len) : slurp(img, &len);
   if (!data) { perror(img ? img : "NaN16 training guest"); return 1; }
@@ -82,11 +82,11 @@ int main(int argc, char **argv) {
     uint8_t *raw = slurp(corpus, &corpus_len);
     if (!raw) { perror(corpus); return 1; }
     if (corpus_len > 1048576u || memchr(raw, 0, corpus_len)) {
-      fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\\n");
+      fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\n");
       free(raw); return 2;
     }
-    static const uint8_t header_lf[] = "N16TXT/1\\n";
-    static const uint8_t header_crlf[] = "N16TXT/1\\r\\n";
+    static const uint8_t header_lf[] = "N16TXT/1\n";
+    static const uint8_t header_crlf[] = "N16TXT/1\\r\n";
     int has_header_lf = corpus_len >= sizeof(header_lf) - 1 &&
                         memcmp(raw, header_lf, sizeof(header_lf) - 1) == 0;
     int has_header_crlf = corpus_len >= sizeof(header_crlf) - 1 &&
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     framed[framed_len] = 0;
     int wrc = nan_write_bytes(v, 49152u, framed, framed_len + 1);
     free(framed); free(raw);
-    if (wrc) { fprintf(stderr, "corpus does not fit the NaN16 guest buffer\\n"); return 1; }
+    if (wrc) { fprintf(stderr, "corpus does not fit the NaN16 guest buffer\n"); return 1; }
   } else if (train_mode) {
     static const uint8_t sample[] =
       "N16TXT/1\n"
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
       "Runner and Android share one trainer.\n"
       "The intake stages updates before merge.\n";
     if (nan_write_bytes(v, 49152u, sample, sizeof(sample))) {
-      fprintf(stderr, "built-in sample does not fit the NaN16 guest buffer\\n");
+      fprintf(stderr, "built-in sample does not fit the NaN16 guest buffer\n");
       return 1;
     }
   }
@@ -161,13 +161,13 @@ int main(int argc, char **argv) {
   int train_ok = !train_mode || (rc == NAN_HALTED && (uint32_t)(nan_word(v, 8449u) >> 16) != 0);
   if (candidate_out) {
     if (!train_mode || !train_ok) {
-      fprintf(stderr, "candidate export requires a successful training run\\n");
+      fprintf(stderr, "candidate export requires a successful training run\n");
       train_ok = 0;
     } else {
       size_t state_len = nan_state_size(v);
       uint8_t *state = (uint8_t *)malloc(state_len ? state_len : 1);
       if (!state || !state_len || nan_save_state(v, state, state_len) != state_len) {
-        fprintf(stderr, "could not serialize candidate VM state\\n");
+        fprintf(stderr, "could not serialize candidate VM state\n");
         train_ok = 0;
       } else {
         FILE *out = fopen(candidate_out, "wb");
@@ -177,7 +177,7 @@ int main(int argc, char **argv) {
           if (fclose(out) != 0) write_ok = 0;
         }
         if (!write_ok) {
-          fprintf(stderr, "could not write candidate checkpoint\\n");
+          fprintf(stderr, "could not write candidate checkpoint\n");
           train_ok = 0;
         }
       }

@@ -270,7 +270,7 @@ class MainActivity : Activity(), NanLoop.Listener {
         finishTraining(result, candidate)
     }
 
-    private fun finishTraining(message: String, candidate: ByteArray? = null) {
+    private fun finishTraining(message: String) {
         val saved = trainingState
         trainingState = null
         trainingActive = false
@@ -282,17 +282,6 @@ class MainActivity : Activity(), NanLoop.Listener {
                 .setTitle("NaNLMind Remote Training")
                 .setMessage(if (restored) message else "$message\nWarning: the previous VM snapshot could not be restored.")
                 .setPositiveButton("Close", null)
-            if (restored && candidate != null) {
-                dialog.setNeutralButton("Save candidate") { _, _ ->
-                    pendingCandidate = candidate
-                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "application/octet-stream"
-                        putExtra(Intent.EXTRA_TITLE, "nan16-candidate.nan1")
-                    }
-                    startActivityForResult(intent, reqCandidate)
-                }
-            }
             dialog.show()
         }
     }
@@ -387,31 +376,13 @@ class MainActivity : Activity(), NanLoop.Listener {
             return
         }
         if (requestCode == reqCandidate) {
-            if (requestCode == reqCandidate) {
-            val bytes = pendingCandidate
-            pendingCandidate = null
-            val uri = data?.data
-            if (resultCode == RESULT_OK && uri != null && bytes != null) {
-                Thread {
-                    try {
-                        contentResolver.openOutputStream(uri, "w")!!.use { it.write(bytes) }
-                        runOnUiThread { Toast.makeText(this, "Candidate checkpoint saved", Toast.LENGTH_LONG).show() }
-                    } catch (_: Exception) {
-                        runOnUiThread { Toast.makeText(this, "Candidate export failed", Toast.LENGTH_LONG).show() }
-                    }
-                }.start()
-            }
-            return
-        }
-        val uri = data?.data ?: return
+            val uri = data?.data ?: return
             if (resultCode != RESULT_OK) return
             Thread {
                 val copied = try {
                     val output = contentResolver.openOutputStream(uri)
                         ?: throw IllegalStateException("Could not open export destination")
-                    output.use {
-                        candidateFile.inputStream().use { input -> input.copyTo(it) }
-                    }
+                    output.use { candidateFile.inputStream().use { input -> input.copyTo(it) } }
                     true
                 } catch (_: Exception) { false }
                 runOnUiThread {
