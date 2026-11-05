@@ -19,6 +19,7 @@ for attempt in 1 2 3; do
   grep -q '^TX OK$' "$T/com1.txt" &&
   grep -q '^ARP 0A000202$' "$T/com1.txt" &&
   grep -q '^PING OK$' "$T/com1.txt" &&
+  grep -q '^PING MS' "$T/com1.txt" &&
   grep -q '^MAC 024E414E3053$' "$T/com1.txt" &&
   grep -q '^HOST NaN0S  HINFO NaN-LATTICE NAN0S$' "$T/com1.txt" &&
   grep -q '^DNS OK$' "$T/com1.txt" &&
@@ -26,4 +27,4 @@ for attempt in 1 2 3; do
   grep -q '^TCP ACK$' "$T/com1.txt" && { ok=1; break; }
 done
 [ "$ok" -eq 1 ] || { echo "nic gate: FAIL"; tail -8 "$T/com1.txt" | cat -v; exit 1; }
-echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/data/ACK + identity)"
+echo "nic gate: PASS (RTL8139 PCI/BAR/MAC/reset + raw-DMA TX/RX + ARP/IPv4/ICMP/UDP/DNS/TCP handshake/data/ACK + identity + ping timing)"

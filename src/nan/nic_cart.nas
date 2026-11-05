@@ -1,7 +1,9 @@
 ; nic_cart.nas - RTL8139 PCI bring-up probe (I/O BAR, MAC).
 ; PCI config byte offsets: command=4, BAR0=16.
 .org 8192
-main:
+JMP @nc_main
+.include "../lib/timing.nas"
+nc_main:
 MOVI r13,1
 ST r15,r0,@nc_ret
 CALL @nic_probe
@@ -191,6 +193,7 @@ MOVI r5,0x38
 ADD r5,r6,r5
 MOVI r2,0
 OUTB r2,r5
+CALL @tm_start
 ; build a 60-byte Ethernet ARP request in the raw DMA window
 MOVI r9,0xF800
 MOVI r1,255
@@ -636,6 +639,13 @@ CMP r1,r0
 JMP[NE] @pingbad
 MOVI r1,@t_pingok
 CALL @sputs
+MOVI r1,10
+PUTC r1
+CALL @tm_stop
+MOVI r1,@t_pingms
+CALL @sputs
+LD r1,r0,@tm_ms
+CALL @puthex4
 MOVI r1,10
 PUTC r1
 MOVI r1,@t_host
@@ -1387,6 +1397,8 @@ t_rxno:
 .str "RX FAIL"
 t_arp:
 .str "ARP "
+t_pingms:
+.str "PING MS "
 t_pad:
 .str "PAD LO FROM NAN0S 1969"
 t_pingok:
