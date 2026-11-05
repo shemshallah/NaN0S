@@ -61,7 +61,7 @@ CMP r14,r0
 JMP[NE] @utf8_cont
 MOVI r10,13
 CMP r9,r10
-JMP[EQ] @advance
+JMP[EQ] @cr
 MOVI r10,10
 CMP r9,r10
 JMP[EQ] @newline
@@ -222,6 +222,14 @@ set_prev:
 ST r9,r0,@prev_byte
 MOVI r2,1
 ST r2,r0,@prev_valid
+cr:
+; CR is legal only as the first byte of a CRLF line ending.
+LDB r10,r4,1
+MOVI r2,10
+CMP r10,r2
+JMP[NE] @reject
+JMP @advance
+
 advance:
 ADDI r4,r4,1
 JMP @scan
