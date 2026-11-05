@@ -12,7 +12,7 @@ crypt/nan0s_fs mkfs "$T/fs.img" "$KEY" >/dev/null
 printf 'hello nan0s_fs\n' > "$T/hello.txt"
 crypt/nan0s_fs put "$T/fs.img" "$KEY" "$T/hello.txt" hello.txt >/dev/null
 
-K='@3000000,ESC,@1000000,3,@3000000,4,@5000000,l,s,ENTER'
+K='@3000000,ESC,@3000000,3,@3000000,4,@5000000,l,s,ENTER'
 aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 120000000 \
   --keys "$K" --dump-text > "$T/ls.out" 2>/dev/null
 grep -q '^nsh> ls$' "$T/ls.out" || { echo "nan0s_fs GUI gate: FAIL (nsh launch)"; head -8 "$T/ls.out"; exit 1; }
@@ -21,7 +21,7 @@ grep -q '^FILE hello.txt start=00000002 sectors=00000001 size=0000000F$' "$T/ls.
 grep -q '^LS OK files=00000001$' "$T/ls.out" || { echo "nan0s_fs GUI gate: FAIL (ls status)"; exit 1; }
 
 # Settings subprogram path: museum menu 9 -> Settings [4] STORAGE -> nsh.
-S='@3000000,ESC,@1000000,3,@3000000,4,@5000000,l,s,ENTER'
+S='@3000000,ESC,@3000000,3,@3000000,4,@5000000,l,s,ENTER'
 aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 150000000 \
   --keys "$S" --dump-text > "$T/settings.out" 2>/dev/null
 grep -q '^nsh> ls$' "$T/settings.out" || { echo "nan0s_fs GUI gate: FAIL (settings storage)"; head -8 "$T/settings.out"; exit 1; }
