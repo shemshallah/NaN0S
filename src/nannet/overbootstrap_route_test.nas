@@ -77,8 +77,8 @@ JMP[NE] @fail
 MOVI r4,1
 CMP r2,r4
 JMP[NE] @fail
-MOVI r4,0xA002
-CMP r4,r4
+MOVI r5,0xA002
+CMP r4,r5
 JMP[NE] @fail
 ; pass
 MOVI r1,79
