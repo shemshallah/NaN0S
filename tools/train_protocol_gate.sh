@@ -3,6 +3,7 @@ set -u
 cd "$(dirname "$0")/.."
 tmp="${TMPDIR:-/tmp}/n16-protocol-gate-$$.out"
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
+awk -f tools/nmk.awk -v CMD=emit src/nannet/train_protocol_test.nas >/dev/null || { echo "protocol assembler failed"; exit 1; }
 set +e
 sh tools/nrun.sh src/nannet/train_protocol_test.nas 5000000 --serial >"$tmp" 2>&1
 rc=$?
