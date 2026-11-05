@@ -407,8 +407,10 @@ class MainActivity : Activity(), NanLoop.Listener {
             if (resultCode != RESULT_OK) return
             Thread {
                 val copied = try {
-                    contentResolver.openOutputStream(uri)?.use { output ->
-                        candidateFile.inputStream().use { input -> input.copyTo(output) }
+                    val output = contentResolver.openOutputStream(uri)
+                        ?: throw IllegalStateException("Could not open export destination")
+                    output.use {
+                        candidateFile.inputStream().use { input -> input.copyTo(it) }
                     }
                     true
                 } catch (_: Exception) { false }
