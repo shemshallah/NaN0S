@@ -251,6 +251,15 @@ MOVI r12,8448
 ST r5,r12,0
 ST r6,r12,1
 ST r8,r12,2
+; Clear the original corpus bytes before any candidate checkpoint is exported.
+MOVI r2,49152
+clear_corpus:
+CMP r2,r4
+JMP[GT] @corpus_cleared
+STB r0,r2,0
+ADDI r2,r2,1
+JMP @clear_corpus
+corpus_cleared:
 ; report success on COM1
 MOVI r1,78
 PUTC r1
