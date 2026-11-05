@@ -48,4 +48,15 @@ tasks.register("compileTrainingGuest") {
         }
     }
 }
-tasks.named("preBuild").configure { dependsOn("compileTrainingGuest") }
+tasks.register("verifyRuntimeAssetAllowlist") {
+    dependsOn("compileTrainingGuest")
+    doLast {
+        val allowed = setOf("nan0s.img", "disk.nanfs", "n16_train.nan")
+        val actual = fileTree("src/main/assets").files.map { it.name }.toSet()
+        val unexpected = actual - allowed
+        val missing = allowed - actual
+        check(unexpected.isEmpty()) { "Unexpected runtime assets: $unexpected" }
+        check(missing.isEmpty()) { "Missing runtime assets: $missing" }
+    }
+}
+tasks.named("preBuild").configure { dependsOn("verifyRuntimeAssetAllowlist") }
