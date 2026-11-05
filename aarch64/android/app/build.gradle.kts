@@ -34,7 +34,7 @@ tasks.register<Copy>("syncImage") {
 
 // Compile the shared NaN16 training guest from its source before Android packaging.
 tasks.register("compileTrainingGuest") {
-    val guestSource = file("../../src/training/n16_train.nas")
+    val guestSource = file("../../../src/training/n16_train.nas")
     val guestOutput = file("src/main/assets/n16_train.nan")
     inputs.file(guestSource)
     outputs.file(guestOutput)
@@ -42,7 +42,7 @@ tasks.register("compileTrainingGuest") {
         guestOutput.parentFile.mkdirs()
         guestOutput.outputStream().use { stream ->
             exec {
-                commandLine("awk", "-f", file("../../tools/nmk.awk"), "-v", "CMD=emit", guestSource)
+                commandLine("awk", "-f", file("../../../tools/nmk.awk"), "-v", "CMD=emit", guestSource)
                 standardOutput = stream
             }
         }
