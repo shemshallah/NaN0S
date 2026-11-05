@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--dump-text")) dump_text = 1;
     else if (!strcmp(argv[i], "--no-trim")) trim = 0;
     else if (!strcmp(argv[i], "--serial")) serial = 1;
-    else { fprintf(stderr, "usage: nan_cli --img f [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--peek ADDR[:LEN]] [--disk f] [--clock steps:N]\n"); return 2; }
+    else { fprintf(stderr, "usage: nan_cli --img f [--nannet-train corpus.txt] [--steps N] [--keys \"1,ESC,~,@5000000\"] [--serial] [--dump-text] [--dump-ppm f] [--peek ADDR[:LEN]] [--disk f] [--clock steps:N]\n"); return 2; }
   }
   if (!img) { fprintf(stderr, "need --img\n"); return 2; }
   size_t len; uint8_t *data = slurp(img, &len); if (!data) { perror(img); return 1; }
