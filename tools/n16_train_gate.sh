@@ -10,4 +10,10 @@ aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --peek 8448:3 
 grep -qx 'N16 TRAIN PASS' "$tmp/out"
 aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"
 grep -qx 'N16 TRAIN PASS' "$tmp/sample.out"
+printf 'N16TXT/1\ncaf\\303\\251\nemoji \\360\\237\\214\\215\n' > "$tmp/utf8.txt"
+aarch64/android/nan_cli --nannet-train "$tmp/utf8.txt" --serial > "$tmp/utf8.out"
+grep -qx 'N16 TRAIN PASS' "$tmp/utf8.out"
+printf 'N16TXT/1\nbad \\300\\257\n' > "$tmp/invalid.txt"
+if aarch64/android/nan_cli --nannet-train "$tmp/invalid.txt" --serial > "$tmp/invalid.out"; then echo "invalid UTF-8 unexpectedly accepted"; exit 1; fi
+grep -qx 'N16 TRAIN REJECT' "$tmp/invalid.out"
 echo "N16 corpus trainer gate: PASS"
