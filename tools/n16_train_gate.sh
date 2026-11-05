@@ -8,4 +8,6 @@ printf 'N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one tra
 make -s -C aarch64/android nan_cli
 aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --peek 8448:3 > "$tmp/out"
 grep -qx 'N16 TRAIN PASS' "$tmp/out"
+aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"
+grep -qx 'N16 TRAIN PASS' "$tmp/sample.out"
 echo "N16 corpus trainer gate: PASS"
