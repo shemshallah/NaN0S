@@ -125,44 +125,6 @@ n16v_crc_done:
 MOVI r12,65535
 MOVHI r12,65535
 BOOL.6 r11,r11,r12
-; Lock the first validated 128-bit session id. Frames from another
-; session are rejected until the owning session explicitly resets state.
-LD r12,r0,@n16v_session_active
-CMP r12,r0
-JMP[NE] @n16v_session_check
-LD r4,r0,@n16v_base
-ADDI r4,r4,8
-LD r5,r4,0
-ST r5,r0,@n16v_session_0
-LD r5,r4,1
-ST r5,r0,@n16v_session_1
-LD r5,r4,2
-ST r5,r0,@n16v_session_2
-LD r5,r4,3
-ST r5,r0,@n16v_session_3
-MOVI r12,1
-ST r12,r0,@n16v_session_active
-JMP @n16v_session_ok
-n16v_session_check:
-LD r4,r0,@n16v_base
-ADDI r4,r4,8
-LD r5,r4,0
-LD r12,r0,@n16v_session_0
-CMP r5,r12
-JMP[NE] @n16v_session_error
-LD r5,r4,1
-LD r12,r0,@n16v_session_1
-CMP r5,r12
-JMP[NE] @n16v_session_error
-LD r5,r4,2
-LD r12,r0,@n16v_session_2
-CMP r5,r12
-JMP[NE] @n16v_session_error
-LD r5,r4,3
-LD r12,r0,@n16v_session_3
-CMP r5,r12
-JMP[NE] @n16v_session_error
-n16v_session_ok:
 LD r4,r0,@n16v_base
 ADD r4,r4,r9
 MOVI r10,0
@@ -179,6 +141,116 @@ SHL r12,r12,24
 BOOL.14 r10,r10,r12
 CMP r11,r10
 JMP[NE] @n16v_crc_error
+; Lock the first CRC-valid 128-bit session id and compare all
+; sixteen bytes on every subsequent frame.
+LD r12,r0,@n16v_session_active
+CMP r12,r0
+JMP[NE] @n16v_session_check
+LD r4,r0,@n16v_base
+ADDI r4,r4,8
+LDB r5,r4,0
+ST r5,r0,@n16v_session_0
+LDB r5,r4,1
+ST r5,r0,@n16v_session_1
+LDB r5,r4,2
+ST r5,r0,@n16v_session_2
+LDB r5,r4,3
+ST r5,r0,@n16v_session_3
+LDB r5,r4,4
+ST r5,r0,@n16v_session_4
+LDB r5,r4,5
+ST r5,r0,@n16v_session_5
+LDB r5,r4,6
+ST r5,r0,@n16v_session_6
+LDB r5,r4,7
+ST r5,r0,@n16v_session_7
+LDB r5,r4,8
+ST r5,r0,@n16v_session_8
+LDB r5,r4,9
+ST r5,r0,@n16v_session_9
+LDB r5,r4,10
+ST r5,r0,@n16v_session_10
+LDB r5,r4,11
+ST r5,r0,@n16v_session_11
+LDB r5,r4,12
+ST r5,r0,@n16v_session_12
+LDB r5,r4,13
+ST r5,r0,@n16v_session_13
+LDB r5,r4,14
+ST r5,r0,@n16v_session_14
+LDB r5,r4,15
+ST r5,r0,@n16v_session_15
+MOVI r12,1
+ST r12,r0,@n16v_session_active
+JMP @n16v_session_ok
+n16v_session_check:
+LD r4,r0,@n16v_base
+ADDI r4,r4,8
+LDB r5,r4,0
+LD r12,r0,@n16v_session_0
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,1
+LD r12,r0,@n16v_session_1
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,2
+LD r12,r0,@n16v_session_2
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,3
+LD r12,r0,@n16v_session_3
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,4
+LD r12,r0,@n16v_session_4
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,5
+LD r12,r0,@n16v_session_5
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,6
+LD r12,r0,@n16v_session_6
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,7
+LD r12,r0,@n16v_session_7
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,8
+LD r12,r0,@n16v_session_8
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,9
+LD r12,r0,@n16v_session_9
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,10
+LD r12,r0,@n16v_session_10
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,11
+LD r12,r0,@n16v_session_11
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,12
+LD r12,r0,@n16v_session_12
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,13
+LD r12,r0,@n16v_session_13
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,14
+LD r12,r0,@n16v_session_14
+CMP r5,r12
+JMP[NE] @n16v_session_error
+LDB r5,r4,15
+LD r12,r0,@n16v_session_15
+CMP r5,r12
+JMP[NE] @n16v_session_error
+n16v_session_ok:
 LD r6,r0,@n16v_seq
 ST r6,r0,@n16v_last_seq
 LD r1,r0,@n16v_type
@@ -228,6 +300,30 @@ n16v_session_1:
 n16v_session_2:
 .word 0
 n16v_session_3:
+.word 0
+n16v_session_4:
+.word 0
+n16v_session_5:
+.word 0
+n16v_session_6:
+.word 0
+n16v_session_7:
+.word 0
+n16v_session_8:
+.word 0
+n16v_session_9:
+.word 0
+n16v_session_10:
+.word 0
+n16v_session_11:
+.word 0
+n16v_session_12:
+.word 0
+n16v_session_13:
+.word 0
+n16v_session_14:
+.word 0
+n16v_session_15:
 .word 0
 ; Reset only after the owning transport has closed/aborted its session.
 n16_session_reset:
