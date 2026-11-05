@@ -15,7 +15,7 @@ grep -q "NANNET / BROWSER" "$T/system.txt" || { echo "settings gate: FAIL (compa
 if grep -Eq "\\[3\\] DISK|\\[4\\] MEMORY|\\[5\\] CPU" "$T/system.txt"; then echo "settings gate: FAIL (extra system utilities remain visible)"; exit 1; fi
 menu "@3000000,ESC,@1000000,3" > "$T/settings.txt"
 grep -q 'SETTINGS' "$T/settings.txt" || { echo "settings gate: FAIL (settings menu)"; exit 1; }
-grep -q 'NANNET MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (NANNET entry)"; exit 1; }
+grep -q 'NANNET MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (NANNET entry)"; cat "$T/settings.txt"; exit 1; }
 grep -q 'DRIVER MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (driver entry)"; exit 1; }
 grep -q 'CODEC MANAGER' "$T/settings.txt" || { echo "settings gate: FAIL (codec entry)"; exit 1; }
 grep -q 'STORAGE (nsh)' "$T/settings.txt" || { echo "settings gate: FAIL (storage entry)"; exit 1; }
