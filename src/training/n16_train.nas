@@ -233,6 +233,7 @@ set_prev:
 ST r9,r0,@prev_byte
 MOVI r2,1
 ST r2,r0,@prev_valid
+JMP @advance
 cr:
 ; CR is legal only as the first byte of a CRLF line ending.
 LDB r10,r4,1
