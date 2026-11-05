@@ -166,8 +166,12 @@ int main(int argc, char **argv) {
         train_ok = 0;
       } else {
         FILE *out = fopen(candidate_out, "wb");
-        if (!out || fwrite(state, 1, state_len, out) != state_len || fclose(out) != 0) {
-          if (out) fclose(out);
+        int write_ok = 0;
+        if (out) {
+          write_ok = fwrite(state, 1, state_len, out) == state_len;
+          if (fclose(out) != 0) write_ok = 0;
+        }
+        if (!write_ok) {
           fprintf(stderr, "could not write candidate checkpoint\\n");
           train_ok = 0;
         }
