@@ -1711,3 +1711,5 @@ nsv_ret:
 .word 0
 
 .include "overbootstrap_route.nas"
+
+.include "train_protocol.nas"
