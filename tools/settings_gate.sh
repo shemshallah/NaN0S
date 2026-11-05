@@ -23,19 +23,19 @@ grep -q 'NIC STATUS' "$T/settings.txt" || { echo "settings gate: FAIL (nic entry
 grep -q 'TIMING' "$T/settings.txt" || { echo "settings gate: FAIL (timing entry)"; exit 1; }
 grep -q 'CPU TIMING' "$T/settings.txt" || { echo "settings gate: FAIL (cpu timing entry)"; exit 1; }
 
-menu "@3000000,ESC,@1000000,9,@1500000,1" > "$T/nannet.txt"
+menu "@3000000,ESC,@1000000,3,@1500000,1" > "$T/nannet.txt"
 grep -q 'NANNET MANAGER' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET manager)"; exit 1; }
 grep -q '^LINKS' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET status)"; exit 1; }
 grep -q 'NIC NONE' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET NIC status)"; exit 1; }
 grep -q 'S SERVICES' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET services marker)"; exit 1; }
-menu "@3000000,ESC,@1000000,9,@1500000,1,@300000,s" > "$T/services.txt"
+menu "@3000000,ESC,@1000000,3,@1500000,1,@300000,s" > "$T/services.txt"
 grep -q 'SERVICE MANAGER' "$T/services.txt" || { echo "settings gate: FAIL (NANNET services)"; exit 1; }
 grep -q 'QOTD 17' "$T/services.txt" || { echo "settings gate: FAIL (service list)"; exit 1; }
-menu "@3000000,ESC,@1000000,9,@500000,2" > "$T/driver.txt"
+menu "@3000000,ESC,@1000000,3,@1500000,2" > "$T/driver.txt"
 grep -q 'DRIVER MANAGER' "$T/driver.txt" || { echo "settings gate: FAIL (driver manager)"; exit 1; }
 grep -q 'DN_UDP' "$T/driver.txt" || { echo "settings gate: FAIL (driver registry)"; exit 1; }
-menu "@3000000,ESC,@1000000,9,@500000,3" > "$T/codec.txt"
+menu "@3000000,ESC,@1000000,3,@1500000,3" > "$T/codec.txt"
 grep -q 'CODEC MANAGER' "$T/codec.txt" || { echo "settings gate: FAIL (codec manager)"; exit 1; }
 grep -q 'NSP-7' "$T/codec.txt" || { echo "settings gate: FAIL (codec registry)"; exit 1; }
 
-echo "settings gate: PASS (slot 9 Settings; NANNET/Driver/Codec/Storage/NIC/Timing/CPU; NANNET services; no hidden extra slot)"
+echo "settings gate: PASS (slot 3 Settings; NANNET/Driver/Codec/Storage/NIC/Timing/CPU; NANNET services; no hidden extra slot)"
