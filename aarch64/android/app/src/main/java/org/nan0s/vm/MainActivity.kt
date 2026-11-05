@@ -36,9 +36,11 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val reqDisk = 2
     private val reqWifi = 3
     private val reqTrain = 4
+    private val reqCandidate = 5
     @Volatile private var trainingActive = false
     private var trainingState: ByteArray? = null
     private val autosave get() = File(filesDir, "autosave.nan1")
+    private val candidateFile get() = File(filesDir, "n16_candidate.nan1")
     private val diskFile get() = File(filesDir, "disk.nanfs")
     private val fsFile get() = File(filesDir, "nan0s_fs.img")
     private val fsKey get() = File(filesDir, "nan0s_fs.key")
@@ -180,7 +182,18 @@ class MainActivity : Activity(), NanLoop.Listener {
             .setNeutralButton("Run sample") { _, _ ->
                 if (prepareTraining()) Thread { runTraining(null) }.start()
             }
-            .setNegativeButton("Close", null)
+            .setNegativeButton("Export candidate") { _, _ ->
+                if (!candidateFile.isFile) {
+                    Toast.makeText(this, "Run a successful corpus first", Toast.LENGTH_SHORT).show()
+                } else {
+                    val export = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/octet-stream"
+                        putExtra(Intent.EXTRA_TITLE, "n16_candidate.nan1")
+                    }
+                    startActivityForResult(export, reqCandidate)
+                }
+            }
             .show()
     }
 
@@ -239,9 +252,14 @@ class MainActivity : Activity(), NanLoop.Listener {
                 rounds++
             }
             val transcript = String(vm.serial(), Charsets.UTF_8).trim()
+            if (rc == NanVm.HALTED && transcript.contains("N16 TRAIN PASS")) {
+                val candidate = vm.saveState()
+                    ?: throw IllegalStateException("Could not snapshot NaN16 candidate")
+                candidateFile.writeBytes(candidate)
+            }
             result = when {
                 rc != NanVm.HALTED -> "Training stopped before completion (VM result $rc)"
-                transcript.contains("N16 TRAIN PASS") -> "$transcript\nNaN16 temporary byte-bigram candidate computed; active universe restored."
+                transcript.contains("N16 TRAIN PASS") -> "$transcript\nTemporary byte-bigram candidate saved locally; active universe restored."
                 transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; active universe restored unchanged."
                 else -> "Training guest halted without a success marker: $transcript"
             }
@@ -353,6 +371,22 @@ class MainActivity : Activity(), NanLoop.Listener {
             Thread {
                 try { runTraining(readCorpus(uri)) }
                 catch (e: Exception) { finishTraining("Training failed: \${e.message}") }
+            }.start()
+            return
+        }
+        if (requestCode == reqCandidate) {
+            val uri = data?.data ?: return
+            if (resultCode != RESULT_OK) return
+            Thread {
+                val copied = try {
+                    contentResolver.openOutputStream(uri)?.use { output ->
+                        candidateFile.inputStream().use { input -> input.copyTo(output) }
+                    }
+                    true
+                } catch (_: Exception) { false }
+                runOnUiThread {
+                    Toast.makeText(this, if (copied) "Candidate exported" else "Candidate export failed", Toast.LENGTH_LONG).show()
+                }
             }.start()
             return
         }
