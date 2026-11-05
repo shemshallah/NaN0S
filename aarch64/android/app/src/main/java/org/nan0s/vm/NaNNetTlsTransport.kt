@@ -28,7 +28,9 @@ object NaNNetTlsTransport {
             socket.soTimeout = 15_000
             val parameters = socket.sslParameters
             parameters.endpointIdentificationAlgorithm = "HTTPS"
-            parameters.serverNames = listOf(SNIHostName(host))
+            if (!host.contains(":") && !host.matches(Regex("[0-9.]+"))) {
+                parameters.serverNames = listOf(SNIHostName(host))
+            }
             socket.sslParameters = parameters
             socket.startHandshake()
             writeAll(socket.outputStream, request)
