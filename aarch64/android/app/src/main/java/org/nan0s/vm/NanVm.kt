@@ -16,6 +16,7 @@ class NanVm : AutoCloseable {
     /** returns the detected kind ("floppy", "nan-text", "words", "state") or null if the data is not a NaN16 program */
     fun load(data: ByteArray): String? = synchronized(lock) { if (h == 0L) null else NanNative.load(h, data) }
     fun reset() = synchronized(lock) { if (h != 0L) NanNative.reset(h) }
+    fun writeBytes(address: Int, data: ByteArray): Boolean = synchronized(lock) { h != 0L && NanNative.writeBytes(h, address, data) }
     fun run(steps: Int): Int = synchronized(lock) { if (h == 0L) HALTED else NanNative.run(h, steps) }
     fun setTime(ms: Int) = synchronized(lock) { if (h != 0L) NanNative.setTime(h, ms) }
     fun keyChar(c: Int) = synchronized(lock) { if (h != 0L) NanNative.keyChar(h, c) }
