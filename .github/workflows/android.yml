@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Build the current NaN16 system image and APK assets
+        working-directory: .
+        run: sh tools/build.sh
       - run: make test
       - run: make seals
       - run: make asan
