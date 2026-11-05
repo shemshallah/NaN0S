@@ -10,39 +10,39 @@ MOVI r4,49152
 LDB r1,r4,0
 MOVI r2,78
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,1
 MOVI r2,49
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,2
 MOVI r2,54
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,3
 MOVI r2,84
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,4
 MOVI r2,88
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,5
 MOVI r2,84
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,6
 MOVI r2,47
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,7
 MOVI r2,49
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 LDB r1,r4,8
 MOVI r2,10
 CMP r1,r2
-JMP[NE] reject
+JMP[NE] @reject
 ADDI r4,r4,9
 MOVI r5,0
 MOVI r6,0
@@ -52,32 +52,32 @@ MOVI r11,8192
 scan:
 LDB r9,r4,0
 CMP r9,r0
-JMP[EQ] finish
+JMP[EQ] @finish
 MOVI r10,13
 CMP r9,r10
-JMP[EQ] advance
+JMP[EQ] @advance
 MOVI r10,10
 CMP r9,r10
-JMP[EQ] newline
+JMP[EQ] @newline
 MOVI r10,32
 CMP r9,r10
-JMP[LT] control
-JMP accept
+JMP[LT] @control
+JMP @accept
 control:
 MOVI r10,9
 CMP r9,r10
-JMP[EQ] accept
-JMP reject
+JMP[EQ] @accept
+JMP @reject
 accept:
 ADDI r7,r7,1
 MOVI r10,4096
 CMP r7,r10
-JMP[GT] reject
+JMP[GT] @reject
 ADDI r5,r5,1
 MOVI r10,0
 MOVHI r10,16
 CMP r5,r10
-JMP[GT] reject
+JMP[GT] @reject
 ; rolling digest h = h*33 + byte
 MOVI r10,5
 SHL r10,r8,5
@@ -90,22 +90,22 @@ ADDI r10,r10,1
 ST r10,r12,0
 advance:
 ADDI r4,r4,1
-JMP scan
+JMP @scan
 newline:
 CMP r7,r0
-JMP[EQ] newline_advance
+JMP[EQ] @newline_advance
 ADDI r6,r6,1
 MOVI r7,0
 newline_advance:
 ADDI r4,r4,1
-JMP scan
+JMP @scan
 finish:
 CMP r7,r0
-JMP[EQ] finish_counted
+JMP[EQ] @finish_counted
 ADDI r6,r6,1
 finish_counted:
 CMP r6,r0
-JMP[EQ] reject
+JMP[EQ] @reject
 MOVI r12,8448
 ST r5,r12,0
 ST r6,r12,1
