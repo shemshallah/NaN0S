@@ -6,7 +6,7 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir -p "$tmp"
 printf 'N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n' > "$tmp/corpus.txt"
 make -s -C aarch64/android nan_cli
-if ! aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --peek 8448:3 > "$tmp/out"; then cat "$tmp/out"; echo "trainer invocation failed"; exit 1; fi
+if ! aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --peek 8448:3,12288:3 > "$tmp/out"; then cat "$tmp/out"; echo "trainer invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/out" || { cat "$tmp/out"; exit 1; }
 if ! aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"; then cat "$tmp/sample.out"; echo "sample invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/sample.out" || { cat "$tmp/sample.out"; exit 1; }
