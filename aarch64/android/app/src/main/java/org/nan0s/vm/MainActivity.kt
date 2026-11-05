@@ -239,12 +239,12 @@ class MainActivity : Activity(), NanLoop.Listener {
             val transcript = String(vm.serial(), Charsets.UTF_8).trim()
             result = when {
                 rc != NanVm.HALTED -> "Training stopped before completion (VM result $rc)"
-                transcript.contains("N16 TRAIN PASS") -> "$transcript\nNaN16 corpus update staged successfully."
-                transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; active model was not changed."
+                transcript.contains("N16 TRAIN PASS") -> "$transcript\nNaN16 corpus profile computed."
+                transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; no training state was changed."
                 else -> "Training guest halted without a success marker: $transcript"
             }
         } catch (e: Exception) {
-            result = "Training failed: \${e.message}"
+            result = "Training failed: ${e.message}"
         }
         finishTraining(result)
     }
