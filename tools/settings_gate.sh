@@ -23,12 +23,12 @@ grep -q 'NIC STATUS' "$T/settings.txt" || { echo "settings gate: FAIL (nic entry
 grep -q 'TIMING' "$T/settings.txt" || { echo "settings gate: FAIL (timing entry)"; exit 1; }
 grep -q 'CPU TIMING' "$T/settings.txt" || { echo "settings gate: FAIL (cpu timing entry)"; exit 1; }
 
-menu "@3000000,ESC,@1000000,9,@500000,1" > "$T/nannet.txt"
+menu "@3000000,ESC,@1000000,9,@1500000,1" > "$T/nannet.txt"
 grep -q 'NANNET MANAGER' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET manager)"; exit 1; }
 grep -q '^LINKS' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET status)"; exit 1; }
 grep -q 'NIC NONE' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET NIC status)"; exit 1; }
 grep -q 'S SERVICES' "$T/nannet.txt" || { echo "settings gate: FAIL (NANNET services marker)"; exit 1; }
-menu "@3000000,ESC,@1000000,9,@500000,1,@300000,s" > "$T/services.txt"
+menu "@3000000,ESC,@1000000,9,@1500000,1,@300000,s" > "$T/services.txt"
 grep -q 'SERVICE MANAGER' "$T/services.txt" || { echo "settings gate: FAIL (NANNET services)"; exit 1; }
 grep -q 'QOTD 17' "$T/services.txt" || { echo "settings gate: FAIL (service list)"; exit 1; }
 menu "@3000000,ESC,@1000000,9,@500000,2" > "$T/driver.txt"
