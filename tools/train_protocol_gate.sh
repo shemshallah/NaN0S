@@ -4,5 +4,5 @@ cd "$(dirname "$0")/.."
 tmp="${TMPDIR:-/tmp}/n16-protocol-gate-$$.out"
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
 sh tools/nrun.sh src/nannet/train_protocol_test.nas 5000000 --serial | tee "$tmp"
-grep -qx 'N16 PROTOCOL PASS' "$tmp"
+grep -qx 'N16 PROTOCOL PASS' "$tmp" || { cat "$tmp"; echo "NaN16 protocol guest did not pass"; exit 1; }
 echo "NaN16 network protocol gate: PASS"
