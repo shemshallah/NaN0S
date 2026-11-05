@@ -186,14 +186,16 @@ class MainActivity : Activity(), NanLoop.Listener {
 
     private fun prepareTraining(): Boolean {
         if (trainingActive) return false
+        loop.paused = true
         val saved = vm.saveState()
         if (saved == null) {
+            loop.paused = false
+            loop.rearm()
             Toast.makeText(this, "Could not snapshot the active universe", Toast.LENGTH_LONG).show()
             return false
         }
         trainingState = saved
         trainingActive = true
-        loop.paused = true
         return true
     }
 
