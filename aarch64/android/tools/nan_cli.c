@@ -24,10 +24,13 @@ static void drain(nan_vm *v, int echo) {
   char b[512]; size_t n; while ((n = nan_serial_read(v, b, sizeof b))) if (echo) fwrite(b, 1, n, stdout);
 }
 int main(int argc, char **argv) {
-  const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL, *peek = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
+  const char *vga = NULL, *img = NULL, *keys = NULL, *ppm = NULL, *disk = NULL, *peek = NULL, *corpus = NULL; uint64_t steps = 50000000ull, per_ms = 1000;
+  int train_mode = 0;
   int dump_text = 0, serial = 0, trim = 1;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--img") && i + 1 < argc) img = argv[++i];
+    else if (!strcmp(argv[i], "--nannet-train")) { train_mode = 1; if (i + 1 < argc && argv[i + 1][0] != '-') corpus = argv[++i]; }
+    else if (!strcmp(argv[i], "--corpus") && i + 1 < argc) { train_mode = 1; corpus = argv[++i]; }
     else if (!strcmp(argv[i], "--steps") && i + 1 < argc) steps = strtoull(argv[++i], 0, 0);
     else if (!strcmp(argv[i], "--keys") && i + 1 < argc) keys = argv[++i];
     else if (!strcmp(argv[i], "--dump-ppm") && i + 1 < argc) ppm = argv[++i];
@@ -44,6 +47,32 @@ int main(int argc, char **argv) {
   size_t len; uint8_t *data = slurp(img, &len); if (!data) { perror(img); return 1; }
   nan_vm *v = nan_create(); if (!v) { fprintf(stderr, "out of memory\n"); return 1; }
   const char *kind; if (nan_load_auto(v, data, len, &kind)) { fprintf(stderr, "cannot load %s (text error line %d)\n", img, nan_load_error(v)); return 1; }
+
+  if (train_mode) {
+    size_t corpus_len = 0;
+    uint8_t *raw = slurp(corpus, &corpus_len);
+    if (!raw) { perror(corpus); return 1; }
+    if (corpus_len > 1048576u || memchr(raw, 0, corpus_len)) {
+      fprintf(stderr, "corpus must be at most 1 MiB and contain no NUL bytes\n");
+      free(raw); return 2;
+    }
+    static const uint8_t header[] = "N16TXT/1\n";
+    int has_header = corpus_len >= sizeof(header) - 1 &&
+                     memcmp(raw, header, sizeof(header) - 1) == 0;
+    size_t framed_len = corpus_len + (has_header ? 0 : sizeof(header) - 1);
+    uint8_t *framed = (uint8_t *)malloc(framed_len + 1);
+    if (!framed) { free(raw); return 1; }
+    if (has_header) memcpy(framed, raw, corpus_len);
+    else {
+      memcpy(framed, header, sizeof(header) - 1);
+      memcpy(framed + sizeof(header) - 1, raw, corpus_len);
+    }
+    framed[framed_len] = 0;
+    int wrc = nan_write_bytes(v, 49152u, framed, framed_len + 1);
+    free(framed); free(raw);
+    if (wrc) { fprintf(stderr, "corpus does not fit the NaN16 guest buffer\n"); return 1; }
+    serial = 1;
+  }
   if (disk) { int fd = open(disk, O_RDWR); struct stat st; if (fd < 0 || fstat(fd, &st)) { perror(disk); return 1; } nan_attach_disk_fd(v, fd, (size_t)st.st_size); }
   char *kcopy = keys ? strdup(keys) : NULL; char *save = NULL; char *tok = kcopy ? strtok_r(kcopy, ",", &save) : NULL;
   uint64_t pause_until = 0; int rc = NAN_BUDGET;
@@ -85,5 +114,6 @@ int main(int argc, char **argv) {
     } else fprintf(stderr, "(text mode: no PPM written)\n");
   }
   fprintf(stderr, "[nan_cli] %s: %llu steps, rc=%d, pc=%u, trap='%s'\n", kind, (unsigned long long)nan_steps(v), rc, nan_pc(v), nan_trap_text(v));
-  nan_destroy(v); return 0;
+  int train_ok = !train_mode || (rc == NAN_HALTED && (uint32_t)(nan_word(v, 8449u) >> 16) != 0);
+  nan_destroy(v); return train_ok ? 0 : 1;
 }
