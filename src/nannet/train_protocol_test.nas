@@ -189,11 +189,7 @@ MOVI r10,78
 PUTC r10
 MOVI r10,10
 PUTC r10
-MOVI r1,13
-MOVI r2,0
-CALL @n16_session_transition
-CMP r3,r0
-JMP[NE] @fail
+CALL @n16_session_reset
 MOVI r10,67
 PUTC r10
 MOVI r10,10
