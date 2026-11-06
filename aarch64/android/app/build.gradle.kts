@@ -68,17 +68,15 @@ tasks.register("compileProtocolGuest") {
     outputs.files(guestOutput, labelsOutput)
     doLast {
         guestOutput.parentFile.mkdirs()
-        labelsOutput.outputStream().use { labels ->
-            guestOutput.outputStream().use { guest ->
-                exec {
-                    commandLine(
-                        "awk", "-f", file("../../../tools/nmk.awk"),
-                        "-v", "CMD=emit",
-                        "-v", "LABELS=${labelsOutput.absolutePath}",
-                        guestSource
-                    )
-                    standardOutput = guest
-                }
+        guestOutput.outputStream().use { guest ->
+            exec {
+                commandLine(
+                    "awk", "-f", file("../../../tools/nmk.awk"),
+                    "-v", "CMD=emit",
+                    "-v", "LABELS=${labelsOutput.absolutePath}",
+                    guestSource
+                )
+                standardOutput = guest
             }
         }
         check(labelsOutput.isFile && labelsOutput.length() > 0) {
