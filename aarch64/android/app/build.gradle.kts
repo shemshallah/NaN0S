@@ -52,10 +52,47 @@ tasks.register("compileTrainingGuest") {
         }
     }
 }
-tasks.register("verifyRuntimeAssetAllowlist") {
-    dependsOn("compileTrainingGuest")
+// Compile a dedicated persistent protocol VM image and its guest label map.
+tasks.register("compileProtocolGuest") {
+    val guestSource = file("../../../src/nannet/n16t_android_guest.nas")
+    val guestOutput = file("src/main/assets/n16_protocol.nan")
+    val labelsOutput = file("src/main/assets/n16_protocol.labels")
+    inputs.files(
+        guestSource,
+        file("../../../src/nannet/nannet.nas"),
+        file("../../../src/nannet/overbootstrap_route.nas"),
+        file("../../../src/nannet/train_protocol.nas"),
+        file("../../../src/nannet/n16t_android_abi.nas"),
+        file("../../../tools/nmk.awk")
+    )
+    outputs.files(guestOutput, labelsOutput)
     doLast {
-        val allowed = setOf("nan0s.img", "disk.nanfs", "n16_train.nan")
+        guestOutput.parentFile.mkdirs()
+        labelsOutput.outputStream().use { labels ->
+            guestOutput.outputStream().use { guest ->
+                exec {
+                    commandLine(
+                        "awk", "-f", file("../../../tools/nmk.awk"),
+                        "-v", "CMD=emit",
+                        "-v", "LABELS=${labelsOutput.absolutePath}",
+                        guestSource
+                    )
+                    standardOutput = guest
+                }
+            }
+        }
+        check(labelsOutput.isFile && labelsOutput.length() > 0) {
+            "NaN16 protocol guest label map was not generated"
+        }
+    }
+}
+tasks.register("verifyRuntimeAssetAllowlist") {
+    dependsOn("compileTrainingGuest", "compileProtocolGuest")
+    doLast {
+        val allowed = setOf(
+            "nan0s.img", "disk.nanfs", "n16_train.nan",
+            "n16_protocol.nan", "n16_protocol.labels"
+        )
         val actual = fileTree("src/main/assets").files.map { it.name }.toSet()
         val unexpected = actual - allowed
         val missing = allowed - actual
