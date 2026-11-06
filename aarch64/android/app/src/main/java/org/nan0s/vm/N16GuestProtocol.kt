@@ -89,7 +89,13 @@ internal class N16GuestProtocol(context: Context) : Closeable {
         check(status == 0) {
             "NaN16 rejected outbound transition (status=$status, detail=${vm.register(2)})"
         }
-        nextSendSequence = if (item.sequence == 0x7fffffff) 1 else item.sequence + 1
+        if (item.type == 13) {
+            // CLOSE reset the guest state machine; the next session gets fresh identity/sequence.
+            sessionId = ByteArray(16).also(random::nextBytes)
+            nextSendSequence = 1
+        } else {
+            nextSendSequence = if (item.sequence == 0x7fffffff) 1 else item.sequence + 1
+        }
         pending = null
     }
 
