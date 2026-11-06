@@ -601,3 +601,185 @@ n16s_len:
 .word 0
 n16s_state:
 .word 0
+
+; Guest-side N16T frame encoder.
+; n16_frame_build(r1=output byte base,r2=type,r3=sequence,
+;                 r4=payload byte base,r5=payload bytes,r6=session-id byte base)
+; returns r1=frame bytes (36+payload),r2=error,r3=status.
+; Session id entropy is supplied by the host; all wire framing and CRC stay guest-side.
+n16_frame_build:
+ST r15,r0,@n16b_ret
+ST r1,r0,@n16b_base
+ST r2,r0,@n16b_type
+ST r3,r0,@n16b_seq
+ST r4,r0,@n16b_src
+ST r5,r0,@n16b_len
+ST r6,r0,@n16b_sid
+CMP r2,r0
+JMP[EQ] @n16b_error
+MOVI r10,14
+CMP r10,r2
+JMP[LT] @n16b_error
+MOVI r10,0
+MOVHI r10,16
+CMP r10,r5
+JMP[LT] @n16b_error
+LD r4,r0,@n16b_base
+MOVI r10,78
+STB r10,r4,0
+MOVI r10,49
+STB r10,r4,1
+MOVI r10,54
+STB r10,r4,2
+MOVI r10,84
+STB r10,r4,3
+MOVI r10,1
+STB r10,r4,4
+MOVI r10,0
+STB r10,r4,5
+LD r5,r0,@n16b_type
+MOVI r10,255
+BOOL.8 r11,r5,r10
+STB r11,r4,6
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,7
+; Copy all 16 opaque session-id bytes.
+LD r7,r0,@n16b_sid
+MOVI r8,0
+n16b_sid_loop:
+MOVI r10,16
+CMP r8,r10
+JMP[GE] @n16b_seq
+ADD r9,r7,r8
+LDB r11,r9,0
+LD r4,r0,@n16b_base
+ADD r9,r4,r8
+ADDI r9,r9,8
+STB r11,r9,0
+ADDI r8,r8,1
+JMP @n16b_sid_loop
+; Write sequence and payload length as little-endian u32 values.
+n16b_seq:
+LD r5,r0,@n16b_seq
+LD r4,r0,@n16b_base
+MOVI r10,255
+BOOL.8 r11,r5,r10
+STB r11,r4,24
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,25
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,26
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,27
+LD r5,r0,@n16b_len
+MOVI r10,255
+BOOL.8 r11,r5,r10
+STB r11,r4,28
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,29
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,30
+SHR r5,r5,8
+BOOL.8 r11,r5,r10
+STB r11,r4,31
+; Copy the opaque payload after the fixed 32-byte header.
+LD r7,r0,@n16b_src
+MOVI r8,0
+n16b_payload_loop:
+LD r5,r0,@n16b_len
+CMP r8,r5
+JMP[GE] @n16b_crc_start
+ADD r9,r7,r8
+LDB r11,r9,0
+LD r4,r0,@n16b_base
+ADD r9,r4,r8
+ADDI r9,r9,32
+STB r11,r9,0
+ADDI r8,r8,1
+JMP @n16b_payload_loop
+; CRC-32/IEEE over header + payload, matching n16_frame_validate.
+n16b_crc_start:
+MOVI r11,65535
+MOVHI r11,65535
+MOVI r7,0
+LD r9,r0,@n16b_len
+ADDI r9,r9,32
+n16b_crc_byte:
+CMP r7,r9
+JMP[GE] @n16b_crc_done
+LD r4,r0,@n16b_base
+ADD r4,r4,r7
+LDB r10,r4,0
+BOOL.6 r11,r11,r10
+MOVI r13,8
+n16b_crc_bit:
+MOVI r12,1
+BOOL.8 r12,r11,r12
+CMP r12,r0
+JMP[EQ] @n16b_crc_zero
+SHR r11,r11,1
+MOVI r12,0x8320
+MOVHI r12,0xEDB8
+BOOL.6 r11,r11,r12
+JMP @n16b_crc_next
+n16b_crc_zero:
+SHR r11,r11,1
+n16b_crc_next:
+MOVI r12,1
+SUB r13,r13,r12
+CMP r13,r0
+JMP[NE] @n16b_crc_bit
+ADDI r7,r7,1
+JMP @n16b_crc_byte
+n16b_crc_done:
+MOVI r10,65535
+MOVHI r10,65535
+BOOL.6 r11,r11,r10
+LD r4,r0,@n16b_base
+LD r5,r0,@n16b_len
+ADDI r5,r5,32
+ADD r4,r4,r5
+MOVI r10,255
+BOOL.8 r12,r11,r10
+STB r12,r4,0
+SHR r11,r11,8
+BOOL.8 r12,r11,r10
+STB r12,r4,1
+SHR r11,r11,8
+BOOL.8 r12,r11,r10
+STB r12,r4,2
+SHR r11,r11,8
+BOOL.8 r12,r11,r10
+STB r12,r4,3
+LD r5,r0,@n16b_len
+ADDI r1,r5,36
+MOVI r2,0
+MOVI r3,0
+LD r15,r0,@n16b_ret
+RET
+n16b_error:
+MOVI r1,0
+MOVI r2,1
+MOVI r3,1
+LD r15,r0,@n16b_ret
+RET
+n16b_ret:
+.word 0
+n16b_base:
+.word 0
+n16b_type:
+.word 0
+n16b_seq:
+.word 0
+n16b_src:
+.word 0
+n16b_len:
+.word 0
+n16b_sid:
+.word 0
