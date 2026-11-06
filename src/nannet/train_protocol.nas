@@ -381,7 +381,7 @@ n16r_type:
 ; Return r1=state,r2=error (0,1 transition,2 payload),r3=status.
 ; State: 0 idle,1 hello,2 negotiated,3 receiving,4 corpus complete,
 ; 5 accepted,6 candidate digest,7 merge proposal,8 terminal.
-; Payload lengths: HELLO 4, CAPABILITIES 8, BEGIN 12, CHUNK 1..4096,
+; Payload lengths: HELLO 2, CAPABILITIES 8, BEGIN 12, CHUNK 1..4096,
 ; END 4, ACCEPTED 4, REJECTED 4..256, STATUS 8, DIGEST 4,
 ; PROPOSAL 8, RESULT 4, HEARTBEAT 0, CLOSE 0.
 n16_session_transition:
