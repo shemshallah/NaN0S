@@ -335,6 +335,14 @@ n16_frame_route:
 ST r15,r0,@n16r_ret
 ST r1,r0,@n16r_base
 ST r2,r0,@n16r_len
+; Validation advances the replay cursor and may claim a new session.
+; Save those fields so a later transition/routing rejection is atomic.
+LD r5,r0,@n16v_last_seq
+ST r5,r0,@n16r_prev_seq
+LD r5,r0,@n16v_session_active
+ST r5,r0,@n16r_prev_active
+LD r5,r0,@n16s_state
+ST r5,r0,@n16r_prev_state
 CALL @n16_frame_validate
 CMP r3,r0
 JMP[NE] @n16r_done
@@ -342,11 +350,20 @@ ST r1,r0,@n16r_type
 ST r2,r0,@n16r_len
 CALL @n16_session_transition
 CMP r3,r0
-JMP[NE] @n16r_state_error
+JMP[NE] @n16r_rollback_state
+; HEARTBEAT and CLOSE are control messages, not point-addressed payloads.
+; In particular, a zero-byte CLOSE must still complete the guest reset.
+LD r5,r0,@n16r_type
+MOVI r6,12
+CMP r5,r6
+JMP[EQ] @n16r_control
+MOVI r6,13
+CMP r5,r6
+JMP[EQ] @n16r_control
 LD r2,r0,@n16r_len
 MOVI r5,2
 CMP r2,r5
-JMP[LT] @n16r_short
+JMP[LT] @n16r_rollback_short
 LD r4,r0,@n16r_base
 ADDI r4,r4,32
 LDB r1,r4,0
@@ -355,16 +372,29 @@ SHL r5,r5,8
 BOOL.14 r1,r1,r5
 CALL @ob_point_to_route
 JMP @n16r_done
-n16r_short:
+n16r_control:
 MOVI r1,0
 MOVI r2,0
+MOVI r3,0
+MOVI r4,0
+JMP @n16r_done
+n16r_rollback_short:
 MOVI r3,2
-MOVI r4,0
-n16r_state_error:
+JMP @n16r_rollback
+n16r_rollback_state:
+MOVI r3,6
+n16r_rollback:
+; Do not consume sequence/session ownership for a rejected route.
+LD r5,r0,@n16r_prev_seq
+ST r5,r0,@n16v_last_seq
+LD r5,r0,@n16r_prev_active
+ST r5,r0,@n16v_session_active
+LD r5,r0,@n16r_prev_state
+ST r5,r0,@n16s_state
 MOVI r1,0
 MOVI r2,0
-MOVI r3,6
 MOVI r4,0
+JMP @n16r_done
 n16r_done:
 LD r15,r0,@n16r_ret
 RET
@@ -375,6 +405,12 @@ n16r_base:
 n16r_len:
 .word 0
 n16r_type:
+.word 0
+n16r_prev_seq:
+.word 0
+n16r_prev_active:
+.word 0
+n16r_prev_state:
 .word 0
 
 ; N16T session transition machine. r1=type,r2=payload bytes.
