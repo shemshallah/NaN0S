@@ -21,6 +21,7 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
 import java.io.File
+import java.net.URI
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
@@ -38,7 +39,10 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val reqTrain = 4
     private val reqCandidate = 5
     @Volatile private var trainingActive = false
+    @Volatile private var remoteSession: N16RemoteSession? = null
+    @Volatile private var remoteConnectGeneration = 0
     private var trainingState: ByteArray? = null
+    private val remotePrefs get() = getSharedPreferences("n16_remote", MODE_PRIVATE)
     private val autosave get() = File(filesDir, "autosave.nan1")
     private val candidateFile get() = File(filesDir, "n16_candidate.nan1")
     private val diskFile get() = File(filesDir, "disk.nanfs")
@@ -163,13 +167,102 @@ class MainActivity : Activity(), NanLoop.Listener {
         row.addView(btn("Log") { showLog() })
         row.addView(btn("WiFi") { showWifi() })
         row.addView(btn("NaNLMind Remote Training") { showTrainingSuite() })
+        row.addView(btn("N16T Gateway") { showRemoteGateway() })
         return HorizontalScrollView(this).apply { addView(row) }
+    }
+
+    private fun showRemoteGateway() {
+        val input = EditText(this).apply {
+            hint = "https://gateway.example/n16t"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+            setText(remotePrefs.getString("endpoint", "") ?: "")
+        }
+        AlertDialog.Builder(this)
+            .setTitle("N16T HTTPS Gateway")
+            .setMessage(
+                "Connect the persistent NaN16 protocol guest and perform HELLO/CAPABILITIES only. " +
+                    "Remote corpus upload and the server-side runner response path are not enabled yet. " +
+                    "This client does not request or store a GitHub token."
+            )
+            .setView(input)
+            .setPositiveButton("Connect") { _, _ ->
+                connectRemoteGateway(input.text.toString().trim())
+            }
+            .setNeutralButton("Disconnect") { _, _ -> disconnectRemoteGateway() }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun connectRemoteGateway(raw: String) {
+        val endpoint = try { URI(raw) } catch (e: Exception) {
+            Toast.makeText(this, "Invalid gateway URL", Toast.LENGTH_LONG).show()
+            return
+        }
+        if (endpoint.scheme != "https" || endpoint.host.isNullOrBlank() ||
+            endpoint.userInfo != null || endpoint.fragment != null) {
+            Toast.makeText(this, "Use an HTTPS URL without embedded credentials or fragments", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val generation = remoteConnectGeneration + 1
+        remoteConnectGeneration = generation
+        remoteSession?.close()
+        remoteSession = null
+        val session = try { N16RemoteSession(this, endpoint) } catch (e: Exception) {
+            Toast.makeText(this, "Could not initialize NaN16 protocol guest: ${e.message}", Toast.LENGTH_LONG).show()
+            return
+        }
+        remotePrefs.edit().putString("endpoint", endpoint.toString()).apply()
+        Toast.makeText(this, "Connecting to N16T gateway…", Toast.LENGTH_SHORT).show()
+
+        Thread {
+            try {
+                // HELLO's two-byte route prefix selects the Runner portal (point 1).
+                val result = session.exchange(1, byteArrayOf(1, 0))
+                runOnUiThread {
+                    if (generation != remoteConnectGeneration || isFinishing || isDestroyed) {
+                        session.close()
+                    } else {
+                        remoteSession = session
+                        Toast.makeText(
+                            this,
+                            "N16T HELLO/CAPABILITIES accepted; route ${result.route.gateway}/${result.route.interfaceId}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                session.close()
+                runOnUiThread {
+                    if (generation == remoteConnectGeneration) {
+                        Toast.makeText(this, "N16T gateway handshake failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    private fun disconnectRemoteGateway() {
+        remoteConnectGeneration++
+        val active = remoteSession
+        remoteSession = null
+        if (active == null) {
+            Toast.makeText(this, "No active N16T session", Toast.LENGTH_SHORT).show()
+            return
+        }
+        Thread {
+            try { active.closeRemote() } catch (_: Exception) { }
+            active.close()
+            runOnUiThread {
+                Toast.makeText(this, "N16T session disconnected", Toast.LENGTH_SHORT).show()
+            }
+        }.start()
     }
 
     private fun showTrainingSuite() {
         AlertDialog.Builder(this)
             .setTitle("NaNLMind Remote Training")
-            .setMessage("Run the NaN16 corpus trainer in an isolated VM snapshot. It builds a temporary byte-bigram candidate; merging into the active universe is not enabled yet.")
+            .setMessage("Run the NaN16 corpus trainer in an isolated VM snapshot. It builds a temporary byte-bigram candidate; merging into the active universe is not enabled yet. Use N16T Gateway for the HTTPS HELLO/CAPABILITIES check; remote corpus transfer is not enabled yet.")
             .setPositiveButton("Choose TXT") { _, _ ->
                 if (prepareTraining()) {
                     val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -445,6 +538,9 @@ class MainActivity : Activity(), NanLoop.Listener {
     }
     override fun onDestroy() {
         super.onDestroy()
+        remoteConnectGeneration++
+        remoteSession?.close()
+        remoteSession = null
         loop.shutdown(); beeper.shutdown()
         try { loop.join(1000) } catch (e: InterruptedException) { }
         vm.detachDisk()
