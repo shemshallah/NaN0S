@@ -24,21 +24,34 @@ internal class N16RemoteSession(
     private val transport = N16HttpsTransport(endpoint)
     private var closed = false
 
+    /** Send one guest-built frame and return the opaque peer frame without decoding it. */
     @Synchronized
-    fun exchange(type: Int, payload: ByteArray): ExchangeResult {
+    fun send(type: Int, payload: ByteArray): ByteArray {
         check(!closed) { "N16 remote session is closed" }
         val request = guest.buildFrame(type, payload)
         try {
             val response = transport.exchange(request)
             guest.commitSent()
-            val route = guest.acceptFrame(response)
-            return ExchangeResult(response, route)
+            return response
         } catch (failure: Exception) {
-            // If HTTPS failed, the guest has not committed the outbound transition.
-            // If it succeeded but peer validation failed, abortPending is a no-op.
+            // A failed HTTPS exchange has not committed the outbound guest transition.
             try { guest.abortPending() } catch (_: Exception) { }
             throw failure
         }
+    }
+
+    /** Validate/route a saved peer frame. This can be retried after a rejected response. */
+    @Synchronized
+    fun acceptPeerFrame(frame: ByteArray): N16GuestProtocol.Route {
+        check(!closed) { "N16 remote session is closed" }
+        return guest.acceptFrame(frame)
+    }
+
+    @Synchronized
+    fun exchange(type: Int, payload: ByteArray): ExchangeResult {
+        val response = send(type, payload)
+        val route = acceptPeerFrame(response)
+        return ExchangeResult(response, route)
     }
 
     @Synchronized
