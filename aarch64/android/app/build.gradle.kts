@@ -82,6 +82,16 @@ tasks.register("compileProtocolGuest") {
         check(labelsOutput.isFile && labelsOutput.length() > 0) {
             "NaN16 protocol guest label map was not generated"
         }
+        val guestLabels = labelsOutput.readLines().mapNotNull { line ->
+            line.trim().split(Regex("\\s+")).takeIf { it.size == 2 }?.first()
+        }.toSet()
+        val requiredLabels = setOf(
+            "n16_android_build", "n16_android_route",
+            "n16_android_advance", "n16_android_abort", "n16_android_reset"
+        )
+        check(guestLabels.containsAll(requiredLabels)) {
+            "NaN16 protocol guest is missing entry points: ${requiredLabels - guestLabels}"
+        }
     }
 }
 tasks.register("verifyRuntimeAssetAllowlist") {
