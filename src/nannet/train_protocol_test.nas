@@ -194,6 +194,24 @@ MOVI r10,67
 PUTC r10
 MOVI r10,10
 PUTC r10
+
+; Encoder must reject a payload larger than the validator's 64 KiB limit.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,1
+MOVI r3,3
+MOVI r4,12992
+MOVHI r4,2
+MOVI r5,1
+MOVHI r5,1
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_frame_build
+MOVI r5,1
+CMP r2,r5
+JMP[NE] @fail
+CMP r3,r5
+JMP[NE] @fail
 ; pass
 MOVI r1,78
 PUTC r1
