@@ -142,6 +142,52 @@ CMP r2,r5
 JMP[NE] @fail
 CMP r1,r0
 JMP[NE] @fail
+
+; Guest encoder must emit a CRC-valid N16T frame with the expected type and length.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,1
+MOVI r3,2
+MOVI r4,12992
+MOVHI r4,2
+MOVI r5,2
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_frame_build
+MOVI r5,38
+CMP r1,r5
+JMP[NE] @fail
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,38
+CALL @n16_frame_validate
+CMP r3,r0
+JMP[NE] @fail
+MOVI r5,1
+CMP r1,r5
+JMP[NE] @fail
+MOVI r5,2
+CMP r2,r5
+JMP[NE] @fail
+CALL @n16_session_reset
+
+; Encoder must reject a payload larger than the validator's 64 KiB limit.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,1
+MOVI r3,3
+MOVI r4,12992
+MOVHI r4,2
+MOVI r5,1
+MOVHI r5,1
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_frame_build
+MOVI r5,1
+CMP r2,r5
+JMP[NE] @fail
+CMP r3,r5
+JMP[NE] @fail
 ; pass
 MOVI r1,78
 PUTC r1
@@ -228,3 +274,9 @@ frame:
 .org 33024
 other_session_frame:
 .word 0x5436314E,0x00010001,0x00000001,0,0,0,2,2,0xE8230002,0x00006187
+
+.org 36000
+builder_session_id:
+.word 0x12345678,0x90ABCDEF,0x13579BDF,0x2468ACE0
+builder_payload:
+.word 0x00000002
