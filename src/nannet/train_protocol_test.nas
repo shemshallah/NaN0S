@@ -291,6 +291,12 @@ LD r5,r0,@n16a_send_seq
 CMP r5,r6
 JMP[NE] @fail
 CALL @n16_android_advance_impl
+MOVI r1,10
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,10
+PUTC r1
 CMP r3,r0
 JMP[NE] @fail
 LD r5,r0,@n16a_send_seq
@@ -300,7 +306,13 @@ JMP[NE] @fail
 LD r5,r0,@n16a_pending
 CMP r5,r0
 JMP[NE] @fail
-; CAPABILITIES reserves sequence 2 and advances only after commit.
+; CAPABILITIES
+MOVI r1,10
+PUTC r1
+MOVI r1,66
+PUTC r1
+MOVI r1,10
+PUTC r1 reserves sequence 2 and advances only after commit.
 MOVI r1,4928
 MOVHI r1,2
 MOVI r2,2
@@ -324,7 +336,13 @@ LD r5,r0,@n16a_send_seq
 MOVI r6,3
 CMP r5,r6
 JMP[NE] @fail
-; An unsent CORPUS_BEGIN is aborted: neither state nor sequence advances.
+; An unsent
+MOVI r1,10
+PUTC r1
+MOVI r1,67
+PUTC r1
+MOVI r1,10
+PUTC r1 CORPUS_BEGIN is aborted: neither state nor sequence advances.
 MOVI r1,4928
 MOVHI r1,2
 MOVI r2,3
@@ -347,7 +365,13 @@ JMP[NE] @fail
 LD r5,r0,@n16a_pending
 CMP r5,r0
 JMP[NE] @fail
-; Peer CORPUS_BEGIN sequence 1 advances the inbound session through the guest router.
+; Peer CORPUS
+MOVI r1,10
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,10
+PUTC r1_BEGIN sequence 1 advances the inbound session through the guest router.
 MOVI r1,4928
 MOVHI r1,2
 MOVI r2,3
@@ -368,7 +392,13 @@ LD r5,r0,@n16s_state
 MOVI r6,3
 CMP r5,r6
 JMP[NE] @fail
-; CLOSE is committed by the guest, resetting both protocol state and send sequence.
+; CLOSE
+MOVI r1,10
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,10
+PUTC r1 is committed by the guest, resetting both protocol state and send sequence.
 MOVI r1,4928
 MOVHI r1,2
 MOVI r2,13
@@ -392,6 +422,12 @@ LD r5,r0,@n16s_state
 CMP r5,r0
 JMP[NE] @fail
 CALL @n16_android_reset_impl
+MOVI r1,10
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,10
+PUTC r1
 LD r5,r0,@n16s_state
 CMP r5,r0
 JMP[NE] @fail
@@ -407,6 +443,12 @@ CMP r5,r0
 JMP[NE] @fail
 
 ; pass
+MOVI r1,10
+PUTC r1
+MOVI r1,71
+PUTC r1
+MOVI r1,10
+PUTC r1
 MOVI r1,78
 PUTC r1
 MOVI r1,49
