@@ -650,7 +650,7 @@ MOVI r8,0
 n16b_sid_loop:
 MOVI r10,16
 CMP r8,r10
-JMP[GE] @n16b_sequence_value
+JMP[GE] @n16b_write_seq
 ADD r9,r7,r8
 LDB r11,r9,0
 LD r4,r0,@n16b_base
