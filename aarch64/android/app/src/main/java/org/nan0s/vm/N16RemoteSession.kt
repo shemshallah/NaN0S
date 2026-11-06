@@ -13,7 +13,8 @@ import java.net.URI
  */
 internal class N16RemoteSession(
     context: Context,
-    endpoint: URI
+    endpoint: URI,
+    bearerToken: String
 ) : Closeable {
     data class ExchangeResult(
         val peerFrame: ByteArray,
@@ -21,7 +22,7 @@ internal class N16RemoteSession(
     )
 
     private val guest = N16GuestProtocol(context)
-    private val transport = N16HttpsTransport(endpoint)
+    private val transport = N16HttpsTransport(endpoint, bearerToken)
     private var closed = false
 
     /** Send one guest-built frame and return the opaque peer frame without decoding it. */
