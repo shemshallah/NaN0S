@@ -144,17 +144,21 @@ CMP r1,r0
 JMP[NE] @fail
 
 ; Guest encoder must emit a CRC-valid N16T frame with the expected type and length.
-MOVI r1,34000
+MOVI r1,4928
+MOVHI r1,2
 MOVI r2,1
 MOVI r3,2
-MOVI r4,36016
+MOVI r4,12992
+MOVHI r4,2
 MOVI r5,2
-MOVI r6,36000
+MOVI r6,12928
+MOVHI r6,2
 CALL @n16_frame_build
 MOVI r5,38
 CMP r1,r5
 JMP[NE] @fail
-MOVI r1,34000
+MOVI r1,4928
+MOVHI r1,2
 MOVI r2,38
 CALL @n16_frame_validate
 CMP r3,r0
