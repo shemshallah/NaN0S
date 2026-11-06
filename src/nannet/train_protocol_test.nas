@@ -265,12 +265,13 @@ LD r5,r0,@n16v_session_active
 CMP r5,r0
 JMP[NE] @fail
 
-; Exercise the exact callable implementations exposed by the Android guest ABI.
+; Exercise guest-owned outbound sequencing and the Android-callable ABI.
 CALL @n16_android_reset_impl
+; HELLO is built with no host-supplied sequence; the guest reserves sequence 1.
 MOVI r1,4928
 MOVHI r1,2
 MOVI r2,1
-MOVI r3,1
+MOVI r3,0
 MOVI r4,12944
 MOVHI r4,2
 MOVI r5,2
@@ -282,15 +283,74 @@ CMP r1,r5
 JMP[NE] @fail
 CMP r3,r0
 JMP[NE] @fail
-MOVI r1,1
-MOVI r2,2
+LD r5,r0,@n16a_pending_seq
+MOVI r6,1
+CMP r5,r6
+JMP[NE] @fail
+LD r5,r0,@n16a_send_seq
+CMP r5,r6
+JMP[NE] @fail
 CALL @n16_android_advance_impl
 CMP r3,r0
 JMP[NE] @fail
-; Build the peer CAPABILITIES response and route it through the guest ABI.
+LD r5,r0,@n16a_send_seq
+MOVI r6,2
+CMP r5,r6
+JMP[NE] @fail
+LD r5,r0,@n16a_pending
+CMP r5,r0
+JMP[NE] @fail
+; CAPABILITIES reserves sequence 2 and advances only after commit.
 MOVI r1,4928
 MOVHI r1,2
 MOVI r2,2
+MOVI r3,0
+MOVI r4,12944
+MOVHI r4,2
+MOVI r5,8
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_android_build_impl
+CMP r3,r0
+JMP[NE] @fail
+LD r5,r0,@n16a_pending_seq
+MOVI r6,2
+CMP r5,r6
+JMP[NE] @fail
+CALL @n16_android_advance_impl
+CMP r3,r0
+JMP[NE] @fail
+LD r5,r0,@n16a_send_seq
+MOVI r6,3
+CMP r5,r6
+JMP[NE] @fail
+; An unsent CORPUS_BEGIN is aborted: neither state nor sequence advances.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,3
+MOVI r3,0
+MOVI r4,12944
+MOVHI r4,2
+MOVI r5,8
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_android_build_impl
+CMP r3,r0
+JMP[NE] @fail
+CALL @n16_android_abort_impl
+CMP r3,r0
+JMP[NE] @fail
+LD r5,r0,@n16a_send_seq
+MOVI r6,3
+CMP r5,r6
+JMP[NE] @fail
+LD r5,r0,@n16a_pending
+CMP r5,r0
+JMP[NE] @fail
+; Peer CORPUS_BEGIN sequence 1 advances the inbound session through the guest router.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,3
 MOVI r3,1
 MOVI r4,12944
 MOVHI r4,2
@@ -305,7 +365,7 @@ CALL @n16_android_route_impl
 CMP r3,r0
 JMP[NE] @fail
 LD r5,r0,@n16s_state
-MOVI r6,2
+MOVI r6,3
 CMP r5,r6
 JMP[NE] @fail
 CALL @n16_android_reset_impl
@@ -313,6 +373,13 @@ LD r5,r0,@n16s_state
 CMP r5,r0
 JMP[NE] @fail
 LD r5,r0,@n16v_session_active
+CMP r5,r0
+JMP[NE] @fail
+LD r5,r0,@n16a_send_seq
+MOVI r6,1
+CMP r5,r6
+JMP[NE] @fail
+LD r5,r0,@n16a_pending
 CMP r5,r0
 JMP[NE] @fail
 
