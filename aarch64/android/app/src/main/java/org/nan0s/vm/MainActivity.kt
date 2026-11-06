@@ -177,23 +177,32 @@ class MainActivity : Activity(), NanLoop.Listener {
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
             setText(remotePrefs.getString("endpoint", "") ?: "")
         }
+        val tokenInput = EditText(this).apply {
+            hint = "NANNET endpoint token (not a GitHub token)"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        val fields = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 8, 24, 0)
+            addView(input)
+            addView(tokenInput)
+        }
         AlertDialog.Builder(this)
             .setTitle("N16T HTTPS Gateway")
             .setMessage(
-                "Connect the persistent NaN16 protocol guest and perform HELLO/CAPABILITIES only. " +
-                    "Remote corpus upload and the server-side runner response path are not enabled yet. " +
-                    "This client does not request or store a GitHub token."
+                "Connect the persistent NaN16 protocol guest. The endpoint token is scoped to this device and is held only for this connection. " +
+                    "No GitHub token is requested or stored."
             )
-            .setView(input)
+            .setView(fields)
             .setPositiveButton("Connect") { _, _ ->
-                connectRemoteGateway(input.text.toString().trim())
+                connectRemoteGateway(input.text.toString().trim(), tokenInput.text.toString().trim())
             }
             .setNeutralButton("Disconnect") { _, _ -> disconnectRemoteGateway() }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun connectRemoteGateway(raw: String) {
+    private fun connectRemoteGateway(raw: String, bearerToken: String) {
         val endpoint = try { URI(raw) } catch (e: Exception) {
             Toast.makeText(this, "Invalid gateway URL", Toast.LENGTH_LONG).show()
             return
@@ -204,11 +213,16 @@ class MainActivity : Activity(), NanLoop.Listener {
             return
         }
 
+        if (bearerToken.length !in 32..512) {
+            Toast.makeText(this, "A scoped NANNET endpoint token is required", Toast.LENGTH_LONG).show()
+            return
+        }
+
         val generation = remoteConnectGeneration + 1
         remoteConnectGeneration = generation
         remoteSession?.close()
         remoteSession = null
-        val session = try { N16RemoteSession(this, endpoint) } catch (e: Exception) {
+        val session = try { N16RemoteSession(this, endpoint, bearerToken) } catch (e: Exception) {
             Toast.makeText(this, "Could not initialize NaN16 protocol guest: ${e.message}", Toast.LENGTH_LONG).show()
             return
         }
