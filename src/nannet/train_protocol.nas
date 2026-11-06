@@ -621,7 +621,7 @@ MOVI r10,14
 CMP r10,r2
 JMP[LT] @n16b_error
 MOVI r10,0
-MOVHI r10,16
+MOVHI r10,1
 CMP r10,r5
 JMP[LT] @n16b_error
 LD r4,r0,@n16b_base
