@@ -44,7 +44,7 @@ N16T frames have a 32-byte header, up to 65,536 payload bytes, and a 4-byte CRC3
 4. `acceptFrame` stages the peer frame and invokes the guest validator/router. Rejected frames do not consume the guest replay cursor or session ownership.
 5. The same VM remains alive for the next exchange.
 
-The host supplies only random session-id entropy and sequence numbers. The NaN16 guest owns frame bytes, CRC, session transitions, replay checks, payload bounds and route selection.
+The host supplies payload bytes, sequence numbers and random session-id entropy. The NaN16 guest owns frame encoding, CRC, session transitions, replay checks, payload bounds and route selection.
 
 ## Deployment boundary
 
