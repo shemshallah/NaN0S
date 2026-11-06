@@ -333,7 +333,7 @@ MOVI r2,3
 MOVI r3,0
 MOVI r4,12944
 MOVHI r4,2
-MOVI r5,8
+MOVI r5,12
 MOVI r6,12928
 MOVHI r6,2
 CALL @n16_android_build_impl
@@ -357,13 +357,13 @@ MOVI r2,3
 MOVI r3,1
 MOVI r4,12944
 MOVHI r4,2
-MOVI r5,8
+MOVI r5,12
 MOVI r6,12928
 MOVHI r6,2
 CALL @n16_frame_build
 MOVI r1,4928
 MOVHI r1,2
-MOVI r2,44
+MOVI r2,48
 CALL @n16_android_route_impl
 CMP r3,r0
 JMP[NE] @fail
@@ -411,12 +411,6 @@ CMP r5,r0
 JMP[NE] @fail
 
 ; pass
-MOVI r1,10
-PUTC r1
-MOVI r1,71
-PUTC r1
-MOVI r1,10
-PUTC r1
 MOVI r1,78
 PUTC r1
 MOVI r1,49
