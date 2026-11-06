@@ -364,3 +364,228 @@ n16r_base:
 .word 0
 n16r_len:
 .word 0
+
+; N16T session transition machine. r1=type,r2=payload bytes.
+; Return r1=state,r2=error (0,1 transition,2 payload),r3=status.
+; State: 0 idle,1 hello,2 negotiated,3 receiving,4 corpus complete,
+; 5 accepted,6 candidate digest,7 merge proposal,8 terminal.
+; Payload lengths: HELLO 4, CAPABILITIES 8, BEGIN 12, CHUNK 1..4096,
+; END 4, ACCEPTED 4, REJECTED 4..256, STATUS 8, DIGEST 4,
+; PROPOSAL 8, RESULT 4, HEARTBEAT 0, CLOSE 0.
+n16_session_transition:
+ST r15,r0,@n16s_ret
+ST r1,r0,@n16s_type
+ST r2,r0,@n16s_len
+LD r4,r0,@n16s_state
+LD r5,r0,@n16s_type
+MOVI r6,12
+CMP r5,r6
+JMP[NE] @n16s_close
+LD r6,r0,@n16s_len
+CMP r6,r0
+JMP[NE] @n16s_payload_error
+CMP r4,r0
+JMP[EQ] @n16s_transition_error
+MOVI r6,8
+CMP r4,r6
+JMP[GE] @n16s_transition_error
+JMP @n16s_ok
+n16s_close:
+MOVI r6,13
+CMP r5,r6
+JMP[NE] @n16s_hello
+LD r6,r0,@n16s_len
+CMP r6,r0
+JMP[NE] @n16s_payload_error
+CMP r4,r0
+JMP[EQ] @n16s_transition_error
+MOVI r6,0
+ST r6,r0,@n16s_state
+ST r6,r0,@n16v_session_active
+ST r6,r0,@n16v_last_seq
+JMP @n16s_ok
+n16s_hello:
+MOVI r6,1
+CMP r5,r6
+JMP[NE] @n16s_caps
+CMP r4,r0
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,4
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,1
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_caps:
+MOVI r6,2
+CMP r5,r6
+JMP[NE] @n16s_begin
+MOVI r6,1
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,8
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,2
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_begin:
+MOVI r6,3
+CMP r5,r6
+JMP[NE] @n16s_chunk
+MOVI r6,2
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,12
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,3
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_chunk:
+MOVI r6,4
+CMP r5,r6
+JMP[NE] @n16s_end
+MOVI r6,3
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+CMP r6,r0
+JMP[EQ] @n16s_payload_error
+MOVI r7,4096
+CMP r6,r7
+JMP[GT] @n16s_payload_error
+JMP @n16s_ok
+n16s_end:
+MOVI r6,5
+CMP r5,r6
+JMP[NE] @n16s_accept
+MOVI r6,3
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,4
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,4
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_accept:
+MOVI r6,6
+CMP r5,r6
+JMP[NE] @n16s_reject
+MOVI r6,4
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,4
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,5
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_reject:
+MOVI r6,7
+CMP r5,r6
+JMP[NE] @n16s_status
+CMP r4,r0
+JMP[EQ] @n16s_transition_error
+MOVI r7,8
+CMP r4,r7
+JMP[GE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,4
+CMP r6,r7
+JMP[LT] @n16s_payload_error
+MOVI r7,256
+CMP r6,r7
+JMP[GT] @n16s_payload_error
+MOVI r4,8
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_status:
+MOVI r6,8
+CMP r5,r6
+JMP[NE] @n16s_digest
+MOVI r6,4
+CMP r4,r6
+JMP[LT] @n16s_transition_error
+MOVI r7,7
+CMP r4,r7
+JMP[GT] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,8
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+JMP @n16s_ok
+n16s_digest:
+MOVI r6,9
+CMP r5,r6
+JMP[NE] @n16s_proposal
+MOVI r6,5
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,4
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,6
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_proposal:
+MOVI r6,10
+CMP r5,r6
+JMP[NE] @n16s_result
+MOVI r6,6
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,8
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,7
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_result:
+MOVI r6,11
+CMP r5,r6
+JMP[NE] @n16s_unknown
+MOVI r6,7
+CMP r4,r6
+JMP[NE] @n16s_transition_error
+LD r6,r0,@n16s_len
+MOVI r7,4
+CMP r6,r7
+JMP[NE] @n16s_payload_error
+MOVI r4,8
+ST r4,r0,@n16s_state
+JMP @n16s_ok
+n16s_unknown:
+JMP @n16s_transition_error
+n16s_payload_error:
+MOVI r2,2
+JMP @n16s_error
+n16s_transition_error:
+MOVI r2,1
+n16s_error:
+LD r1,r0,@n16s_state
+MOVI r3,1
+LD r15,r0,@n16s_ret
+RET
+n16s_ok:
+LD r1,r0,@n16s_state
+MOVI r2,0
+MOVI r3,0
+LD r15,r0,@n16s_ret
+RET
+n16s_ret:
+.word 0
+n16s_type:
+.word 0
+n16s_len:
+.word 0
+n16s_state:
+.word 0
