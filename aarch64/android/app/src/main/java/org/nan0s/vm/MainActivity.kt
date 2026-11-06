@@ -180,6 +180,8 @@ class MainActivity : Activity(), NanLoop.Listener {
         val tokenInput = EditText(this).apply {
             hint = "NANNET endpoint token (not a GitHub token)"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            isSaveEnabled = false
+            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
         }
         val fields = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
