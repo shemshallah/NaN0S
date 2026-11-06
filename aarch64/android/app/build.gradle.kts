@@ -52,10 +52,55 @@ tasks.register("compileTrainingGuest") {
         }
     }
 }
-tasks.register("verifyRuntimeAssetAllowlist") {
-    dependsOn("compileTrainingGuest")
+// Compile a dedicated persistent protocol VM image and its guest label map.
+tasks.register("compileProtocolGuest") {
+    val guestSource = file("../../../src/nannet/n16t_android_guest.nas")
+    val guestOutput = file("src/main/assets/n16_protocol.nan")
+    val labelsOutput = file("src/main/assets/n16_protocol.labels")
+    inputs.files(
+        guestSource,
+        file("../../../src/nannet/nannet.nas"),
+        file("../../../src/nannet/overbootstrap_route.nas"),
+        file("../../../src/nannet/train_protocol.nas"),
+        file("../../../src/nannet/n16t_android_abi.nas"),
+        file("../../../tools/nmk.awk")
+    )
+    outputs.files(guestOutput, labelsOutput)
     doLast {
-        val allowed = setOf("nan0s.img", "disk.nanfs", "n16_train.nan")
+        guestOutput.parentFile.mkdirs()
+        guestOutput.outputStream().use { guest ->
+            exec {
+                commandLine(
+                    "awk", "-f", file("../../../tools/nmk.awk"),
+                    "-v", "CMD=emit",
+                    "-v", "LABELS=${labelsOutput.absolutePath}",
+                    guestSource
+                )
+                standardOutput = guest
+            }
+        }
+        check(labelsOutput.isFile && labelsOutput.length() > 0) {
+            "NaN16 protocol guest label map was not generated"
+        }
+        val guestLabels = labelsOutput.readLines().mapNotNull { line ->
+            line.trim().split(Regex("\\s+")).takeIf { it.size == 2 }?.first()
+        }.toSet()
+        val requiredLabels = setOf(
+            "n16_android_build", "n16_android_route",
+            "n16_android_advance", "n16_android_abort", "n16_android_reset"
+        )
+        check(guestLabels.containsAll(requiredLabels)) {
+            "NaN16 protocol guest is missing entry points: ${requiredLabels - guestLabels}"
+        }
+    }
+}
+tasks.register("verifyRuntimeAssetAllowlist") {
+    dependsOn("compileTrainingGuest", "compileProtocolGuest")
+    doLast {
+        val allowed = setOf(
+            "nan0s.img", "disk.nanfs", "n16_train.nan",
+            "n16_protocol.nan", "n16_protocol.labels"
+        )
         val actual = fileTree("src/main/assets").files.map { it.name }.toSet()
         val unexpected = actual - allowed
         val missing = allowed - actual

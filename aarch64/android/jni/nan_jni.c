@@ -56,6 +56,15 @@ JNIEXPORT jboolean JNICALL FN(writeBytes)(JNIEnv *e, jclass c, jlong h, jint add
   (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
   return rc == 0 ? JNI_TRUE : JNI_FALSE;
 }
+JNIEXPORT jint JNICALL FN(getReg)(JNIEnv *e, jclass c, jlong h, jint index) {
+  (void)e; (void)c; return (jint)nan_reg(VM(h), index);
+}
+JNIEXPORT void JNICALL FN(setReg)(JNIEnv *e, jclass c, jlong h, jint index, jint value) {
+  (void)e; (void)c; nan_set_reg(VM(h), index, (uint32_t)value);
+}
+JNIEXPORT void JNICALL FN(setPc)(JNIEnv *e, jclass c, jlong h, jint pc) {
+  (void)e; (void)c; if (pc >= 0) nan_set_pc(VM(h), (uint32_t)pc);
+}
 JNIEXPORT jint JNICALL FN(run)(JNIEnv *e, jclass c, jlong h, jint steps) { (void)e; (void)c; return nan_run(VM(h), steps > 0 ? (uint32_t)steps : 0u); }
 JNIEXPORT void JNICALL FN(setTime)(JNIEnv *e, jclass c, jlong h, jint ms) { (void)e; (void)c; nan_set_time_ms(VM(h), (uint32_t)ms); }
 JNIEXPORT void JNICALL FN(keyChar)(JNIEnv *e, jclass c, jlong h, jint ch) { (void)e; (void)c; nan_key_char(VM(h), ch); }
