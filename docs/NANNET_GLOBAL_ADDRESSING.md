@@ -78,3 +78,21 @@ without changing the v1 payload interpretation.
    approve corpus data, and only the canonical runner can commit learning.
 6. Clocked may be a cooperative corpus participant now; macrocluster promotion
    is a later topology operation, not a credential shortcut.
+
+
+## NANNET HTTP compatibility
+
+The Android HTTPS adapter currently labels opaque N16T frames
+`application/x-n16t`. NANNET accepts that legacy media type and the canonical
+`application/vnd.nan16.n16t` type, then forwards to the configured trusted peer
+using the canonical vendor type. This is only an HTTP content-type adaptation:
+NANNET does not inspect frame fields, CRC, sequence, session identity, or route
+payload. The NaN16 guest remains the authority for those semantics.
+
+The Android route-diff wrapper is a separate metadata path:
+`POST /v1/intake/route` with an endpoint token bound to
+`nan://GM0:SC0:MC0:BS0:HW1` and an `X-NaN-Address` consistency header. NANNET
+checks the canonical digest and confirms that the route diff's local node point
+is 2, then stores it as pending unverified evidence. It does not directly alter
+the bootstrap map or any head state. The six-runner canonical ring remains the
+only writer of bootstrap training state.
