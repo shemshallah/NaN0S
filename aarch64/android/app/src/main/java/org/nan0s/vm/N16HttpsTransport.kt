@@ -15,11 +15,13 @@ import javax.net.ssl.HttpsURLConnection
  */
 internal class N16HttpsTransport(
     private val endpoint: URI,
+    private val bearerToken: String,
     private val connectTimeoutMs: Int = 10_000,
     private val readTimeoutMs: Int = 30_000,
     private val maxFrameBytes: Int = 65_572
 ) {
     init {
+        require(bearerToken.length in 32..512) { "NANNET endpoint token is missing or invalid" }
         require(endpoint.scheme.equals("https", ignoreCase = true)) {
             "N16 gateway must use HTTPS"
         }
@@ -44,6 +46,7 @@ internal class N16HttpsTransport(
             connection.instanceFollowRedirects = false
             connection.doOutput = true
             connection.useCaches = false
+            connection.setRequestProperty("Authorization", "Bearer " + bearerToken)
             connection.setRequestProperty("Content-Type", MEDIA_TYPE)
             connection.setRequestProperty("Accept", MEDIA_TYPE)
             connection.setRequestProperty("Cache-Control", "no-store")
