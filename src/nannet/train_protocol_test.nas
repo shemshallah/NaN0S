@@ -66,16 +66,6 @@ MOVI r2,2
 CALL @n16_session_transition
 CMP r3,r0
 JMP[NE] @fail
-MOVI r1,83
-PUTC r1
-MOVI r1,10
-PUTC r1
-PUTC r1
-MOVI r10,32
-PUTC r10
-PUTC r2
-MOVI r10,10
-PUTC r10
 MOVI r5,1
 CMP r1,r5
 JMP[NE] @fail
