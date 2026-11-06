@@ -3,10 +3,10 @@
 ; Each public entry returns through HALT; the same VM instance is retained.
 ; All framing, CRC, sequence assignment, session and transition semantics stay here.
 ;
-; n16_android_build: r1=out,r2=type,r4=payload,r5=len,r6=sid; guest assigns r3 sequence.
+; n16_android_build: r1=out,r2=type,r4=payload,r5=len,r6=sid; guest assigns sequence.
 ; n16_android_route: r1=frame,r2=frame_bytes -> r1..r4 route,status
-; n16_android_advance: commits the pending outbound message and increments guest sequence.
-; n16_android_abort: abandons an unsent pending message without state/sequence advancement.
+; n16_android_advance: commits pending outbound message and increments guest sequence.
+; n16_android_abort: abandons unsent pending message without state/sequence advancement.
 ; n16_android_reset: reset validator replay/session, transition state and send sequence.
 
 n16_android_build:
