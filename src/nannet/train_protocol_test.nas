@@ -188,6 +188,83 @@ CMP r2,r5
 JMP[NE] @fail
 CMP r3,r5
 JMP[NE] @fail
+
+; A rejected state transition must not consume its sequence or claim its session.
+; Retry the exact same CHUNK frame after negotiating the session; it must pass.
+CALL @n16_session_reset
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,4
+MOVI r3,7
+MOVI r4,12992
+MOVHI r4,2
+MOVI r5,2
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_frame_build
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,38
+CALL @n16_frame_route
+MOVI r5,6
+CMP r3,r5
+JMP[NE] @fail
+LD r5,r0,@n16v_last_seq
+CMP r5,r0
+JMP[NE] @fail
+LD r5,r0,@n16v_session_active
+CMP r5,r0
+JMP[NE] @fail
+LD r5,r0,@n16s_state
+CMP r5,r0
+JMP[NE] @fail
+MOVI r1,1
+MOVI r2,2
+CALL @n16_session_transition
+CMP r3,r0
+JMP[NE] @fail
+MOVI r1,2
+MOVI r2,8
+CALL @n16_session_transition
+CMP r3,r0
+JMP[NE] @fail
+MOVI r1,3
+MOVI r2,12
+CALL @n16_session_transition
+CMP r3,r0
+JMP[NE] @fail
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,38
+CALL @n16_frame_route
+CMP r3,r0
+JMP[NE] @fail
+
+; A zero-payload CLOSE is a control frame: it must reset state without
+; attempting to decode a point address from a nonexistent payload.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,13
+MOVI r3,8
+MOVI r4,12992
+MOVHI r4,2
+MOVI r5,0
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_frame_build
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,36
+CALL @n16_frame_route
+CMP r3,r0
+JMP[NE] @fail
+LD r5,r0,@n16s_state
+CMP r5,r0
+JMP[NE] @fail
+LD r5,r0,@n16v_session_active
+CMP r5,r0
+JMP[NE] @fail
+
 ; pass
 MOVI r1,78
 PUTC r1
