@@ -47,8 +47,13 @@ internal class N16RemoteSession(
         return guest.acceptFrame(frame)
     }
 
+    /** CLOSE is terminal and may have no peer frame to route. */
+    @Synchronized
+    fun closeRemote(): ByteArray = send(13, ByteArray(0))
+
     @Synchronized
     fun exchange(type: Int, payload: ByteArray): ExchangeResult {
+        require(type != 13) { "Use closeRemote() for the terminal CLOSE message" }
         val response = send(type, payload)
         val route = acceptPeerFrame(response)
         return ExchangeResult(response, route)
