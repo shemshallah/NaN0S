@@ -208,6 +208,8 @@ class MainActivity : Activity(), NanLoop.Listener {
             return false
         }
         trainingState = saved
+        // Never leave an older candidate exportable after a new run is started.
+        candidateFile.delete()
         trainingActive = true
         return true
     }
