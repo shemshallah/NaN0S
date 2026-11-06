@@ -265,6 +265,57 @@ LD r5,r0,@n16v_session_active
 CMP r5,r0
 JMP[NE] @fail
 
+; Exercise the exact callable implementations exposed by the Android guest ABI.
+CALL @n16_android_reset_impl
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,1
+MOVI r3,1
+MOVI r4,12944
+MOVHI r4,2
+MOVI r5,2
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_android_build_impl
+MOVI r5,38
+CMP r1,r5
+JMP[NE] @fail
+CMP r3,r0
+JMP[NE] @fail
+MOVI r1,1
+MOVI r2,2
+CALL @n16_android_advance_impl
+CMP r3,r0
+JMP[NE] @fail
+; Build the peer CAPABILITIES response and route it through the guest ABI.
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,2
+MOVI r3,1
+MOVI r4,12944
+MOVHI r4,2
+MOVI r5,8
+MOVI r6,12928
+MOVHI r6,2
+CALL @n16_frame_build
+MOVI r1,4928
+MOVHI r1,2
+MOVI r2,44
+CALL @n16_android_route_impl
+CMP r3,r0
+JMP[NE] @fail
+LD r5,r0,@n16s_state
+MOVI r6,2
+CMP r5,r6
+JMP[NE] @fail
+CALL @n16_android_reset_impl
+LD r5,r0,@n16s_state
+CMP r5,r0
+JMP[NE] @fail
+LD r5,r0,@n16v_session_active
+CMP r5,r0
+JMP[NE] @fail
+
 ; pass
 MOVI r1,78
 PUTC r1
@@ -344,6 +395,7 @@ HALT
 .include "nannet.nas"
 .include "overbootstrap_route.nas"
 .include "train_protocol.nas"
+.include "n16t_android_abi.nas"
 .org 32768
 frame:
 .word 0x5436314E,0x00010001,0,0,0,0,1,2,0xF5B70002,0x00006DAD
