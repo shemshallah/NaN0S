@@ -338,7 +338,12 @@ ST r2,r0,@n16r_len
 CALL @n16_frame_validate
 CMP r3,r0
 JMP[NE] @n16r_done
-LD r2,r0,@n16v_payload
+ST r1,r0,@n16r_type
+ST r2,r0,@n16r_len
+CALL @n16_session_transition
+CMP r3,r0
+JMP[NE] @n16r_state_error
+LD r2,r0,@n16r_len
 MOVI r5,2
 CMP r2,r5
 JMP[LT] @n16r_short
@@ -355,6 +360,11 @@ MOVI r1,0
 MOVI r2,0
 MOVI r3,2
 MOVI r4,0
+n16r_state_error:
+MOVI r1,0
+MOVI r2,0
+MOVI r3,6
+MOVI r4,0
 n16r_done:
 LD r15,r0,@n16r_ret
 RET
@@ -363,6 +373,8 @@ n16r_ret:
 n16r_base:
 .word 0
 n16r_len:
+.word 0
+n16r_type:
 .word 0
 
 ; N16T session transition machine. r1=type,r2=payload bytes.
@@ -411,7 +423,7 @@ JMP[NE] @n16s_caps
 CMP r4,r0
 JMP[NE] @n16s_transition_error
 LD r6,r0,@n16s_len
-MOVI r7,4
+MOVI r7,2
 CMP r6,r7
 JMP[NE] @n16s_payload_error
 MOVI r4,1
