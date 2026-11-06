@@ -7,37 +7,37 @@ import org.junit.Test
 class N16HttpsTransportTest {
     @Test
     fun acceptsHttpsEndpointAndDocumentedFrameLimit() {
-        val transport = N16HttpsTransport(URI("https://gateway.example/n16t"))
+        val transport = N16HttpsTransport(URI("https://gateway.example/n16t"), "t".repeat(48))
         assertTrue(transport.javaClass.simpleName == "N16HttpsTransport")
     }
 
     @Test
     fun rejectsPlainHttpEndpoint() {
         assertIllegalArgument {
-            N16HttpsTransport(URI("http://gateway.example/n16t"))
+            N16HttpsTransport(URI("http://gateway.example/n16t"), "t".repeat(48))
         }
     }
 
     @Test
     fun rejectsEndpointUserInfoAndFragment() {
         assertIllegalArgument {
-            N16HttpsTransport(URI("https://user:secret@gateway.example/n16t"))
+            N16HttpsTransport(URI("https://user:secret@gateway.example/n16t"), "t".repeat(48))
         }
         assertIllegalArgument {
-            N16HttpsTransport(URI("https://gateway.example/n16t#fragment"))
+            N16HttpsTransport(URI("https://gateway.example/n16t#fragment"), "t".repeat(48))
         }
     }
 
     @Test
     fun rejectsMissingHostAndInvalidTimeouts() {
         assertIllegalArgument {
-            N16HttpsTransport(URI("https:/n16t"))
+            N16HttpsTransport(URI("https:/n16t"), "t".repeat(48))
         }
         assertIllegalArgument {
-            N16HttpsTransport(URI("https://gateway.example/n16t"), connectTimeoutMs = 0)
+            N16HttpsTransport(URI("https://gateway.example/n16t"), "t".repeat(48), connectTimeoutMs = 0)
         }
         assertIllegalArgument {
-            N16HttpsTransport(URI("https://gateway.example/n16t"), readTimeoutMs = 120_001)
+            N16HttpsTransport(URI("https://gateway.example/n16t"), "t".repeat(48), readTimeoutMs = 120_001)
         }
     }
 
@@ -45,6 +45,7 @@ class N16HttpsTransportTest {
     fun rejectsFrameOutsideConfiguredBoundsBeforeOpeningConnection() {
         val transport = N16HttpsTransport(
             URI("https://gateway.example/n16t"),
+            "t".repeat(48),
             maxFrameBytes = 36
         )
         assertIllegalArgument { transport.exchange(ByteArray(35)) }
