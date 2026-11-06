@@ -1,7 +1,6 @@
 package org.nan0s.vm
 
 import java.net.URI
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
