@@ -24,6 +24,10 @@ android {
     androidResources { noCompress += "img" }
 }
 
+dependencies {
+    testImplementation("junit:junit:4.13.2")
+}
+
 // Optional: refresh the bundled image from the x86 build (sh x86/tools/mkall.sh -> x86/build/nan0s.img). This project lives at <repo>/aarch64/android/.
 tasks.register<Copy>("syncImage") {
     from("../../../x86/build/nan0s.img")
