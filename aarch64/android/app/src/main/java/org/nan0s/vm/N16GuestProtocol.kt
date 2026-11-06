@@ -150,9 +150,9 @@ internal class N16GuestProtocol(context: Context) : Closeable {
     }
 
     companion object {
-        private const val FRAME_BASE = 131_072
-        private const val PAYLOAD_BASE = 144_016
-        private const val SESSION_BASE = 144_000
+        private const val FRAME_BASE = 65_536
+        private const val PAYLOAD_BASE = 196_608
+        private const val SESSION_BASE = 262_144
         private const val HEADER_AND_TRAILER = 36
         private const val MAX_PAYLOAD = 65_536
         private const val MAX_FRAME = HEADER_AND_TRAILER + MAX_PAYLOAD
