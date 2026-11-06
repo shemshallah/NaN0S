@@ -50,6 +50,11 @@ CMP r3,r5
 JMP[NE] @fail
 
 ; Stateful N16T transitions and message-specific payload lengths.
+MOVI r1,13
+MOVI r2,0
+CALL @n16_session_transition
+CMP r3,r0
+JMP[NE] @fail
 MOVI r1,4
 MOVI r2,16
 CALL @n16_session_transition
@@ -57,7 +62,7 @@ MOVI r5,1
 CMP r3,r5
 JMP[NE] @fail
 MOVI r1,1
-MOVI r2,4
+MOVI r2,2
 CALL @n16_session_transition
 CMP r3,r0
 JMP[NE] @fail
