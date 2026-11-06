@@ -611,7 +611,7 @@ n16_frame_build:
 ST r15,r0,@n16b_ret
 ST r1,r0,@n16b_base
 ST r2,r0,@n16b_type
-ST r3,r0,@n16b_seq
+ST r3,r0,@n16b_sequence_value
 ST r4,r0,@n16b_src
 ST r5,r0,@n16b_len
 ST r6,r0,@n16b_sid
@@ -650,7 +650,7 @@ MOVI r8,0
 n16b_sid_loop:
 MOVI r10,16
 CMP r8,r10
-JMP[GE] @n16b_seq
+JMP[GE] @n16b_sequence_value
 ADD r9,r7,r8
 LDB r11,r9,0
 LD r4,r0,@n16b_base
@@ -660,8 +660,8 @@ STB r11,r9,0
 ADDI r8,r8,1
 JMP @n16b_sid_loop
 ; Write sequence and payload length as little-endian u32 values.
-n16b_seq:
-LD r5,r0,@n16b_seq
+n16b_write_seq:
+LD r5,r0,@n16b_sequence_value
 LD r4,r0,@n16b_base
 MOVI r10,255
 BOOL.8 r11,r5,r10
@@ -775,7 +775,7 @@ n16b_base:
 .word 0
 n16b_type:
 .word 0
-n16b_seq:
+n16b_sequence_value:
 .word 0
 n16b_src:
 .word 0
