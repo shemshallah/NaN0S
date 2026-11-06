@@ -26,16 +26,25 @@ HALT
 
 ; Callable implementations are also used by the NaN16 guest regression.
 n16_android_build_impl:
+ST r15,r0,@n16a_call_ret
 CALL @n16_frame_build
+LD r15,r0,@n16a_call_ret
 RET
 
 n16_android_route_impl:
+ST r15,r0,@n16a_call_ret
 CALL @n16_frame_route
+LD r15,r0,@n16a_call_ret
 RET
 
 n16_android_advance_impl:
+ST r15,r0,@n16a_call_ret
 CALL @n16_session_transition
+LD r15,r0,@n16a_call_ret
 RET
+
+n16a_call_ret:
+.word 0
 
 n16_android_reset_impl:
 ST r15,r0,@n16a_reset_ret
