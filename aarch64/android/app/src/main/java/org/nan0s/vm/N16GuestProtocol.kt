@@ -18,18 +18,12 @@ internal class N16GuestProtocol(context: Context) : Closeable {
         val logicalPoint: Int
     )
 
-    private data class PendingSend(
-        val type: Int,
-        val payloadBytes: Int,
-        val sequence: Int
-    )
-
     private val vm = NanVm()
     private val labels: Map<String, Int>
     private val random = SecureRandom()
     private var sessionId = ByteArray(16).also(random::nextBytes)
-    private var nextSendSequence = 1
-    private var pending: PendingSend? = null
+    private var pending = false
+    private var pendingType = 0
     private var closed = false
 
     init {
@@ -45,7 +39,7 @@ internal class N16GuestProtocol(context: Context) : Closeable {
             address?.let { name to it }
         }.toMap()
         listOf("n16_android_build", "n16_android_route",
-            "n16_android_advance", "n16_android_reset").forEach { name ->
+            "n16_android_advance", "n16_android_abort", "n16_android_reset").forEach { name ->
             check(labels.containsKey(name)) { "Missing NaN16 guest entry: $name" }
         }
     }
@@ -54,15 +48,14 @@ internal class N16GuestProtocol(context: Context) : Closeable {
     @Synchronized
     fun buildFrame(type: Int, payload: ByteArray): ByteArray {
         checkOpen()
-        require(pending == null) { "An N16T send is already awaiting transport completion" }
+        require(!pending) { "An N16T send is already awaiting transport completion" }
         require(type in 1..13) { "Unsupported N16T message type" }
         require(payload.size <= MAX_PAYLOAD)
-        val sequence = nextSendSequence
         check(vm.writeBytes(PAYLOAD_BASE, payload)) { "Could not stage N16T payload" }
         check(vm.writeBytes(SESSION_BASE, sessionId)) { "Could not stage N16T session identity" }
         vm.setRegister(1, FRAME_BASE)
         vm.setRegister(2, type)
-        vm.setRegister(3, sequence)
+        vm.setRegister(3, 0) // NaN16 assigns the outbound sequence number.
         vm.setRegister(4, PAYLOAD_BASE)
         vm.setRegister(5, payload.size)
         vm.setRegister(6, SESSION_BASE)
@@ -73,7 +66,8 @@ internal class N16GuestProtocol(context: Context) : Closeable {
         check(length == HEADER_AND_TRAILER + payload.size) { "NaN16 returned an invalid frame length" }
         val frame = vm.readBytes(FRAME_BASE, length)
             ?: throw IllegalStateException("Could not read guest-built N16T frame")
-        pending = PendingSend(type, payload.size, sequence)
+        pending = true
+        pendingType = type
         return frame
     }
 
@@ -81,36 +75,38 @@ internal class N16GuestProtocol(context: Context) : Closeable {
     @Synchronized
     fun commitSent() {
         checkOpen()
-        val item = pending ?: throw IllegalStateException("No pending N16T send")
-        vm.setRegister(1, item.type)
-        vm.setRegister(2, item.payloadBytes)
+        check(pending) { "No pending N16T send" }
         runEntry("n16_android_advance")
         val status = vm.register(3)
         check(status == 0) {
             "NaN16 rejected outbound transition (status=$status, detail=${vm.register(2)})"
         }
-        if (item.type == 13) {
-            // CLOSE reset the guest state machine; the next session gets fresh identity/sequence.
+        if (pendingType == 13) {
+            // CLOSE resets the guest state machine; begin the next session with fresh entropy.
             sessionId = ByteArray(16).also(random::nextBytes)
-            nextSendSequence = 1
-        } else {
-            nextSendSequence = if (item.sequence == 0x7fffffff) 1 else item.sequence + 1
         }
-        pending = null
+        pending = false
+        pendingType = 0
     }
 
     /** Abandon an unsent frame without advancing the guest session state. */
     @Synchronized
     fun abortPending() {
         checkOpen()
-        pending = null
+        if (pending) {
+            runEntry("n16_android_abort")
+            val status = vm.register(3)
+            check(status == 0) { "NaN16 failed to abort pending send (status=$status)" }
+        }
+        pending = false
+        pendingType = 0
     }
 
     /** Stage and route a complete peer frame; validation and state changes happen only in NaN16. */
     @Synchronized
     fun acceptFrame(frame: ByteArray): Route {
         checkOpen()
-        require(pending == null) { "Commit or abort the outbound frame before accepting a response" }
+        require(!pending) { "Commit or abort the outbound frame before accepting a response" }
         require(frame.size in HEADER_AND_TRAILER..MAX_FRAME)
         check(vm.writeBytes(FRAME_BASE, frame)) { "Could not stage peer N16T frame" }
         vm.setRegister(1, FRAME_BASE)
@@ -124,10 +120,10 @@ internal class N16GuestProtocol(context: Context) : Closeable {
     @Synchronized
     fun resetSession() {
         checkOpen()
-        pending = null
+        pending = false
+        pendingType = 0
         runEntry("n16_android_reset")
         sessionId = ByteArray(16).also(random::nextBytes)
-        nextSendSequence = 1
     }
 
     private fun runEntry(name: String) {
