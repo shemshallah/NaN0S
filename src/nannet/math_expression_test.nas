@@ -54,6 +54,7 @@ CMP r3,r0
 JMP[NE] @expr_fail
 MOVI r1,98
 ST r1,r0,@expr_stage
+LD r1,r0,@expr_dbg_kind
 MOVI r6,3
 CMP r1,r6
 JMP[NE] @expr_fail
