@@ -36,6 +36,7 @@ JMP[LT] @nmr_expr_bad
 MOVI r11,57
 CMP r10,r11
 JMP[GT] @nmr_expr_bad
+MOVI r11,48
 SUB r10,r10,r11
 MUL r7,r7,r9
 ADD r7,r7,r10
