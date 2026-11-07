@@ -105,6 +105,33 @@ ST r1,r0,@nmr_expr_out_kind
 ST r2,r0,@nmr_expr_program
 ST r4,r0,@nmr_expr_left_data
 ST r5,r0,@nmr_expr_right_data
+; Both operands must have rank-1 shapes with matching dimensions and unit stride.
+LD r1,r0,@nmr_expr_left_id
+CALL @nmr_shape_get
+CMP r5,r0
+JMP[NE] @nmr_expr_shape_error
+MOVI r8,1
+CMP r1,r8
+JMP[NE] @nmr_expr_shape_error
+CMP r3,r8
+JMP[NE] @nmr_expr_shape_error
+CMP r4,r2
+JMP[LT] @nmr_expr_shape_error
+ST r2,r0,@nmr_expr_dimension
+LD r1,r0,@nmr_expr_right_id
+CALL @nmr_shape_get
+CMP r5,r0
+JMP[NE] @nmr_expr_shape_error
+MOVI r8,1
+CMP r1,r8
+JMP[NE] @nmr_expr_shape_error
+CMP r3,r8
+JMP[NE] @nmr_expr_shape_error
+LD r8,r0,@nmr_expr_dimension
+CMP r2,r8
+JMP[NE] @nmr_expr_shape_error
+CMP r4,r2
+JMP[LT] @nmr_expr_shape_error
 LD r1,r0,@nmr_expr_left_id
 LD r2,r0,@nmr_expr_right_id
 LD r3,r0,@nmr_expr_op_id
@@ -112,6 +139,7 @@ LD r4,r0,@nmr_expr_out_kind
 LD r5,r0,@nmr_expr_program
 LD r6,r0,@nmr_expr_left_data
 LD r7,r0,@nmr_expr_right_data
+LD r9,r0,@nmr_expr_dimension
 MOVI r8,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
@@ -148,6 +176,17 @@ MOVI r7,0
 MOVI r8,3
 LD r15,r0,@nmr_expr_resolve_ret
 RET
+nmr_expr_shape_error:
+MOVI r1,0
+MOVI r2,0
+MOVI r3,0
+MOVI r4,0
+MOVI r5,0
+MOVI r6,0
+MOVI r7,0
+MOVI r8,5
+LD r15,r0,@nmr_expr_resolve_ret
+RET
 nmr_expr_operator_error:
 MOVI r1,0
 MOVI r2,0
@@ -162,14 +201,13 @@ RET
 nmr_expr_resolve_ret:
 .word 0
 
-; nmr_expr_execute ABI: r1=expression byte pointer,r2=dimension,r3=output word pointer.
+; nmr_expr_execute ABI: r1=expression byte pointer,r2=output word pointer.
+; Dimension is derived from the immutable endpoint shape records.
 ; Returns r1=output kind,r2=program ID,r3=status,r4=output word pointer.
-; This first execution form takes the dimension from the caller; shape metadata is next.
 nmr_expr_execute:
 ST r15,r0,@nmr_expr_execute_ret
 ST r1,r0,@nmr_expr_input
-ST r2,r0,@nmr_expr_exec_dim
-ST r3,r0,@nmr_expr_exec_out
+ST r2,r0,@nmr_expr_exec_out
 LD r1,r0,@nmr_expr_input
 CALL @nmr_expr_resolve
 ST r8,r0,@nmr_expr_status
@@ -177,6 +215,7 @@ CMP r8,r0
 JMP[NE] @nmr_expr_execute_error
 ST r4,r0,@nmr_expr_out_kind
 ST r5,r0,@nmr_expr_program
+ST r9,r0,@nmr_expr_exec_dim
 ST r6,r0,@nmr_expr_left_data
 ST r7,r0,@nmr_expr_right_data
 LD r1,r0,@nmr_expr_program
@@ -245,4 +284,6 @@ nmr_expr_exec_out:
 nmr_expr_result_ptr:
 .word 0
 nmr_expr_status:
+.word 0
+nmr_expr_dimension:
 .word 0
