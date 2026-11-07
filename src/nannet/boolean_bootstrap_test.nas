@@ -1,5 +1,6 @@
 ; BS0 Boolean bootstrap: all 16 truth tables x all four input pairs.
-; Truth-table bit order follows OPS.md: bit0=00, bit1=01, bit2=10, bit3=11.
+; BOOL results are canonical Boolean words: false=0, true=0xFFFFFFFF.
+; Truth-table bit order: bit0=00, bit1=01, bit2=10, bit3=11.
 main:
 MOVI r13,1
 MOVI r10,0
@@ -39,7 +40,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.1 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,1
@@ -79,7 +81,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.2 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,2
@@ -103,7 +106,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.3 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,3
@@ -111,7 +115,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.3 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,3
@@ -151,7 +156,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.4 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,4
@@ -167,7 +173,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.5 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,5
@@ -183,7 +190,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.5 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,5
@@ -207,7 +215,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.6 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,6
@@ -215,7 +224,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.6 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,6
@@ -231,7 +241,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.7 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,7
@@ -239,7 +250,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.7 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,7
@@ -247,7 +259,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.7 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,7
@@ -287,7 +300,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.8 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,9
@@ -295,7 +309,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.9 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,9
@@ -319,7 +334,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.9 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,10
@@ -335,7 +351,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.10 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,10
@@ -351,7 +368,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.10 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,11
@@ -359,7 +377,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.11 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,11
@@ -367,7 +386,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.11 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,11
@@ -383,7 +403,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.11 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,12
@@ -407,7 +428,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.12 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,12
@@ -415,7 +437,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.12 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,13
@@ -423,7 +446,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.13 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,13
@@ -439,7 +463,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.13 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,13
@@ -447,7 +472,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.13 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,14
@@ -463,7 +489,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.14 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,14
@@ -471,7 +498,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.14 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,14
@@ -479,7 +507,8 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.14 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,15
@@ -487,7 +516,8 @@ MOVI r11,0
 MOVI r1,0
 MOVI r2,0
 BOOL.15 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,15
@@ -495,7 +525,8 @@ MOVI r11,1
 MOVI r1,0
 MOVI r2,1
 BOOL.15 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,15
@@ -503,7 +534,8 @@ MOVI r11,2
 MOVI r1,1
 MOVI r2,0
 BOOL.15 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
 MOVI r10,15
@@ -511,10 +543,10 @@ MOVI r11,3
 MOVI r1,1
 MOVI r2,1
 BOOL.15 r3,r1,r2
-MOVI r4,1
+MOVI r4,0
+MOVHI r4,65535
 CMP r3,r4
 JMP[NE] @fail
-; all 64 checks passed
 MOVI r1,66
 PUTC r1
 MOVI r1,83
@@ -627,9 +659,15 @@ MOVI r1,108
 PUTC r1
 MOVI r1,61
 PUTC r1
-MOVI r6,48
-ADD r1,r6,r3
+CMP r3,r0
+JMP[EQ] @actual_zero
+MOVI r1,49
 PUTC r1
+JMP @actual_done
+actual_zero:
+MOVI r1,48
+PUTC r1
+actual_done:
 MOVI r1,32
 PUTC r1
 MOVI r1,101
@@ -650,9 +688,15 @@ MOVI r1,100
 PUTC r1
 MOVI r1,61
 PUTC r1
-MOVI r6,48
-ADD r1,r6,r4
+CMP r4,r0
+JMP[EQ] @expected_zero
+MOVI r1,49
 PUTC r1
+JMP @expected_done
+expected_zero:
+MOVI r1,48
+PUTC r1
+expected_done:
 MOVI r1,10
 PUTC r1
 HALT
