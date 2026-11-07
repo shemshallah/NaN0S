@@ -1,0 +1,137 @@
+; Canonical NaN route address parser regression suite.
+main:
+MOVI r13,1
+MOVI r1,@addr_valid1
+SHL r1,r1,2
+CALL @nmr_addr_parse
+MOVI r5,0
+CMP r3,r5
+JMP[NE] @fail
+MOVI r5,1
+CMP r1,r5
+JMP[NE] @fail
+MOVI r5,10
+CMP r2,r5
+JMP[NE] @fail
+MOVI r1,@addr_valid255
+SHL r1,r1,2
+CALL @nmr_addr_parse
+MOVI r5,0
+CMP r3,r5
+JMP[NE] @fail
+MOVI r5,255
+CMP r1,r5
+JMP[NE] @fail
+MOVI r5,12
+CMP r2,r5
+JMP[NE] @fail
+MOVI r1,@addr_zero
+SHL r1,r1,2
+CALL @nmr_addr_parse
+MOVI r5,2
+CMP r3,r5
+JMP[NE] @fail
+MOVI r1,@addr_256
+SHL r1,r1,2
+CALL @nmr_addr_parse
+MOVI r5,2
+CMP r3,r5
+JMP[NE] @fail
+MOVI r1,@addr_bad_sep
+SHL r1,r1,2
+CALL @nmr_addr_parse
+MOVI r5,1
+CMP r3,r5
+JMP[NE] @fail
+MOVI r1,@addr_empty_key
+SHL r1,r1,2
+CALL @nmr_addr_parse
+MOVI r5,3
+CMP r3,r5
+JMP[NE] @fail
+MOVI r1,78
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,78
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,82
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+fail:
+MOVI r1,78
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,78
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,82
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+.include "route_address.nas"
+.org 18100
+addr_valid1:
+.str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1::vector1337"
+addr_valid255:
+.str "nan://GM0:SC0:MC0:BS0:HW0::HW0:255::hypergraph42"
+addr_zero:
+.str "nan://GM0:SC0:MC0:BS0:HW0::HW0:0::vector1"
+addr_256:
+.str "nan://GM0:SC0:MC0:BS0:HW0::HW0:256::vector1"
+addr_bad_sep:
+.str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1:vector1337"
+addr_empty_key:
+.str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1::"
+
