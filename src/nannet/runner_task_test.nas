@@ -48,32 +48,40 @@ CALL @nmr_task_submit
 MOVI r5,1
 CMP r3,r5
 JMP[NE] @fail
-; Wrong runner cannot claim the task.
+; Wrong runner cannot claim the task, even at a later valid epoch.
 MOVI r1,7001
 MOVI r2,2
-MOVI r3,9
-CALL @nmr_task_claim
-MOVI r5,6
-CMP r3,r5
-JMP[NE] @fail
-; Wrong epoch cannot claim the task.
-MOVI r1,7001
-MOVI r2,1
 MOVI r3,10
 CALL @nmr_task_claim
 MOVI r5,6
 CMP r3,r5
 JMP[NE] @fail
-; Correct owner and epoch claim exactly once.
+; A task cannot be claimed before its issue epoch.
 MOVI r1,7001
 MOVI r2,1
-MOVI r3,9
+MOVI r3,8
+CALL @nmr_task_claim
+MOVI r5,6
+CMP r3,r5
+JMP[NE] @fail
+; Expired tasks are rejected.
+MOVI r1,7001
+MOVI r2,1
+MOVI r3,13
+CALL @nmr_task_claim
+MOVI r5,8
+CMP r3,r5
+JMP[NE] @fail
+; Correct owner claims inside the issue/expiry window.
+MOVI r1,7001
+MOVI r2,1
+MOVI r3,10
 CALL @nmr_task_claim
 CMP r3,r0
 JMP[NE] @fail
 MOVI r1,7001
 MOVI r2,1
-MOVI r3,9
+MOVI r3,10
 CALL @nmr_task_claim
 MOVI r5,7
 CMP r3,r5
@@ -81,7 +89,7 @@ JMP[NE] @fail
 ; Finish with output and trace digests.
 MOVI r1,7001
 MOVI r2,1
-MOVI r3,9
+MOVI r3,10
 MOVI r4,333
 MOVI r5,444
 CALL @nmr_task_finish

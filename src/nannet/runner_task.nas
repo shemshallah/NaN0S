@@ -1,13 +1,13 @@
 ; NaNLMROUTER bounded task ledger prototype.
-; Task record (14 words): id, epoch, checkpoint, runner, logical_point,
+; Task record (15 words): id, epoch, checkpoint, runner, logical_point,
 ; operation, input_digest, scratch_words, step_budget, time_budget,
-; expiry_epoch, state, output_digest, trace_digest.
+; expiry_epoch, state, output_digest, trace_digest, claim_epoch.
 ; States: 0 empty, 1 queued, 2 claimed, 3 completed.
 ; ABI:
 ; nmr_task_submit r1..r11 = fields 0..10; returns r1=slot,r3=status.
 ; nmr_task_claim  r1=task_id,r2=runner_id,r3=epoch; returns r3=status.
 ; nmr_task_finish r1=task_id,r2=runner_id,r3=epoch,r4=output_digest,r5=trace_digest.
-; Status: 0 success, 1 invalid/not found, 3 full, 5 duplicate id, 6 owner/epoch mismatch, 7 invalid state/replay.
+; Status: 0 success, 1 invalid/not found, 3 full, 5 duplicate id, 6 runner/epoch mismatch, 7 invalid state/replay, 8 expired.
 nmr_task_submit:
 ST r15,r0,@nmr_task_submit_ret
 ST r1,r0,@nmr_task_tmp_id
@@ -43,6 +43,10 @@ JMP[EQ] @nmr_task_invalid
 MOVI r12,255
 CMP r5,r12
 JMP[GT] @nmr_task_invalid
+LD r8,r0,@nmr_task_tmp_epoch
+LD r9,r0,@nmr_task_tmp_expiry
+CMP r8,r9
+JMP[GE] @nmr_task_invalid
 MOVI r4,@nmr_task_table
 MOVI r5,16
 MOVI r6,0
@@ -53,7 +57,7 @@ JMP[EQ] @nmr_task_submit_empty
 LD r8,r0,@nmr_task_tmp_id
 CMP r7,r8
 JMP[EQ] @nmr_task_duplicate
-ADDI r4,r4,14
+ADDI r4,r4,15
 ADDI r6,r6,1
 CMP r6,r5
 JMP[LT] @nmr_task_submit_scan
@@ -88,6 +92,7 @@ MOVI r8,1
 ST r8,r4,11
 ST r0,r4,12
 ST r0,r4,13
+ST r0,r4,14
 BOOL.14 r1,r6,r0
 MOVI r3,0
 LD r15,r0,@nmr_task_submit_ret
@@ -134,13 +139,18 @@ JMP[NE] @nmr_task_owner_error
 LD r8,r0,@nmr_task_tmp_epoch
 LD r9,r4,1
 CMP r8,r9
-JMP[NE] @nmr_task_owner_error
+JMP[LT] @nmr_task_owner_error
+LD r9,r4,10
+CMP r9,r8
+JMP[LT] @nmr_task_expired
 LD r8,r4,11
 MOVI r9,1
 CMP r8,r9
 JMP[NE] @nmr_task_state_error
 MOVI r8,2
 ST r8,r4,11
+LD r8,r0,@nmr_task_tmp_epoch
+ST r8,r4,14
 MOVI r3,0
 LD r15,r0,@nmr_task_claim_ret
 RET
@@ -150,6 +160,10 @@ LD r15,r0,@nmr_task_claim_ret
 RET
 nmr_task_state_error:
 MOVI r3,7
+LD r15,r0,@nmr_task_claim_ret
+RET
+nmr_task_expired:
+MOVI r3,8
 LD r15,r0,@nmr_task_claim_ret
 RET
 nmr_task_missing:
@@ -188,9 +202,12 @@ LD r9,r4,3
 CMP r8,r9
 JMP[NE] @nmr_task_owner_error_finish
 LD r8,r0,@nmr_task_tmp_epoch
-LD r9,r4,1
+LD r9,r4,14
 CMP r8,r9
 JMP[NE] @nmr_task_owner_error_finish
+LD r9,r4,10
+CMP r9,r8
+JMP[LT] @nmr_task_expired_finish
 LD r8,r4,11
 MOVI r9,2
 CMP r8,r9
@@ -210,6 +227,10 @@ LD r15,r0,@nmr_task_finish_ret
 RET
 nmr_task_state_error_finish:
 MOVI r3,7
+LD r15,r0,@nmr_task_finish_ret
+RET
+nmr_task_expired_finish:
+MOVI r3,8
 LD r15,r0,@nmr_task_finish_ret
 RET
 nmr_task_missing_finish:
@@ -247,7 +268,7 @@ nmr_task_tmp_trace:
 .word 0
 .org 22000
 nmr_task_table:
-.word 0,0,0,0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0
