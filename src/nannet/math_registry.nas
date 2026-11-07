@@ -1,6 +1,6 @@
 ; NaN16 mathematical object/operator registry prototype.
 ; Direct-call ABI:
-;   nmr_obj_put: r1=id,r2=kind,r3=owner_head,r4=payload_digest -> r1=slot,r3=status
+;   nmr_obj_put: r1=id,r2=kind,r3=owner_point,r4=payload_digest -> r1=slot,r3=status
 ;   nmr_obj_get: r1=id -> r1=kind,r2=owner,r3=digest,r4=slot,r5=status
 ;   nmr_op_put: r1=op_id,r2=left_kind,r3=right_kind,r4=out_kind,r5=program_id -> r1=slot,r3=status
 ;   nmr_resolve: r1=left_object_id,r2=right_object_id,r3=op_id -> r1=out_kind,r2=program_id,r3=status
