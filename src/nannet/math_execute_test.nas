@@ -140,6 +140,65 @@ LD r7,r6,0
 MOVI r8,300
 CMP r7,r8
 JMP[NE] @math_exec_fail
+; Publish a scalar result object with its guest payload pointer.
+MOVI r1,1501
+MOVI r2,3
+MOVI r3,3
+MOVI r4,1201
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,1501
+MOVI r2,@math_dot_output
+CALL @nmr_obj_bind_data
+CMP r3,r0
+JMP[NE] @math_exec_fail
+; Append derivation only after re-resolving the typed operation and result schema.
+MOVI r1,9001
+MOVI r2,1401
+MOVI r3,1402
+MOVI r4,701
+MOVI r5,1501
+MOVI r6,79
+MOVI r7,1201
+CALL @nmr_derivation_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+; Exact derivation replay is idempotent.
+MOVI r1,9001
+MOVI r2,1401
+MOVI r3,1402
+MOVI r4,701
+MOVI r5,1501
+MOVI r6,79
+MOVI r7,1201
+CALL @nmr_derivation_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+; A different output cannot rewrite an existing operation ID.
+MOVI r1,1502
+MOVI r2,3
+MOVI r3,4
+MOVI r4,1202
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,1502
+MOVI r2,@math_dot_output
+CALL @nmr_obj_bind_data
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,9001
+MOVI r2,1401
+MOVI r3,1402
+MOVI r4,701
+MOVI r5,1502
+MOVI r6,79
+MOVI r7,1202
+CALL @nmr_derivation_put
+MOVI r8,5
+CMP r3,r8
+JMP[NE] @math_exec_fail
 ; Invalid dimension is rejected without touching a valid result contract.
 MOVI r1,78
 MOVI r2,@math_vec_left
