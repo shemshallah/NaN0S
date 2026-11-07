@@ -145,6 +145,8 @@ MOVI r1,76
 PUTC r1
 LD r1,r0,@expr_stage
 PUTC r1
+LD r1,r0,@nmr_expr_debug_stage
+PUTC r1
 LD r1,r0,@expr_dbg_status
 ADDI r1,r1,48
 PUTC r1
