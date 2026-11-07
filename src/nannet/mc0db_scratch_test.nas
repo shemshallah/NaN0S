@@ -31,7 +31,7 @@ CMP r3,r7
 JMP[NE] @fail
 ; Reject a reservation above the BS0DB quota.
 MOVI r1,1
-MOVI r2,262145
+LA r2,262145
 CALL @mc_scratch_reserve
 MOVI r7,3
 CMP r3,r7
