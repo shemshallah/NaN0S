@@ -27,6 +27,19 @@ jobs:
           sh tools/settings_gate.sh || exit 1
           sh tools/nannet_service_gate.sh || exit 1
           sh tools/n16_train_gate.sh || exit 1
+          sh tools/mirror_pair_gate.sh || exit 1
+          sh tools/math_registry_gate.sh || exit 1
+          sh tools/boolean_bootstrap_gate.sh || exit 1
+          sh tools/runner_task_gate.sh || exit 1
+          sh tools/runner_ring_integration_gate.sh || exit 1
+          sh tools/route_address_gate.sh || exit 1
+          sh tools/object_key_decode_gate.sh || exit 1
+          sh tools/route_object_resolve_gate.sh || exit 1
+          sh tools/mc0db_scratch_gate.sh || exit 1
+          sh tools/mc0_feedback_gate.sh || exit 1
+          sh tools/math_dispatch_gate.sh || exit 1
+          sh tools/math_execute_gate.sh || exit 1
+          sh tools/math_expression_gate.sh || exit 1
           sh tools/overbootstrap_route_gate.sh || exit 1
           sh tools/train_protocol_gate.sh || exit 1
           sh tools/cart_page_gate.sh || exit 1
