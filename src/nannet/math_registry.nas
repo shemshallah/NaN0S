@@ -107,7 +107,11 @@ nmr_obj_bind_found:
 LD r8,r4,1
 MOVI r9,4
 CMP r8,r9
+JMP[EQ] @nmr_obj_bind_kind_ok
+MOVI r9,3
+CMP r8,r9
 JMP[NE] @nmr_obj_bind_type
+nmr_obj_bind_kind_ok:
 LD r8,r4,4
 CMP r8,r0
 JMP[EQ] @nmr_obj_bind_write
@@ -317,6 +321,154 @@ RET
 nmr_resolve_ret:
 .word 0
 
+; Append-only derivation provenance. operation_id is a local immutable record key,
+; NOT a cryptographic content hash. Output digest is checked against the result object.
+; ABI: r1=operation_id,r2=left_id,r3=right_id,r4=operator_id,
+;      r5=output_id,r6=program_id,r7=output_digest_marker -> r1=slot,r3=status.
+nmr_derivation_put:
+ST r15,r0,@nmr_derivation_ret
+ST r1,r0,@nmr_deriv_id
+ST r2,r0,@nmr_deriv_left
+ST r3,r0,@nmr_deriv_right
+ST r4,r0,@nmr_deriv_op
+ST r5,r0,@nmr_deriv_output
+ST r6,r0,@nmr_deriv_program
+ST r7,r0,@nmr_deriv_digest
+CMP r1,r0
+JMP[EQ] @nmr_derivation_bad
+CMP r5,r0
+JMP[EQ] @nmr_derivation_bad
+; Re-resolve the ordered input signature; workers cannot self-assert program IDs.
+LD r1,r0,@nmr_deriv_left
+LD r2,r0,@nmr_deriv_right
+LD r3,r0,@nmr_deriv_op
+CALL @nmr_resolve
+CMP r3,r0
+JMP[NE] @nmr_derivation_missing
+ST r1,r0,@nmr_deriv_out_kind
+LD r8,r0,@nmr_deriv_program
+CMP r2,r8
+JMP[NE] @nmr_derivation_signature
+; The result object must exist, have the registered output kind and digest,
+; and have a bound guest payload address.
+LD r1,r0,@nmr_deriv_output
+CALL @nmr_obj_get
+CMP r5,r0
+JMP[NE] @nmr_derivation_missing
+LD r8,r0,@nmr_deriv_out_kind
+CMP r1,r8
+JMP[NE] @nmr_derivation_signature
+LD r8,r0,@nmr_deriv_digest
+CMP r3,r8
+JMP[NE] @nmr_derivation_signature
+CMP r6,r0
+JMP[EQ] @nmr_derivation_signature
+; Immutable operation ID: exact duplicate is idempotent; any changed field conflicts.
+MOVI r4,@nmr_derivation_table
+MOVI r5,16
+MOVI r6,0
+nmr_derivation_scan:
+LD r7,r4,0
+CMP r7,r0
+JMP[EQ] @nmr_derivation_empty
+LD r8,r0,@nmr_deriv_id
+CMP r7,r8
+JMP[EQ] @nmr_derivation_found
+ADDI r4,r4,7
+ADDI r6,r6,1
+CMP r6,r5
+JMP[LT] @nmr_derivation_scan
+MOVI r1,0
+MOVI r3,3
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_found:
+LD r8,r0,@nmr_deriv_left
+LD r9,r4,1
+CMP r8,r9
+JMP[NE] @nmr_derivation_conflict
+LD r8,r0,@nmr_deriv_right
+LD r9,r4,2
+CMP r8,r9
+JMP[NE] @nmr_derivation_conflict
+LD r8,r0,@nmr_deriv_op
+LD r9,r4,3
+CMP r8,r9
+JMP[NE] @nmr_derivation_conflict
+LD r8,r0,@nmr_deriv_output
+LD r9,r4,4
+CMP r8,r9
+JMP[NE] @nmr_derivation_conflict
+LD r8,r0,@nmr_deriv_program
+LD r9,r4,5
+CMP r8,r9
+JMP[NE] @nmr_derivation_conflict
+LD r8,r0,@nmr_deriv_digest
+LD r9,r4,6
+CMP r8,r9
+JMP[NE] @nmr_derivation_conflict
+BOOL.14 r1,r6,r0
+MOVI r3,0
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_empty:
+LD r8,r0,@nmr_deriv_id
+ST r8,r4,0
+LD r8,r0,@nmr_deriv_left
+ST r8,r4,1
+LD r8,r0,@nmr_deriv_right
+ST r8,r4,2
+LD r8,r0,@nmr_deriv_op
+ST r8,r4,3
+LD r8,r0,@nmr_deriv_output
+ST r8,r4,4
+LD r8,r0,@nmr_deriv_program
+ST r8,r4,5
+LD r8,r0,@nmr_deriv_digest
+ST r8,r4,6
+BOOL.14 r1,r6,r0
+MOVI r3,0
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_bad:
+MOVI r1,0
+MOVI r3,1
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_missing:
+MOVI r1,0
+MOVI r3,1
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_signature:
+MOVI r1,0
+MOVI r3,6
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_conflict:
+MOVI r1,0
+MOVI r3,5
+LD r15,r0,@nmr_derivation_ret
+RET
+nmr_derivation_ret:
+.word 0
+nmr_deriv_id:
+.word 0
+nmr_deriv_left:
+.word 0
+nmr_deriv_right:
+.word 0
+nmr_deriv_op:
+.word 0
+nmr_deriv_output:
+.word 0
+nmr_deriv_program:
+.word 0
+nmr_deriv_digest:
+.word 0
+nmr_deriv_out_kind:
+.word 0
+
 nmr_tmp_id:
 .word 0
 nmr_tmp_kind:
@@ -403,3 +555,20 @@ nmr_op_table:
 .word 0,0,0,0,0
 .word 0,0,0,0,0
 .word 0,0,0,0,0
+nmr_derivation_table:
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0
