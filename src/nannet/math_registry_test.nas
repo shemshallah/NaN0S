@@ -3,7 +3,7 @@
 ; and operator dispatch resolution without executing the returned program.
 main:
 MOVI r13,1
-; vector1337: kind 4, HW0 head 1, digest marker 0x1234
+; vector1337: kind 4, HW0 logical point 1, digest marker 0x1234
 MOVI r1,1337
 MOVI r2,4
 MOVI r3,1
@@ -28,7 +28,7 @@ CALL @nmr_obj_put
 MOVI r5,5
 CMP r3,r5
 JMP[NE] @fail
-; hypergraph42: kind 8, HW0 head 1
+; hypergraph42: kind 8, HW0 logical point 1
 MOVI r1,42
 MOVI r2,8
 MOVI r3,1
