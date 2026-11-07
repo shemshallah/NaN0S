@@ -30,11 +30,11 @@ JMP[EQ] @mc_reserve_bad
 CMP r1,r0
 JMP[NE] @mc_reserve_mc
 LD r5,r0,@mc_bs_used
-MOVI r6,262144
+LA r6,262144
 JMP @mc_reserve_check
 mc_reserve_mc:
 LD r5,r0,@mc_mc_used
-MOVI r6,1835008
+LA r6,1835008
 mc_reserve_check:
 LD r7,r0,@mc_tmp_pages
 ADD r8,r5,r7
@@ -42,7 +42,7 @@ CMP r8,r6
 JMP[GT] @mc_reserve_full
 LD r9,r0,@mc_total_used
 ADD r10,r9,r7
-MOVI r11,2097152
+LA r11,2097152
 CMP r10,r11
 JMP[GT] @mc_reserve_full
 ; Find free metadata slot.
