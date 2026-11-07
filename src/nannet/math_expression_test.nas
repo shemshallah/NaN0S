@@ -87,9 +87,29 @@ MOVI r5,79
 CALL @nmr_op_put
 CMP r3,r0
 JMP[NE] @expr_fail
+; The linker must resolve the complete contract, not just the output kind.
+MOVI r1,701
+MOVI r2,1
+MOVI r3,1
+MOVI r4,0
+MOVI r5,1
+MOVI r6,1
+MOVI r7,1
+MOVI r8,0
+CALL @nmr_contract_put
+CMP r3,r0
+JMP[NE] @expr_fail
 MOVI r1,49
 ST r1,r0,@expr_stage
-; Canonical expression resolves both route endpoints and executes the operator.
+; Canonical expression resolves both route endpoints and the registered contract.
+MOVI r1,@expr_valid
+SHL r1,r1,2
+CALL @nmr_expr_resolve
+CMP r8,r0
+JMP[NE] @expr_fail
+CMP r10,r0
+JMP[EQ] @expr_fail
+; The legacy vector executor consumes only the already-contracted vector subset.
 MOVI r1,@expr_valid
 SHL r1,r1,2
 MOVI r2,@expr_output
