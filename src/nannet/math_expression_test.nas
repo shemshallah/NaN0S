@@ -124,6 +124,16 @@ LD r7,r6,0
 MOVI r8,300
 CMP r7,r8
 JMP[NE] @expr_fail
+; Expression execution must release its BS0DB accounting reservation.
+CALL @mc_scratch_stats
+CMP r1,r0
+JMP[NE] @expr_fail
+CMP r2,r0
+JMP[NE] @expr_fail
+CMP r3,r0
+JMP[NE] @expr_fail
+CMP r4,r0
+JMP[NE] @expr_fail
 MOVI r1,102
 ST r1,r0,@expr_stage
 MOVI r1,50
@@ -283,8 +293,9 @@ HALT
 .include "math_registry.nas"
 .include "route_object_resolve.nas"
 .include "vector_ops.nas"
+.include "mc0db_scratch.nas"
 .include "math_expression.nas"
-.org 22990
+.org 25990
 expr_stage:
 .word 48
 expr_dbg_status:
@@ -295,7 +306,7 @@ expr_dbg_program:
 .word 0
 expr_dbg_ptr:
 .word 0
-.org 23000
+.org 26000
 expr_vec_left:
 .word 1,2,3,4
 expr_vec_right:
@@ -308,7 +319,7 @@ expr_vec_strided:
 .word 10,0,20,0,30,0,40
 expr_vec_unshaped:
 .word 10,20,30,40
-.org 23100
+.org 26100
 expr_valid:
 .str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1::vector1401::op:701::nan://GM0:SC0:MC0:BS0:HW0::HW0:2::vector1402"
 expr_no_operator:
