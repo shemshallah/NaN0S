@@ -9,8 +9,6 @@
 nmr_expr_resolve:
 ST r15,r0,@nmr_expr_resolve_ret
 ST r1,r0,@nmr_expr_input
-MOVI r9,48
-ST r9,r0,@nmr_expr_debug_stage
 CALL @nmr_addr_parse
 CMP r3,r0
 JMP[NE] @nmr_expr_bad
@@ -18,8 +16,6 @@ ST r1,r0,@nmr_expr_left_point
 ST r2,r0,@nmr_expr_left_len
 ST r4,r0,@nmr_expr_left_key
 ST r5,r0,@nmr_expr_delim
-MOVI r9,49
-ST r9,r0,@nmr_expr_debug_stage
 CMP r5,r0
 JMP[EQ] @nmr_expr_bad
 ; Skip exact "::op:" delimiter and parse a bounded decimal operator ID.
@@ -60,8 +56,6 @@ MOVI r11,65535
 CMP r7,r11
 JMP[GT] @nmr_expr_bad
 ST r7,r0,@nmr_expr_op_id
-MOVI r9,50
-ST r9,r0,@nmr_expr_debug_stage
 ; Require the exact "::" separator before the right endpoint.
 LD r5,r0,@nmr_expr_cursor
 LDB r10,r5,0
@@ -84,8 +78,6 @@ JMP[NE] @nmr_expr_bad
 ST r1,r0,@nmr_expr_right_point
 ST r2,r0,@nmr_expr_right_len
 ST r4,r0,@nmr_expr_right_key
-MOVI r9,51
-ST r9,r0,@nmr_expr_debug_stage
 ; Resolve left endpoint against key kind, object ID and owner point.
 LD r1,r0,@nmr_expr_left_key
 LD r2,r0,@nmr_expr_left_len
@@ -94,8 +86,6 @@ CALL @nmr_route_resolve
 CMP r3,r0
 JMP[NE] @nmr_expr_left_error
 ST r1,r0,@nmr_expr_left_id
-MOVI r9,52
-ST r9,r0,@nmr_expr_debug_stage
 ; Resolve right endpoint with the same owner/type checks.
 LD r1,r0,@nmr_expr_right_key
 LD r2,r0,@nmr_expr_right_len
@@ -104,8 +94,6 @@ CALL @nmr_route_resolve
 CMP r3,r0
 JMP[NE] @nmr_expr_right_error
 ST r1,r0,@nmr_expr_right_id
-MOVI r9,53
-ST r9,r0,@nmr_expr_debug_stage
 ; Registry is authoritative for signature, output kind and guest program.
 LD r1,r0,@nmr_expr_left_id
 LD r2,r0,@nmr_expr_right_id
@@ -117,8 +105,6 @@ ST r1,r0,@nmr_expr_out_kind
 ST r2,r0,@nmr_expr_program
 ST r4,r0,@nmr_expr_left_data
 ST r5,r0,@nmr_expr_right_data
-MOVI r9,54
-ST r9,r0,@nmr_expr_debug_stage
 LD r1,r0,@nmr_expr_left_id
 LD r2,r0,@nmr_expr_right_id
 LD r3,r0,@nmr_expr_op_id
@@ -127,8 +113,6 @@ LD r5,r0,@nmr_expr_program
 LD r6,r0,@nmr_expr_left_data
 LD r7,r0,@nmr_expr_right_data
 MOVI r8,0
-MOVI r9,55
-ST r9,r0,@nmr_expr_debug_stage
 LD r15,r0,@nmr_expr_resolve_ret
 RET
 nmr_expr_bad:
@@ -262,5 +246,3 @@ nmr_expr_result_ptr:
 .word 0
 nmr_expr_status:
 .word 0
-nmr_expr_debug_stage:
-.word 48
