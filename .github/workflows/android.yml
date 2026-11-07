@@ -38,6 +38,7 @@ jobs:
           sh tools/mc0db_scratch_gate.sh || exit 1
           sh tools/mc0_feedback_gate.sh || exit 1
           sh tools/math_dispatch_gate.sh || exit 1
+          sh tools/math_execute_gate.sh || exit 1
           sh tools/overbootstrap_route_gate.sh || exit 1
           sh tools/train_protocol_gate.sh || exit 1
           sh tools/cart_page_gate.sh || exit 1
