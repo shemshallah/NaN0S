@@ -171,7 +171,7 @@ nmr_obj_get_found:
 LD r1,r4,1
 LD r2,r4,2
 LD r3,r4,3
-BOOL.14 r5,r6,r0
+BOOL.14 r4,r6,r0
 LD r6,r4,4
 MOVI r5,0
 LD r15,r0,@nmr_obj_get_ret
