@@ -3,7 +3,8 @@
 ;   <canonical-left-route>::op:<decimal-id>::<canonical-right-route>
 ; nmr_expr_resolve ABI: r1=byte pointer to expression.
 ; Returns r1=left object ID,r2=right object ID,r3=operator ID,
-;         r4=output kind,r5=program ID,r6=left payload ptr,r7=right payload ptr,r8=status.
+;         r4=output kind,r5=program ID,r6=left payload ptr,r7=right payload ptr,
+;         r8=status,r9=vector dimension (legacy path),r10=canonical contract pointer.
 ; Status: 0 success, 1 malformed expression, 2 left route failure,
 ;         3 right route failure, 4 typed operator resolution failure.
 nmr_expr_resolve:
@@ -101,6 +102,11 @@ LD r3,r0,@nmr_expr_op_id
 CALL @nmr_resolve
 CMP r3,r0
 JMP[NE] @nmr_expr_operator_error
+; A ::op: expression is executable only when the canonical registry has
+; attached a complete immutable typed contract to this operator identity.
+CMP r6,r0
+JMP[EQ] @nmr_expr_operator_error
+ST r6,r0,@nmr_expr_contract
 ST r1,r0,@nmr_expr_out_kind
 ST r2,r0,@nmr_expr_program
 ST r4,r0,@nmr_expr_left_data
@@ -140,6 +146,7 @@ LD r5,r0,@nmr_expr_program
 LD r6,r0,@nmr_expr_left_data
 LD r7,r0,@nmr_expr_right_data
 LD r9,r0,@nmr_expr_dimension
+LD r10,r0,@nmr_expr_contract
 MOVI r8,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
@@ -152,6 +159,8 @@ MOVI r5,0
 MOVI r6,0
 MOVI r7,0
 MOVI r8,1
+MOVI r9,0
+MOVI r10,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
 nmr_expr_left_error:
@@ -163,6 +172,8 @@ MOVI r5,0
 MOVI r6,0
 MOVI r7,0
 MOVI r8,2
+MOVI r9,0
+MOVI r10,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
 nmr_expr_right_error:
@@ -174,6 +185,8 @@ MOVI r5,0
 MOVI r6,0
 MOVI r7,0
 MOVI r8,3
+MOVI r9,0
+MOVI r10,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
 nmr_expr_shape_error:
@@ -185,6 +198,8 @@ MOVI r5,0
 MOVI r6,0
 MOVI r7,0
 MOVI r8,5
+MOVI r9,0
+MOVI r10,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
 nmr_expr_operator_error:
@@ -196,6 +211,8 @@ MOVI r5,0
 MOVI r6,0
 MOVI r7,0
 MOVI r8,4
+MOVI r9,0
+MOVI r10,0
 LD r15,r0,@nmr_expr_resolve_ret
 RET
 nmr_expr_resolve_ret:
@@ -216,6 +233,7 @@ JMP[NE] @nmr_expr_execute_error
 ST r4,r0,@nmr_expr_out_kind
 ST r5,r0,@nmr_expr_program
 ST r9,r0,@nmr_expr_exec_dim
+ST r10,r0,@nmr_expr_exec_contract
 ST r6,r0,@nmr_expr_left_data
 ST r7,r0,@nmr_expr_right_data
 ; Reserve one BS0DB page as an execution-budget token. The current allocator
@@ -316,4 +334,8 @@ nmr_expr_scratch_id:
 nmr_expr_status:
 .word 0
 nmr_expr_dimension:
+.word 0
+nmr_expr_contract:
+.word 0
+nmr_expr_exec_contract:
 .word 0
