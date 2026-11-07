@@ -156,6 +156,9 @@ CALL @nmr_mul_u32
 LD r9,r0,@nmr_dot_acc
 ADD r9,r9,r1
 ST r9,r0,@nmr_dot_acc
+; The multiplier uses r8 internally, so reload both endpoint cursors.
+LD r7,r0,@nmr_dot_left
+LD r8,r0,@nmr_dot_right
 ADDI r7,r7,1
 ADDI r8,r8,1
 ST r7,r0,@nmr_dot_left
