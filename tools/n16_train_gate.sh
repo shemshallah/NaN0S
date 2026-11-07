@@ -39,3 +39,13 @@ printf 'N16TXT/1\ncontrol \302\200\n' > "$tmp/control.txt"
 if aarch64/android/nan_cli --nannet-train "$tmp/control.txt" --serial > "$tmp/control.out"; then echo "C1 control unexpectedly accepted"; exit 1; fi
 grep -qx 'N16 TRAIN REJECT' "$tmp/control.out" || { cat "$tmp/control.out"; exit 1; }
 echo "N16 corpus trainer gate: PASS"
+
+# The deterministic scheduler is a separate NaN16 guest kernel. Its rotated
+# epoch order is a full permutation, and invalid corpus/draw bounds are rejected.
+awk -f tools/nmk.awk -v CMD=emit src/training/n16_schedule.nas > "$tmp/n16_schedule.nan"
+if ! aarch64/android/nan_cli --img "$tmp/n16_schedule.nan" --serial > "$tmp/schedule.out"; then
+  cat "$tmp/schedule.out"
+  echo "deterministic scheduler invocation failed"
+  exit 1
+fi
+grep -qx 'N16 SCHED PASS' "$tmp/schedule.out" || { cat "$tmp/schedule.out"; exit 1; }
