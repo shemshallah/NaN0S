@@ -64,7 +64,6 @@ MOVI r9,50
 ST r9,r0,@nmr_expr_debug_stage
 ; Require the exact "::" separator before the right endpoint.
 LD r5,r0,@nmr_expr_cursor
-ADDI r5,r5,1
 LDB r10,r5,0
 MOVI r11,58
 CMP r10,r11
