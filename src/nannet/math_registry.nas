@@ -173,7 +173,7 @@ LD r2,r4,2
 LD r3,r4,3
 LD r7,r4,4
 BOOL.14 r4,r6,r0
-MOV r6,r7
+ADD r6,r7,r0
 MOVI r5,0
 LD r15,r0,@nmr_obj_get_ret
 RET
