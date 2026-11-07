@@ -34,6 +34,7 @@ jobs:
           sh tools/runner_ring_integration_gate.sh || exit 1
           sh tools/route_address_gate.sh || exit 1
           sh tools/object_key_decode_gate.sh || exit 1
+          sh tools/route_object_resolve_gate.sh || exit 1
           sh tools/overbootstrap_route_gate.sh || exit 1
           sh tools/train_protocol_gate.sh || exit 1
           sh tools/cart_page_gate.sh || exit 1

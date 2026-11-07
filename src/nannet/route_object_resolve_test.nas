@@ -1,0 +1,190 @@
+; Route-key → typed registry → logical-owner resolution tests.
+main:
+; Register vector 1337 at logical point 1 with digest 123.
+MOVI r1,1337
+MOVI r2,4
+MOVI r3,1
+MOVI r4,123
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @resolve_fail
+; Register hypergraph 42 at logical point 255 with digest 456.
+MOVI r1,42
+MOVI r2,8
+MOVI r3,255
+MOVI r4,456
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @resolve_fail
+; Register ID 99 as kind 8; a vector99 key must fail its kind check.
+MOVI r1,99
+MOVI r2,8
+MOVI r3,1
+MOVI r4,789
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @resolve_fail
+; vector1337 resolves to kind 4 / ID 1337 at point 1.
+MOVI r1,@resolve_vector
+SHL r1,r1,2
+MOVI r2,10
+MOVI r3,1
+CALL @nmr_route_resolve
+CMP r3,r0
+JMP[NE] @resolve_fail
+MOVI r5,1337
+CMP r1,r5
+JMP[NE] @resolve_fail
+MOVI r5,4
+CMP r2,r5
+JMP[NE] @resolve_fail
+MOVI r5,123
+CMP r4,r5
+JMP[NE] @resolve_fail
+; hypergraph42 resolves to kind 8 / ID 42 at point 255.
+MOVI r1,@resolve_hyper
+SHL r1,r1,2
+MOVI r2,12
+MOVI r3,255
+CALL @nmr_route_resolve
+CMP r3,r0
+JMP[NE] @resolve_fail
+MOVI r5,42
+CMP r1,r5
+JMP[NE] @resolve_fail
+MOVI r5,8
+CMP r2,r5
+JMP[NE] @resolve_fail
+MOVI r5,456
+CMP r4,r5
+JMP[NE] @resolve_fail
+; Existing ID at the wrong logical point is rejected.
+MOVI r1,@resolve_vector
+SHL r1,r1,2
+MOVI r2,10
+MOVI r3,2
+CALL @nmr_route_resolve
+MOVI r5,5
+CMP r3,r5
+JMP[NE] @resolve_fail
+; Existing ID with a different registered kind is rejected.
+MOVI r1,@resolve_wrong_kind
+SHL r1,r1,2
+MOVI r2,9
+MOVI r3,1
+CALL @nmr_route_resolve
+MOVI r5,4
+CMP r3,r5
+JMP[NE] @resolve_fail
+; Missing object is rejected.
+MOVI r1,@resolve_missing
+SHL r1,r1,2
+MOVI r2,9
+MOVI r3,1
+CALL @nmr_route_resolve
+MOVI r5,3
+CMP r3,r5
+JMP[NE] @resolve_fail
+; Zero ID is rejected by the key decoder.
+MOVI r1,@resolve_zero
+SHL r1,r1,2
+MOVI r2,7
+MOVI r3,1
+CALL @nmr_route_resolve
+MOVI r5,2
+CMP r3,r5
+JMP[NE] @resolve_fail
+MOVI r1,82
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,85
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,82
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,86
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+resolve_fail:
+MOVI r1,82
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,85
+PUTC r1
+MOVI r1,84
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,82
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,86
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,70
+PUTC r1
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+.include "object_key_decode.nas"
+.include "math_registry.nas"
+.include "route_object_resolve.nas"
+.org 22000
+resolve_vector:
+.str "vector1337"
+resolve_hyper:
+.str "hypergraph42"
+resolve_wrong_kind:
+.str "vector99"
+resolve_missing:
+.str "vector404"
+resolve_zero:
+.str "vector0"
