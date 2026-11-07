@@ -1,6 +1,5 @@
 ; Route-key → typed registry → logical-owner resolution tests.
 main:
-MOVI r12,65
 ; Register vector 1337 at logical point 1 with digest 123.
 MOVI r1,1337
 MOVI r2,4
@@ -25,7 +24,6 @@ MOVI r4,789
 CALL @nmr_obj_put
 CMP r3,r0
 JMP[NE] @resolve_fail
-MOVI r12,66
 ; vector1337 resolves to kind 4 / ID 1337 at point 1.
 MOVI r1,@resolve_vector
 SHL r1,r1,2
@@ -43,7 +41,6 @@ JMP[NE] @resolve_fail
 MOVI r5,123
 CMP r4,r5
 JMP[NE] @resolve_fail
-MOVI r12,67
 ; hypergraph42 resolves to kind 8 / ID 42 at point 255.
 MOVI r1,@resolve_hyper
 SHL r1,r1,2
@@ -61,7 +58,6 @@ JMP[NE] @resolve_fail
 MOVI r5,456
 CMP r4,r5
 JMP[NE] @resolve_fail
-MOVI r12,68
 ; Existing ID at the wrong logical point is rejected.
 MOVI r1,@resolve_vector
 SHL r1,r1,2
@@ -71,17 +67,15 @@ CALL @nmr_route_resolve
 MOVI r5,5
 CMP r3,r5
 JMP[NE] @resolve_fail
-MOVI r12,69
 ; Existing ID with a different registered kind is rejected.
 MOVI r1,@resolve_wrong_kind
 SHL r1,r1,2
-MOVI r2,9
+MOVI r2,8
 MOVI r3,1
 CALL @nmr_route_resolve
 MOVI r5,4
 CMP r3,r5
 JMP[NE] @resolve_fail
-MOVI r12,70
 ; Missing object is rejected.
 MOVI r1,@resolve_missing
 SHL r1,r1,2
@@ -91,7 +85,6 @@ CALL @nmr_route_resolve
 MOVI r5,3
 CMP r3,r5
 JMP[NE] @resolve_fail
-MOVI r12,71
 ; Zero ID is rejected by the key decoder.
 MOVI r1,@resolve_zero
 SHL r1,r1,2
@@ -141,10 +134,6 @@ MOVI r1,10
 PUTC r1
 HALT
 resolve_fail:
-MOVI r1,64
-PUTC r1
-ADD r1,r12,r0
-PUTC r1
 MOVI r1,82
 PUTC r1
 MOVI r1,79
