@@ -82,7 +82,7 @@ ADD r7,r7,r10
 ADDI r9,r9,1
 MOVI r11,4
 CMP r9,r11
-JMP[GT] @nmr_key_bad
+JMP[GT] @nmr_key_id_bad
 ADDI r5,r5,1
 ST r5,r0,@nmr_key_scan
 CMP r9,r6
