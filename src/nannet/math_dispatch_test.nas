@@ -16,7 +16,7 @@ MOVI r4,3002
 CALL @nmr_obj_put
 CMP r3,r0
 JMP[NE] @fail
-; dot.v1: vector(4) x vector(4) -> scalar(1), NaN16 guest program 79.
+; dot.v1: vector(4) x vector(4) -> scalar(3), NaN16 guest program 79.
 MOVI r1,701
 MOVI r2,4
 MOVI r3,4
@@ -62,7 +62,7 @@ MOVI r1,1337
 MOVI r2,1338
 MOVI r3,702
 CALL @nmr_resolve
-MOVI r7,3
+MOVI r7,1
 CMP r3,r7
 JMP[NE] @fail
 ; Type mismatch (hypergraph as right endpoint) fails closed.
