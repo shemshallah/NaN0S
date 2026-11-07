@@ -56,7 +56,7 @@ MOVI r7,20
 CMP r3,r7
 JMP[NE] @fail
 ; PASS
-MOVI r1,77
+MOVI r1,80
 PUTC r1
 MOVI r1,65
 PUTC r1
