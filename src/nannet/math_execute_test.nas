@@ -1,0 +1,134 @@
+; End-to-end typed vector.add.v1 execution through the NaN16 program dispatcher.
+main:
+; Register two vector(4) endpoints and an immutable operator mapping to guest program 78.
+MOVI r1,1401
+MOVI r2,4
+MOVI r3,1
+MOVI r4,1101
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,1402
+MOVI r2,4
+MOVI r3,2
+MOVI r4,1102
+CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,702
+MOVI r2,4
+MOVI r3,4
+MOVI r4,4
+MOVI r5,78
+CALL @nmr_op_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+; Resolve the operator before execution; registry is the authority for program ID.
+MOVI r1,1401
+MOVI r2,1402
+MOVI r3,702
+CALL @nmr_resolve
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r6,4
+CMP r1,r6
+JMP[NE] @math_exec_fail
+MOVI r6,78
+CMP r2,r6
+JMP[NE] @math_exec_fail
+; Execute the resolved program on two four-element guest vectors.
+MOVI r1,78
+MOVI r2,@math_vec_left
+MOVI r3,@math_vec_right
+MOVI r4,4
+MOVI r5,@math_vec_output
+CALL @nmr_execute
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r6,@math_vec_output
+CMP r1,r6
+JMP[NE] @math_exec_fail
+MOVI r6,4
+CMP r2,r6
+JMP[NE] @math_exec_fail
+; Expected [11,22,33,44].
+MOVI r7,@math_vec_output
+LD r8,r7,0
+MOVI r9,11
+CMP r8,r9
+JMP[NE] @math_exec_fail
+LD r8,r7,1
+MOVI r9,22
+CMP r8,r9
+JMP[NE] @math_exec_fail
+LD r8,r7,2
+MOVI r9,33
+CMP r8,r9
+JMP[NE] @math_exec_fail
+LD r8,r7,3
+MOVI r9,44
+CMP r8,r9
+JMP[NE] @math_exec_fail
+; Invalid dimension is rejected without touching a valid result contract.
+MOVI r1,78
+MOVI r2,@math_vec_left
+MOVI r3,@math_vec_right
+MOVI r4,0
+MOVI r5,@math_vec_output
+CALL @nmr_execute
+MOVI r6,1
+CMP r3,r6
+JMP[NE] @math_exec_fail
+; Dimensions above the bounded v1 limit are rejected.
+MOVI r1,78
+MOVI r2,@math_vec_left
+MOVI r3,@math_vec_right
+MOVI r4,17
+MOVI r5,@math_vec_output
+CALL @nmr_execute
+MOVI r6,1
+CMP r3,r6
+JMP[NE] @math_exec_fail
+; Unknown program IDs never dispatch.
+MOVI r1,999
+MOVI r2,@math_vec_left
+MOVI r3,@math_vec_right
+MOVI r4,4
+MOVI r5,@math_vec_output
+CALL @nmr_execute
+MOVI r6,1
+CMP r3,r6
+JMP[NE] @math_exec_fail
+; PASS
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+math_exec_fail:
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+.include "math_registry.nas"
+.include "vector_ops.nas"
+.org 21000
+math_vec_left:
+.word 1,2,3,4
+math_vec_right:
+.word 10,20,30,40
+math_vec_output:
+.word 0,0,0,0
