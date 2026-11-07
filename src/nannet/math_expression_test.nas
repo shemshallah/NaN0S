@@ -1,5 +1,7 @@
 ; End-to-end canonical route expression -> typed dispatch -> NaN16 execution.
 main:
+MOVI r1,48
+ST r1,r0,@expr_stage
 ; Register endpoint objects at distinct HW0 logical points.
 MOVI r1,1401
 MOVI r2,4
@@ -34,6 +36,8 @@ MOVI r5,79
 CALL @nmr_op_put
 CMP r3,r0
 JMP[NE] @expr_fail
+MOVI r1,49
+ST r1,r0,@expr_stage
 ; Canonical expression resolves both route endpoints and executes the operator.
 MOVI r1,@expr_valid
 SHL r1,r1,2
@@ -55,6 +59,8 @@ LD r7,r6,0
 MOVI r8,300
 CMP r7,r8
 JMP[NE] @expr_fail
+MOVI r1,50
+ST r1,r0,@expr_stage
 ; A route without ::op: is not an executable expression.
 MOVI r1,@expr_no_operator
 SHL r1,r1,2
@@ -64,6 +70,8 @@ CALL @nmr_expr_execute
 MOVI r6,1
 CMP r3,r6
 JMP[NE] @expr_fail
+MOVI r1,51
+ST r1,r0,@expr_stage
 ; An unknown operator is rejected by the typed registry.
 MOVI r1,@expr_unknown_operator
 SHL r1,r1,2
@@ -73,6 +81,8 @@ CALL @nmr_expr_execute
 MOVI r6,4
 CMP r3,r6
 JMP[NE] @expr_fail
+MOVI r1,52
+ST r1,r0,@expr_stage
 ; A syntactically valid endpoint at the wrong owner point is rejected.
 MOVI r1,@expr_wrong_owner
 SHL r1,r1,2
@@ -82,6 +92,8 @@ CALL @nmr_expr_execute
 MOVI r6,2
 CMP r3,r6
 JMP[NE] @expr_fail
+MOVI r1,53
+ST r1,r0,@expr_stage
 ; Non-decimal operator IDs are malformed.
 MOVI r1,@expr_bad_operator
 SHL r1,r1,2
@@ -91,6 +103,8 @@ CALL @nmr_expr_execute
 MOVI r6,1
 CMP r3,r6
 JMP[NE] @expr_fail
+MOVI r1,54
+ST r1,r0,@expr_stage
 ; PASS
 MOVI r1,80
 PUTC r1
@@ -112,6 +126,8 @@ MOVI r1,73
 PUTC r1
 MOVI r1,76
 PUTC r1
+LD r1,r0,@expr_stage
+PUTC r1
 MOVI r1,10
 PUTC r1
 HALT
@@ -121,6 +137,9 @@ HALT
 .include "route_object_resolve.nas"
 .include "vector_ops.nas"
 .include "math_expression.nas"
+.org 22990
+expr_stage:
+.word 48
 .org 23000
 expr_vec_left:
 .word 1,2,3,4
