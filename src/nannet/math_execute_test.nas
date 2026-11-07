@@ -101,6 +101,45 @@ LD r8,r7,3
 MOVI r9,44
 CMP r8,r9
 JMP[NE] @math_exec_fail
+; Register dot.v1: vector(4) x vector(4) -> scalar(1), program 79.
+MOVI r1,701
+MOVI r2,4
+MOVI r3,4
+MOVI r4,1
+MOVI r5,79
+CALL @nmr_op_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,1401
+MOVI r2,1402
+MOVI r3,701
+CALL @nmr_resolve
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r6,1
+CMP r1,r6
+JMP[NE] @math_exec_fail
+MOVI r6,79
+CMP r2,r6
+JMP[NE] @math_exec_fail
+ST r4,r0,@math_exec_left_ptr
+ST r5,r0,@math_exec_right_ptr
+; Execute the registered dot product using the resolved endpoint addresses.
+MOVI r1,79
+LD r2,r0,@math_exec_left_ptr
+LD r3,r0,@math_exec_right_ptr
+MOVI r4,4
+MOVI r5,@math_dot_output
+CALL @nmr_execute
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r6,@math_dot_output
+CMP r1,r6
+JMP[NE] @math_exec_fail
+LD r7,r6,0
+MOVI r8,300
+CMP r7,r8
+JMP[NE] @math_exec_fail
 ; Invalid dimension is rejected without touching a valid result contract.
 MOVI r1,78
 MOVI r2,@math_vec_left
@@ -169,3 +208,5 @@ math_vec_right:
 .word 10,20,30,40
 math_vec_output:
 .word 0,0,0,0
+math_dot_output:
+.word 0
