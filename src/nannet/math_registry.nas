@@ -3,12 +3,17 @@
 ;   nmr_obj_put: r1=id,r2=kind,r3=owner_point,r4=payload_digest -> r1=slot,r3=status
 ;   nmr_obj_bind_data: r1=id,r2=guest_word_pointer -> r1=slot,r3=status
 ;   nmr_obj_get: r1=id -> r1=kind,r2=owner,r3=digest,r4=slot,r5=status,r6=data_pointer
-;   nmr_op_put: r1=op_id,r2=left_kind,r3=right_kind,r4=out_kind,r5=program_id -> r1=slot,r3=status
+;   nmr_op_put: r1=op_id,r2=left_kind,r3=right_kind,r4=out_kind,r5=program_id
+;   nmr_contract_put: r1=op_id,r2=left_rank,r3=right_rank,r4=out_rank,r5=domain,
+;       r6=shape_rule,r7=required_capabilities,r8=preconditions -> r1=slot,r3=status
+;   nmr_contract_get: r1=op_id -> r1=10-word contract pointer,r2=status
 ;   nmr_resolve: r1=left_object_id,r2=right_object_id,r3=op_id
-;       -> r1=out_kind,r2=program_id,r3=status,r4=left_data_pointer,r5=right_data_pointer
+;       -> r1=out_kind,r2=program_id,r3=status,r4=left_data_pointer,
+;          r5=right_data_pointer,r6=contract_pointer (0 if not registered)
 ; Status: 0 success, 1 invalid/unknown, 3 full, 5 immutable-key conflict, 6 signature/type mismatch.
 ; Object records are id,kind,owner,digest,data_pointer (5 words).
-; Operator records are op_id,left_kind,right_kind,out_kind,program_id (5 words).
+; Operator identity records remain op_id,left_kind,right_kind,out_kind,program_id.
+; A separate keyed contract extension stores the complete 10-word preflight ABI.
 ; Fixed-size tables are bootstrap scratch. MC0DB persistence/checkpointing is a later layer.
 
 nmr_obj_put:
@@ -253,6 +258,189 @@ RET
 nmr_op_put_ret:
 .word 0
 
+
+; Immutable typed applicability contract, attached to an existing operator ID.
+; The three kinds are copied from the canonical operator record and cannot
+; diverge from it. The returned descriptor is exactly the 10-word MTH ABI.
+nmr_contract_put:
+ST r15,r0,@nmr_contract_put_ret
+ST r1,r0,@nmr_contract_tmp_op
+ST r2,r0,@nmr_contract_tmp_lr
+ST r3,r0,@nmr_contract_tmp_rr
+ST r4,r0,@nmr_contract_tmp_or
+ST r5,r0,@nmr_contract_tmp_domain
+ST r6,r0,@nmr_contract_tmp_shape
+ST r7,r0,@nmr_contract_tmp_caps
+ST r8,r0,@nmr_contract_tmp_pre
+CMP r1,r0
+JMP[EQ] @nmr_contract_put_bad
+; Resolve the existing operator; contracts cannot invent operator identities.
+MOVI r4,@nmr_op_table
+MOVI r5,16
+MOVI r6,0
+nmr_contract_op_scan:
+LD r7,r4,0
+CMP r7,r0
+JMP[EQ] @nmr_contract_op_next
+LD r8,r0,@nmr_contract_tmp_op
+CMP r7,r8
+JMP[EQ] @nmr_contract_op_found
+nmr_contract_op_next:
+ADDI r4,r4,5
+ADDI r6,r6,1
+CMP r6,r5
+JMP[LT] @nmr_contract_op_scan
+JMP @nmr_contract_put_missing
+nmr_contract_op_found:
+LD r7,r4,1
+ST r7,r0,@nmr_contract_tmp_lk
+LD r7,r4,2
+ST r7,r0,@nmr_contract_tmp_rk
+LD r7,r4,3
+ST r7,r0,@nmr_contract_tmp_ok
+; Find an existing immutable contract or the first empty slot.
+MOVI r4,@nmr_contract_table
+MOVI r5,16
+MOVI r6,0
+nmr_contract_scan:
+LD r7,r4,0
+CMP r7,r0
+JMP[EQ] @nmr_contract_empty
+LD r8,r0,@nmr_contract_tmp_op
+CMP r7,r8
+JMP[EQ] @nmr_contract_found
+ADDI r4,r4,11
+ADDI r6,r6,1
+CMP r6,r5
+JMP[LT] @nmr_contract_scan
+MOVI r1,0
+MOVI r3,3
+LD r15,r0,@nmr_contract_put_ret
+RET
+nmr_contract_found:
+; Exact duplicate is idempotent; any changed field is an immutable conflict.
+LD r8,r0,@nmr_contract_tmp_lk
+LD r9,r4,1
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_rk
+LD r9,r4,2
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_ok
+LD r9,r4,3
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_lr
+LD r9,r4,4
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_rr
+LD r9,r4,5
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_or
+LD r9,r4,6
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_domain
+LD r9,r4,7
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_shape
+LD r9,r4,8
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_caps
+LD r9,r4,9
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+LD r8,r0,@nmr_contract_tmp_pre
+LD r9,r4,10
+CMP r8,r9
+JMP[NE] @nmr_contract_conflict
+BOOL.14 r1,r6,r0
+MOVI r3,0
+LD r15,r0,@nmr_contract_put_ret
+RET
+nmr_contract_empty:
+LD r8,r0,@nmr_contract_tmp_op
+ST r8,r4,0
+LD r8,r0,@nmr_contract_tmp_lk
+ST r8,r4,1
+LD r8,r0,@nmr_contract_tmp_rk
+ST r8,r4,2
+LD r8,r0,@nmr_contract_tmp_ok
+ST r8,r4,3
+LD r8,r0,@nmr_contract_tmp_lr
+ST r8,r4,4
+LD r8,r0,@nmr_contract_tmp_rr
+ST r8,r4,5
+LD r8,r0,@nmr_contract_tmp_or
+ST r8,r4,6
+LD r8,r0,@nmr_contract_tmp_domain
+ST r8,r4,7
+LD r8,r0,@nmr_contract_tmp_shape
+ST r8,r4,8
+LD r8,r0,@nmr_contract_tmp_caps
+ST r8,r4,9
+LD r8,r0,@nmr_contract_tmp_pre
+ST r8,r4,10
+BOOL.14 r1,r6,r0
+MOVI r3,0
+LD r15,r0,@nmr_contract_put_ret
+RET
+nmr_contract_put_bad:
+MOVI r1,0
+MOVI r3,1
+LD r15,r0,@nmr_contract_put_ret
+RET
+nmr_contract_put_missing:
+MOVI r1,0
+MOVI r3,1
+LD r15,r0,@nmr_contract_put_ret
+RET
+nmr_contract_conflict:
+MOVI r1,0
+MOVI r3,5
+LD r15,r0,@nmr_contract_put_ret
+RET
+nmr_contract_put_ret:
+.word 0
+
+; Return the canonical 10-word contract descriptor (not a copied summary).
+nmr_contract_get:
+ST r15,r0,@nmr_contract_get_ret
+ST r1,r0,@nmr_contract_get_op
+MOVI r4,@nmr_contract_table
+MOVI r5,16
+MOVI r6,0
+nmr_contract_get_scan:
+LD r7,r4,0
+CMP r7,r0
+JMP[EQ] @nmr_contract_get_next
+LD r8,r0,@nmr_contract_get_op
+CMP r7,r8
+JMP[EQ] @nmr_contract_get_found
+nmr_contract_get_next:
+ADDI r4,r4,11
+ADDI r6,r6,1
+CMP r6,r5
+JMP[LT] @nmr_contract_get_scan
+MOVI r1,0
+MOVI r2,1
+LD r15,r0,@nmr_contract_get_ret
+RET
+nmr_contract_get_found:
+ADDI r1,r4,1
+MOVI r2,0
+LD r15,r0,@nmr_contract_get_ret
+RET
+nmr_contract_get_ret:
+.word 0
+nmr_contract_get_op:
+.word 0
+
 nmr_resolve:
 ST r15,r0,@nmr_resolve_ret
 ST r1,r0,@nmr_tmp_left_id
@@ -296,9 +484,21 @@ LD r9,r4,2
 CMP r8,r9
 JMP[NE] @nmr_resolve_signature
 LD r1,r4,3
-LD r2,r4,4
-LD r4,r0,@nmr_tmp_left_data
-LD r5,r0,@nmr_tmp_right_data
+ST r1,r0,@nmr_resolve_out_kind
+LD r1,r4,4
+ST r1,r0,@nmr_resolve_program
+LD r1,r0,@nmr_tmp_left_data
+ST r1,r0,@nmr_resolve_left_data
+LD r1,r0,@nmr_tmp_right_data
+ST r1,r0,@nmr_resolve_right_data
+LD r1,r0,@nmr_tmp_op
+CALL @nmr_contract_get
+ST r1,r0,@nmr_resolve_contract
+LD r1,r0,@nmr_resolve_out_kind
+LD r2,r0,@nmr_resolve_program
+LD r4,r0,@nmr_resolve_left_data
+LD r5,r0,@nmr_resolve_right_data
+LD r6,r0,@nmr_resolve_contract
 MOVI r3,0
 LD r15,r0,@nmr_resolve_ret
 RET
@@ -308,6 +508,7 @@ MOVI r2,0
 MOVI r3,6
 MOVI r4,0
 MOVI r5,0
+MOVI r6,0
 LD r15,r0,@nmr_resolve_ret
 RET
 nmr_resolve_missing:
@@ -316,6 +517,7 @@ MOVI r2,0
 MOVI r3,1
 MOVI r4,0
 MOVI r5,0
+MOVI r6,0
 LD r15,r0,@nmr_resolve_ret
 RET
 nmr_resolve_ret:
@@ -676,6 +878,39 @@ nmr_bind_id:
 nmr_bind_ptr:
 .word 0
 
+nmr_contract_tmp_op:
+.word 0
+nmr_contract_tmp_lk:
+.word 0
+nmr_contract_tmp_rk:
+.word 0
+nmr_contract_tmp_ok:
+.word 0
+nmr_contract_tmp_lr:
+.word 0
+nmr_contract_tmp_rr:
+.word 0
+nmr_contract_tmp_or:
+.word 0
+nmr_contract_tmp_domain:
+.word 0
+nmr_contract_tmp_shape:
+.word 0
+nmr_contract_tmp_caps:
+.word 0
+nmr_contract_tmp_pre:
+.word 0
+nmr_resolve_out_kind:
+.word 0
+nmr_resolve_program:
+.word 0
+nmr_resolve_left_data:
+.word 0
+nmr_resolve_right_data:
+.word 0
+nmr_resolve_contract:
+.word 0
+
 .org 20000
 nmr_obj_table:
 .word 0,0,0,0,0
@@ -727,6 +962,24 @@ nmr_op_table:
 .word 0,0,0,0,0
 .word 0,0,0,0,0
 .word 0,0,0,0,0
+nmr_contract_table:
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+.word 0,0,0,0,0,0,0,0,0,0,0
+
 nmr_derivation_table:
 .word 0,0,0,0,0,0,0
 .word 0,0,0,0,0,0,0

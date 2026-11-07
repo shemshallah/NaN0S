@@ -53,7 +53,46 @@ MOVI r5,900
 CALL @nmr_op_put
 CMP r3,r0
 JMP[NE] @fail
-; Resolve vector1337 :: hypergraph42.
+; Attach the immutable 10-word preflight contract to that same operator ID.
+; Kinds are inherited from nmr_op_put; only ranks/domain/shape/capability/
+; precondition metadata is supplied here.
+MOVI r1,77
+MOVI r2,1
+MOVI r3,1
+MOVI r4,1
+MOVI r5,1
+MOVI r6,0
+MOVI r7,0
+MOVI r8,0
+CALL @nmr_contract_put
+CMP r3,r0
+JMP[NE] @fail
+; Exact duplicate is idempotent.
+MOVI r1,77
+MOVI r2,1
+MOVI r3,1
+MOVI r4,1
+MOVI r5,1
+MOVI r6,0
+MOVI r7,0
+MOVI r8,0
+CALL @nmr_contract_put
+CMP r3,r0
+JMP[NE] @fail
+; Any changed contract field is an immutable conflict.
+MOVI r1,77
+MOVI r2,1
+MOVI r3,1
+MOVI r4,1
+MOVI r5,1
+MOVI r6,1
+MOVI r7,0
+MOVI r8,0
+CALL @nmr_contract_put
+MOVI r5,5
+CMP r3,r5
+JMP[NE] @fail
+; Resolve vector1337 :: hypergraph42 and return the canonical contract pointer.
 MOVI r1,1337
 MOVI r2,42
 MOVI r3,77
@@ -65,6 +104,28 @@ CMP r1,r5
 JMP[NE] @fail
 MOVI r5,900
 CMP r2,r5
+JMP[NE] @fail
+CMP r6,r0
+JMP[EQ] @fail
+LD r5,r6,0
+MOVI r7,4
+CMP r5,r7
+JMP[NE] @fail
+LD r5,r6,1
+MOVI r7,8
+CMP r5,r7
+JMP[NE] @fail
+LD r5,r6,2
+MOVI r7,9
+CMP r5,r7
+JMP[NE] @fail
+LD r5,r6,3
+MOVI r7,1
+CMP r5,r7
+JMP[NE] @fail
+LD r5,r6,6
+MOVI r7,1
+CMP r5,r7
 JMP[NE] @fail
 ; Wrong left endpoint type must reject with signature status 6.
 MOVI r1,9
