@@ -143,7 +143,7 @@ HALT
 resolve_fail:
 MOVI r1,64
 PUTC r1
-BOOL.14 r1,r12,r0
+ADD r1,r12,r0
 PUTC r1
 MOVI r1,82
 PUTC r1
