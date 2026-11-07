@@ -21,6 +21,16 @@ LDB r5,r4,9
 MOVI r6,55
 CMP r5,r6
 JMP[NE] @fail
+ADD r1,r4,r0
+CALL @nmr_key_decode
+CMP r3,r0
+JMP[NE] @fail
+MOVI r5,4
+CMP r1,r5
+JMP[NE] @fail
+MOVI r5,1337
+CMP r2,r5
+JMP[NE] @fail
 MOVI r1,@addr_valid255
 SHL r1,r1,2
 CALL @nmr_addr_parse
@@ -40,6 +50,16 @@ JMP[NE] @fail
 LDB r5,r4,11
 MOVI r6,50
 CMP r5,r6
+JMP[NE] @fail
+ADD r1,r4,r0
+CALL @nmr_key_decode
+CMP r3,r0
+JMP[NE] @fail
+MOVI r5,8
+CMP r1,r5
+JMP[NE] @fail
+MOVI r5,42
+CMP r2,r5
 JMP[NE] @fail
 MOVI r1,@addr_zero
 SHL r1,r1,2
@@ -137,6 +157,7 @@ MOVI r1,10
 PUTC r1
 HALT
 .include "route_address.nas"
+.include "object_key_decode.nas"
 .org 18100
 addr_valid1:
 .str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1::vector1337"
