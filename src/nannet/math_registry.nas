@@ -468,6 +468,176 @@ nmr_deriv_digest:
 .word 0
 nmr_deriv_out_kind:
 .word 0
+nmr_shape_id:
+.word 0
+nmr_shape_rank:
+.word 0
+nmr_shape_dim:
+.word 0
+nmr_shape_stride:
+.word 0
+nmr_shape_capacity:
+.word 0
+
+; Immutable rank-1 vector shape registry.
+; Shape record: object_id,rank,dimension,stride,capacity_words.
+; nmr_shape_put ABI: r1=id,r2=rank,r3=dimension,r4=stride,r5=capacity_words
+; Returns r1=slot,r3=status. Only registered vector objects (kind 4) are accepted.
+; Required capacity is (dimension-1)*stride+1 words.
+nmr_shape_put:
+ST r15,r0,@nmr_shape_put_ret
+ST r1,r0,@nmr_shape_id
+ST r2,r0,@nmr_shape_rank
+ST r3,r0,@nmr_shape_dim
+ST r4,r0,@nmr_shape_stride
+ST r5,r0,@nmr_shape_capacity
+CMP r1,r0
+JMP[EQ] @nmr_shape_bad
+MOVI r6,1
+CMP r2,r6
+JMP[NE] @nmr_shape_bad
+CMP r3,r0
+JMP[EQ] @nmr_shape_bad
+MOVI r6,16
+CMP r3,r6
+JMP[GT] @nmr_shape_bad
+CMP r4,r0
+JMP[EQ] @nmr_shape_bad
+CMP r5,r0
+JMP[EQ] @nmr_shape_bad
+; Verify capacity for the requested stride.
+LD r6,r0,@nmr_shape_dim
+SUBI r6,r6,1
+LD r7,r0,@nmr_shape_stride
+MUL r6,r6,r7
+ADDI r6,r6,1
+LD r7,r0,@nmr_shape_capacity
+CMP r7,r6
+JMP[LT] @nmr_shape_bad
+; Shape metadata can only be attached to an existing vector object.
+LD r1,r0,@nmr_shape_id
+CALL @nmr_obj_get
+CMP r5,r0
+JMP[NE] @nmr_shape_missing
+MOVI r6,4
+CMP r1,r6
+JMP[NE] @nmr_shape_type
+MOVI r4,@nmr_shape_table
+MOVI r5,32
+MOVI r6,0
+nmr_shape_scan:
+LD r7,r4,0
+CMP r7,r0
+JMP[EQ] @nmr_shape_empty
+LD r8,r0,@nmr_shape_id
+CMP r7,r8
+JMP[EQ] @nmr_shape_found
+ADDI r4,r4,5
+ADDI r6,r6,1
+CMP r6,r5
+JMP[LT] @nmr_shape_scan
+MOVI r1,0
+MOVI r3,3
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_found:
+LD r8,r0,@nmr_shape_rank
+LD r9,r4,1
+CMP r8,r9
+JMP[NE] @nmr_shape_conflict
+LD r8,r0,@nmr_shape_dim
+LD r9,r4,2
+CMP r8,r9
+JMP[NE] @nmr_shape_conflict
+LD r8,r0,@nmr_shape_stride
+LD r9,r4,3
+CMP r8,r9
+JMP[NE] @nmr_shape_conflict
+LD r8,r0,@nmr_shape_capacity
+LD r9,r4,4
+CMP r8,r9
+JMP[NE] @nmr_shape_conflict
+BOOL.14 r1,r6,r0
+MOVI r3,0
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_empty:
+LD r8,r0,@nmr_shape_id
+ST r8,r4,0
+LD r8,r0,@nmr_shape_rank
+ST r8,r4,1
+LD r8,r0,@nmr_shape_dim
+ST r8,r4,2
+LD r8,r0,@nmr_shape_stride
+ST r8,r4,3
+LD r8,r0,@nmr_shape_capacity
+ST r8,r4,4
+BOOL.14 r1,r6,r0
+MOVI r3,0
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_bad:
+MOVI r1,0
+MOVI r3,1
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_missing:
+MOVI r1,0
+MOVI r3,1
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_type:
+MOVI r1,0
+MOVI r3,6
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_conflict:
+MOVI r1,0
+MOVI r3,5
+LD r15,r0,@nmr_shape_put_ret
+RET
+nmr_shape_put_ret:
+.word 0
+
+; nmr_shape_get ABI: r1=object_id -> r1=rank,r2=dimension,r3=stride,
+; r4=capacity_words,r5=status.
+nmr_shape_get:
+ST r15,r0,@nmr_shape_get_ret
+ST r1,r0,@nmr_shape_get_id
+MOVI r4,@nmr_shape_table
+MOVI r5,32
+MOVI r6,0
+nmr_shape_get_scan:
+LD r7,r4,0
+CMP r7,r0
+JMP[EQ] @nmr_shape_get_next
+LD r8,r0,@nmr_shape_get_id
+CMP r7,r8
+JMP[EQ] @nmr_shape_get_found
+nmr_shape_get_next:
+ADDI r4,r4,5
+ADDI r6,r6,1
+CMP r6,r5
+JMP[LT] @nmr_shape_get_scan
+MOVI r1,0
+MOVI r2,0
+MOVI r3,0
+MOVI r4,0
+MOVI r5,1
+LD r15,r0,@nmr_shape_get_ret
+RET
+nmr_shape_get_found:
+LD r1,r4,1
+LD r2,r4,2
+LD r3,r4,3
+LD r4,r4,4
+MOVI r5,0
+LD r15,r0,@nmr_shape_get_ret
+RET
+nmr_shape_get_ret:
+.word 0
+nmr_shape_get_id:
+.word 0
 
 nmr_tmp_id:
 .word 0
@@ -572,3 +742,36 @@ nmr_derivation_table:
 .word 0,0,0,0,0,0,0
 .word 0,0,0,0,0,0,0
 .word 0,0,0,0,0,0,0
+nmr_shape_table:
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
+.word 0,0,0,0,0
