@@ -41,7 +41,14 @@ MOVI r6,@n16srv_test_server_session
 SHL r6,r6,2
 CALL @n16_server_exchange_impl
 CMP r3,r0
-JMP[NE] @n16srv_test_fail
+JMP[EQ] @n16srv_test_server_ok
+MOVI r1,48
+ADD r1,r1,r3
+PUTC r1
+MOVI r1,68
+PUTC r1
+JMP @n16srv_test_fail
+n16srv_test_server_ok:
 MOVI r7,44
 CMP r1,r7
 JMP[NE] @n16srv_test_fail
