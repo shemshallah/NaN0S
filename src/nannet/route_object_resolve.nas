@@ -20,8 +20,12 @@ JMP[NE] @nmr_route_kind_error
 LD r8,r0,@nmr_route_point
 CMP r2,r8
 JMP[NE] @nmr_route_owner_error
+ST r3,r0,@nmr_route_digest
+ST r4,r0,@nmr_route_slot
 LD r1,r0,@nmr_route_id
 LD r2,r0,@nmr_route_kind
+LD r4,r0,@nmr_route_digest
+LD r5,r0,@nmr_route_slot
 MOVI r3,0
 LD r15,r0,@nmr_route_resolve_ret
 RET
@@ -60,4 +64,8 @@ nmr_route_point:
 nmr_route_kind:
 .word 0
 nmr_route_id:
+.word 0
+nmr_route_digest:
+.word 0
+nmr_route_slot:
 .word 0
