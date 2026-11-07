@@ -101,7 +101,7 @@ LD r8,r7,3
 MOVI r9,44
 CMP r8,r9
 JMP[NE] @math_exec_fail
-; Register dot.v1: vector(4) x vector(4) -> scalar(1), program 79.
+; Register dot.v1: vector(4) x vector(4) -> scalar(3), program 79.
 MOVI r1,701
 MOVI r2,4
 MOVI r3,4
