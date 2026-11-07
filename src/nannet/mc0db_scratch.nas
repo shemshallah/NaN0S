@@ -62,6 +62,7 @@ mc_reserve_slot:
 LD r7,r0,@mc_next_id
 CMP r7,r0
 JMP[EQ] @mc_reserve_full
+ST r7,r0,@mc_tmp_id
 ST r7,r4,0
 LD r8,r0,@mc_tmp_pool
 ST r8,r4,1
@@ -89,8 +90,7 @@ LD r8,r0,@mc_total_used
 LD r9,r0,@mc_tmp_pages
 ADD r8,r8,r9
 ST r8,r0,@mc_total_used
-LD r1,r0,@mc_next_id
-SUBI r1,r1,1
+LD r1,r0,@mc_tmp_id
 LD r2,r0,@mc_tmp_pages
 MOVI r3,0
 LD r15,r0,@mc_reserve_ret
