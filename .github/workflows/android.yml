@@ -28,6 +28,7 @@ jobs:
           sh tools/nannet_service_gate.sh || exit 1
           sh tools/n16_train_gate.sh || exit 1
           sh tools/mirror_pair_gate.sh || exit 1
+          sh tools/math_registry_gate.sh || exit 1
           sh tools/overbootstrap_route_gate.sh || exit 1
           sh tools/train_protocol_gate.sh || exit 1
           sh tools/cart_page_gate.sh || exit 1
