@@ -191,7 +191,7 @@ LD r1,r0,@n16srv_req_base
 LD r2,r0,@n16srv_req_len
 CALL @n16_frame_route
 CMP r3,r0
-JMP[NE] @n16srv_route_fail
+JMP[EQ] @n16srv_copy_session
 
 ; The HELLO selects logical point 1 (the runner portal). The current local
 ; router may report status 2 for that physical host route; accept only the
@@ -199,9 +199,7 @@ JMP[NE] @n16srv_route_fail
 LD r7,r0,@n16srv_type
 MOVI r8,1
 CMP r7,r8
-JMP[NE] @n16srv_copy_session
-CMP r3,r0
-JMP[EQ] @n16srv_copy_session
+JMP[NE] @n16srv_route_fail
 MOVI r8,2
 CMP r3,r8
 JMP[NE] @n16srv_route_fail
