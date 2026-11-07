@@ -245,7 +245,7 @@ STB r7,r5,6
 STB r7,r5,7
 LD r1,r0,@n16srv_out_base
 MOVI r2,2
-MOVI r4,@n16srv_payload_base
+LD r4,r0,@n16srv_payload_base
 MOVI r5,8
 LD r6,r0,@n16srv_sid_base
 CALL @n16_android_build_impl
