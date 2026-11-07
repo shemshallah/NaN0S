@@ -8,11 +8,34 @@ MOVI r4,1101
 CALL @nmr_obj_put
 CMP r3,r0
 JMP[NE] @math_exec_fail
+MOVI r1,1401
+MOVI r2,@math_vec_left
+CALL @nmr_obj_bind_data
+CMP r3,r0
+JMP[NE] @math_exec_fail
+; Rebinding the identical payload address is idempotent.
+MOVI r1,1401
+MOVI r2,@math_vec_left
+CALL @nmr_obj_bind_data
+CMP r3,r0
+JMP[NE] @math_exec_fail
+; A different payload cannot silently replace an immutable binding.
+MOVI r1,1401
+MOVI r2,@math_vec_right
+CALL @nmr_obj_bind_data
+MOVI r6,5
+CMP r3,r6
+JMP[NE] @math_exec_fail
 MOVI r1,1402
 MOVI r2,4
 MOVI r3,2
 MOVI r4,1102
 CALL @nmr_obj_put
+CMP r3,r0
+JMP[NE] @math_exec_fail
+MOVI r1,1402
+MOVI r2,@math_vec_right
+CALL @nmr_obj_bind_data
 CMP r3,r0
 JMP[NE] @math_exec_fail
 MOVI r1,702
@@ -36,10 +59,19 @@ JMP[NE] @math_exec_fail
 MOVI r6,78
 CMP r2,r6
 JMP[NE] @math_exec_fail
-; Execute the resolved program on two four-element guest vectors.
+; The resolved object records, not caller-supplied guesses, provide payload addresses.
+MOVI r6,@math_vec_left
+CMP r4,r6
+JMP[NE] @math_exec_fail
+MOVI r6,@math_vec_right
+CMP r5,r6
+JMP[NE] @math_exec_fail
+ST r4,r0,@math_exec_left_ptr
+ST r5,r0,@math_exec_right_ptr
+; Execute the resolved program on the two registered guest payloads.
 MOVI r1,78
-MOVI r2,@math_vec_left
-MOVI r3,@math_vec_right
+LD r2,r0,@math_exec_left_ptr
+LD r3,r0,@math_exec_right_ptr
 MOVI r4,4
 MOVI r5,@math_vec_output
 CALL @nmr_execute
@@ -125,6 +157,11 @@ PUTC r1
 HALT
 .include "math_registry.nas"
 .include "vector_ops.nas"
+.org 20900
+math_exec_left_ptr:
+.word 0
+math_exec_right_ptr:
+.word 0
 .org 21000
 math_vec_left:
 .word 1,2,3,4
