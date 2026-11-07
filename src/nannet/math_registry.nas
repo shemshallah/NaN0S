@@ -700,7 +700,8 @@ CMP r2,r6
 JMP[NE] @nmr_shape_bad
 CMP r3,r0
 JMP[EQ] @nmr_shape_bad
-MOVI r6,16
+; Rank-1 vector dimensions support the same 256-word kernels as MTH.
+MOVI r6,256
 CMP r3,r6
 JMP[GT] @nmr_shape_bad
 CMP r4,r0
