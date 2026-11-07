@@ -256,6 +256,7 @@ JMP[NE] @n16srv_advance_fail
 LD r1,r0,@n16srv_response_len
 MOVI r2,0
 MOVI r3,0
+MOVI r4,0
 JMP @n16srv_done
 
 n16srv_close_reply:
@@ -272,6 +273,7 @@ CMP r3,r0
 JMP[NE] @n16srv_build_fail
 MOVI r2,0
 MOVI r3,0
+MOVI r4,2
 JMP @n16srv_done
 
 n16srv_route_fail:
