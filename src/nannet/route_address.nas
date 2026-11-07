@@ -66,6 +66,7 @@ ADDI r5,r5,1
 ; Object key is a non-empty printable ASCII token without another colon.
 MOVI r2,0
 ST r5,r0,@nmr_addr_tmp_key_ptr
+ST r0,r0,@nmr_addr_op_ptr
 nmr_addr_key_loop:
 LDB r8,r5,0
 CMP r8,r0
@@ -78,7 +79,25 @@ CMP r8,r9
 JMP[GT] @nmr_addr_syntax
 MOVI r9,58
 CMP r8,r9
-JMP[EQ] @nmr_addr_syntax
+JMP[NE] @nmr_addr_key_char
+; The only accepted key terminator is the typed operation marker "::op:".
+LDB r10,r5,1
+CMP r10,r9
+JMP[NE] @nmr_addr_syntax
+MOVI r11,111
+LDB r10,r5,2
+CMP r10,r11
+JMP[NE] @nmr_addr_syntax
+MOVI r11,112
+LDB r10,r5,3
+CMP r10,r11
+JMP[NE] @nmr_addr_syntax
+LDB r10,r5,4
+CMP r10,r9
+JMP[NE] @nmr_addr_syntax
+ST r5,r0,@nmr_addr_op_ptr
+JMP @nmr_addr_key_done
+nmr_addr_key_char:
 ADDI r2,r2,1
 ADDI r5,r5,1
 JMP @nmr_addr_key_loop
@@ -87,6 +106,7 @@ CMP r2,r0
 JMP[EQ] @nmr_addr_key_error
 ADD r1,r7,r0
 LD r4,r0,@nmr_addr_tmp_key_ptr
+LD r5,r0,@nmr_addr_op_ptr
 MOVI r3,0
 LD r15,r0,@nmr_addr_ret
 RET
@@ -113,6 +133,8 @@ nmr_addr_ret:
 nmr_addr_tmp_ptr:
 .word 0
 nmr_addr_tmp_key_ptr:
+.word 0
+nmr_addr_op_ptr:
 .word 0
 .org 18000
 nmr_addr_prefix:
