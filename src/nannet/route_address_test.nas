@@ -157,7 +157,6 @@ MOVI r1,10
 PUTC r1
 HALT
 .include "route_address.nas"
-.include "object_key_decode.nas"
 .org 18100
 addr_valid1:
 .str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1::vector1337"
@@ -171,4 +170,4 @@ addr_bad_sep:
 .str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1:vector1337"
 addr_empty_key:
 .str "nan://GM0:SC0:MC0:BS0:HW0::HW0:1::"
-
+.include "object_key_decode.nas"
