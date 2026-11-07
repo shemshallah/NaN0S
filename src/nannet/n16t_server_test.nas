@@ -142,6 +142,9 @@ JMP[NE] @n16srv_test_fail
 MOVI r7,36
 CMP r1,r7
 JMP[NE] @n16srv_test_fail
+MOVI r8,2
+CMP r4,r8
+JMP[NE] @n16srv_test_fail
 LD r7,r0,@n16s_state
 CMP r7,r0
 JMP[NE] @n16srv_test_fail
