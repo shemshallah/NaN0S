@@ -50,7 +50,8 @@ JMP[NE] @fail
 ; Verify first and final packed keys: (1,1) and (255,255).
 MOVI r9,@pair_map
 LD r10,r9,0
-MOVI r12,65537
+MOVI r12,1
+MOVHI r12,1
 CMP r10,r12
 JMP[NE] @fail
 MOVI r12,32639
