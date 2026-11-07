@@ -10,6 +10,7 @@ ST r1,r0,@nmr_vec_left
 ST r2,r0,@nmr_vec_right
 ST r3,r0,@nmr_vec_dim
 ST r4,r0,@nmr_vec_out
+ST r4,r0,@nmr_vec_out_base
 CMP r1,r0
 JMP[EQ] @nmr_vec_add_bad
 CMP r2,r0
