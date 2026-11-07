@@ -218,6 +218,14 @@ ST r5,r0,@nmr_expr_program
 ST r9,r0,@nmr_expr_exec_dim
 ST r6,r0,@nmr_expr_left_data
 ST r7,r0,@nmr_expr_right_data
+; Reserve one BS0DB page as an execution-budget token. The current allocator
+; accounts quota only; it does not yet return a physical guest-memory pointer.
+MOVI r1,1
+MOVI r2,1
+CALL @mc_scratch_reserve
+CMP r3,r0
+JMP[NE] @nmr_expr_scratch_error
+ST r1,r0,@nmr_expr_scratch_id
 LD r1,r0,@nmr_expr_program
 LD r2,r0,@nmr_expr_left_data
 LD r3,r0,@nmr_expr_right_data
@@ -226,12 +234,32 @@ LD r5,r0,@nmr_expr_exec_out
 CALL @nmr_execute
 ST r1,r0,@nmr_expr_result_ptr
 ST r3,r0,@nmr_expr_status
+; Always release the accounting token, including when the guest kernel fails.
+LD r1,r0,@nmr_expr_scratch_id
+CALL @mc_scratch_release
+CMP r3,r0
+JMP[NE] @nmr_expr_release_error
+LD r3,r0,@nmr_expr_status
 CMP r3,r0
 JMP[NE] @nmr_expr_execute_error
 LD r1,r0,@nmr_expr_out_kind
 LD r2,r0,@nmr_expr_program
 LD r4,r0,@nmr_expr_result_ptr
 MOVI r3,0
+LD r15,r0,@nmr_expr_execute_ret
+RET
+nmr_expr_scratch_error:
+MOVI r1,0
+MOVI r2,0
+MOVI r3,6
+MOVI r4,0
+LD r15,r0,@nmr_expr_execute_ret
+RET
+nmr_expr_release_error:
+MOVI r1,0
+MOVI r2,0
+MOVI r3,7
+MOVI r4,0
 LD r15,r0,@nmr_expr_execute_ret
 RET
 nmr_expr_execute_error:
@@ -282,6 +310,8 @@ nmr_expr_exec_dim:
 nmr_expr_exec_out:
 .word 0
 nmr_expr_result_ptr:
+.word 0
+nmr_expr_scratch_id:
 .word 0
 nmr_expr_status:
 .word 0
