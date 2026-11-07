@@ -105,7 +105,7 @@ JMP[NE] @math_exec_fail
 MOVI r1,701
 MOVI r2,4
 MOVI r3,4
-MOVI r4,1
+MOVI r4,3
 MOVI r5,79
 CALL @nmr_op_put
 CMP r3,r0
@@ -116,7 +116,7 @@ MOVI r3,701
 CALL @nmr_resolve
 CMP r3,r0
 JMP[NE] @math_exec_fail
-MOVI r6,1
+MOVI r6,3
 CMP r1,r6
 JMP[NE] @math_exec_fail
 MOVI r6,79
