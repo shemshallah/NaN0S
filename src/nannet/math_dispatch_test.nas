@@ -16,12 +16,12 @@ MOVI r4,1002
 CALL @nmr_obj_put
 CMP r3,r0
 JMP[NE] @fail
-; dot.v1: vector(4) x vector(4) -> scalar(1), NaN16 guest program 77.
+; dot.v1: vector(4) x vector(4) -> scalar(1), NaN16 guest program 79.
 MOVI r1,701
 MOVI r2,4
 MOVI r3,4
 MOVI r4,1
-MOVI r5,77
+MOVI r5,79
 CALL @nmr_op_put
 CMP r3,r0
 JMP[NE] @fail
@@ -35,7 +35,7 @@ JMP[NE] @fail
 MOVI r7,1
 CMP r1,r7
 JMP[NE] @fail
-MOVI r7,77
+MOVI r7,79
 CMP r2,r7
 JMP[NE] @fail
 ; Re-registering the exact immutable operator is idempotent.
@@ -43,7 +43,7 @@ MOVI r1,701
 MOVI r2,4
 MOVI r3,4
 MOVI r4,1
-MOVI r5,77
+MOVI r5,79
 CALL @nmr_op_put
 CMP r3,r0
 JMP[NE] @fail
@@ -52,7 +52,7 @@ MOVI r1,701
 MOVI r2,4
 MOVI r3,8
 MOVI r4,1
-MOVI r5,77
+MOVI r5,79
 CALL @nmr_op_put
 MOVI r7,5
 CMP r3,r7
