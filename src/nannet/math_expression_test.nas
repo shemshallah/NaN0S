@@ -44,21 +44,37 @@ SHL r1,r1,2
 MOVI r2,4
 MOVI r3,@expr_output
 CALL @nmr_expr_execute
+ST r3,r0,@expr_dbg_status
+ST r1,r0,@expr_dbg_kind
+ST r2,r0,@expr_dbg_program
+ST r4,r0,@expr_dbg_ptr
+MOVI r1,97
+ST r1,r0,@expr_stage
 CMP r3,r0
 JMP[NE] @expr_fail
+MOVI r1,98
+ST r1,r0,@expr_stage
 MOVI r6,3
 CMP r1,r6
 JMP[NE] @expr_fail
+MOVI r1,99
+ST r1,r0,@expr_stage
 MOVI r6,79
 CMP r2,r6
 JMP[NE] @expr_fail
+MOVI r1,100
+ST r1,r0,@expr_stage
 MOVI r6,@expr_output
 CMP r4,r6
 JMP[NE] @expr_fail
+MOVI r1,101
+ST r1,r0,@expr_stage
 LD r7,r6,0
 MOVI r8,300
 CMP r7,r8
 JMP[NE] @expr_fail
+MOVI r1,102
+ST r1,r0,@expr_stage
 MOVI r1,50
 ST r1,r0,@expr_stage
 ; A route without ::op: is not an executable expression.
@@ -128,6 +144,14 @@ MOVI r1,76
 PUTC r1
 LD r1,r0,@expr_stage
 PUTC r1
+LD r1,r0,@expr_dbg_status
+ADDI r1,r1,48
+PUTC r1
+LD r1,r0,@expr_dbg_kind
+ADDI r1,r1,48
+PUTC r1
+LD r1,r0,@expr_dbg_program
+PUTC r1
 MOVI r1,10
 PUTC r1
 HALT
@@ -140,6 +164,14 @@ HALT
 .org 22990
 expr_stage:
 .word 48
+expr_dbg_status:
+.word 0
+expr_dbg_kind:
+.word 0
+expr_dbg_program:
+.word 0
+expr_dbg_ptr:
+.word 0
 .org 23000
 expr_vec_left:
 .word 1,2,3,4
