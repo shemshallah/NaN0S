@@ -74,18 +74,20 @@ ST r8,r4,3
 ADDI r7,r7,1
 ST r7,r0,@mc_next_id
 LD r8,r0,@mc_tmp_pool
-CMP r8,r0
-JMP[NE] @mc_reserve_add_mc
-LD r8,r0,@mc_bs_used
-LD r9,r0,@mc_tmp_pages
-ADD r8,r8,r9
-ST r8,r0,@mc_bs_used
-JMP @mc_reserve_add_total
+MOVI r11,1
+CMP r8,r11
+JMP[EQ] @mc_reserve_add_bs
 mc_reserve_add_mc:
 LD r8,r0,@mc_mc_used
 LD r9,r0,@mc_tmp_pages
 ADD r8,r8,r9
 ST r8,r0,@mc_mc_used
+JMP @mc_reserve_add_total
+mc_reserve_add_bs:
+LD r8,r0,@mc_bs_used
+LD r9,r0,@mc_tmp_pages
+ADD r8,r8,r9
+ST r8,r0,@mc_bs_used
 mc_reserve_add_total:
 LD r8,r0,@mc_total_used
 LD r9,r0,@mc_tmp_pages
@@ -147,6 +149,10 @@ SUB r9,r9,r10
 ST r9,r0,@mc_mc_used
 JMP @mc_release_total
 mc_release_bs:
+LD r9,r0,@mc_bs_used
+LD r10,r4,2
+SUB r9,r9,r10
+ST r9,r0,@mc_bs_used
 mc_release_total:
 LD r9,r0,@mc_total_used
 LD r10,r4,2
