@@ -507,7 +507,8 @@ CMP r5,r0
 JMP[EQ] @nmr_shape_bad
 ; Verify capacity for the requested stride.
 LD r6,r0,@nmr_shape_dim
-SUBI r6,r6,1
+MOVI r9,1
+SUB r6,r6,r9
 LD r7,r0,@nmr_shape_stride
 MUL r6,r6,r7
 ADDI r6,r6,1
@@ -630,7 +631,8 @@ nmr_shape_get_found:
 LD r1,r4,1
 LD r2,r4,2
 LD r3,r4,3
-LD r4,r4,4
+LD r8,r4,4
+ADD r4,r8,r0
 MOVI r5,0
 LD r15,r0,@nmr_shape_get_ret
 RET
