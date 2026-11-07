@@ -26,8 +26,6 @@ CMP r1,r7
 JMP[NE] @n16srv_test_fail
 CMP r3,r0
 JMP[NE] @n16srv_test_fail
-MOVI r1,65
-PUTC r1
 
 ; The server ABI validates/routes HELLO and builds CAPABILITIES in NaN16.
 MOVI r1,@n16srv_test_request
@@ -41,19 +39,10 @@ MOVI r6,@n16srv_test_server_session
 SHL r6,r6,2
 CALL @n16_server_exchange_impl
 CMP r3,r0
-JMP[EQ] @n16srv_test_server_ok
-MOVI r1,48
-ADD r1,r1,r3
-PUTC r1
-MOVI r1,68
-PUTC r1
-JMP @n16srv_test_fail
-n16srv_test_server_ok:
+JMP[NE] @n16srv_test_fail
 MOVI r7,44
 CMP r1,r7
 JMP[NE] @n16srv_test_fail
-MOVI r1,66
-PUTC r1
 LD r7,r0,@n16s_state
 MOVI r8,2
 CMP r7,r8
@@ -61,8 +50,6 @@ JMP[NE] @n16srv_test_fail
 LD r7,r0,@n16a_send_seq
 CMP r7,r8
 JMP[NE] @n16srv_test_fail
-MOVI r1,67
-PUTC r1
 
 ; Replaying the same HELLO must be denied without consuming another sequence.
 MOVI r1,@n16srv_test_request
@@ -78,8 +65,6 @@ CALL @n16_server_exchange_impl
 MOVI r7,3
 CMP r3,r7
 JMP[NE] @n16srv_test_fail
-MOVI r1,68
-PUTC r1
 
 ; Validate the server response in the guest after resetting only the inbound
 ; replay cursor. This proves the emitted CRC, session, sequence and payload.
@@ -96,8 +81,6 @@ JMP[NE] @n16srv_test_fail
 MOVI r7,8
 CMP r2,r7
 JMP[NE] @n16srv_test_fail
-MOVI r1,69
-PUTC r1
 MOVI r4,@n16srv_test_response
 SHL r4,r4,2
 ADDI r4,r4,32
@@ -126,8 +109,6 @@ JMP[NE] @n16srv_test_fail
 LDB r7,r4,7
 CMP r7,r0
 JMP[NE] @n16srv_test_fail
-MOVI r1,70
-PUTC r1
 
 ; CLOSE is routed by the guest, resets its session, and returns a guest-built
 ; terminal CLOSE frame. No host-side frame parsing or CRC generation occurs.
@@ -164,8 +145,6 @@ JMP[NE] @n16srv_test_fail
 LD r7,r0,@n16s_state
 CMP r7,r0
 JMP[NE] @n16srv_test_fail
-MOVI r1,71
-PUTC r1
 
 ; PASS
 MOVI r1,78
@@ -178,21 +157,15 @@ MOVI r1,32
 PUTC r1
 MOVI r1,83
 PUTC r1
-MOVI r1,69
-PUTC r1
 MOVI r1,82
 PUTC r1
 MOVI r1,86
-PUTC r1
-MOVI r1,69
 PUTC r1
 MOVI r1,82
 PUTC r1
 MOVI r1,32
 PUTC r1
 MOVI r1,80
-PUTC r1
-MOVI r1,65
 PUTC r1
 MOVI r1,83
 PUTC r1
@@ -213,21 +186,13 @@ MOVI r1,32
 PUTC r1
 MOVI r1,83
 PUTC r1
-MOVI r1,69
-PUTC r1
 MOVI r1,82
 PUTC r1
 MOVI r1,86
 PUTC r1
-MOVI r1,69
-PUTC r1
 MOVI r1,82
 PUTC r1
 MOVI r1,32
-PUTC r1
-MOVI r1,70
-PUTC r1
-MOVI r1,65
 PUTC r1
 MOVI r1,73
 PUTC r1
