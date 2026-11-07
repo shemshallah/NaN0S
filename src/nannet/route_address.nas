@@ -1,6 +1,6 @@
 ; Canonical NaN route-address parser (guest-owned).
 ; ABI: r1=byte address of NUL-terminated route string.
-; Returns r1=logical point (1..255), r2=object-key byte length, r3=status.
+; Returns r1=logical point (1..255), r2=object-key byte length, r3=status, r4=object-key byte pointer.
 ; Status: 0 success, 1 malformed syntax, 2 reserved/out-of-range point, 3 empty key.
 nmr_addr_parse:
 ST r15,r0,@nmr_addr_ret
@@ -65,6 +65,7 @@ JMP[NE] @nmr_addr_syntax
 ADDI r5,r5,1
 ; Object key is a non-empty printable ASCII token without another colon.
 MOVI r2,0
+ST r5,r0,@nmr_addr_tmp_key_ptr
 nmr_addr_key_loop:
 LDB r8,r5,0
 CMP r8,r0
@@ -85,6 +86,7 @@ nmr_addr_key_done:
 CMP r2,r0
 JMP[EQ] @nmr_addr_key_error
 ADD r1,r7,r0
+LD r4,r0,@nmr_addr_tmp_key_ptr
 MOVI r3,0
 LD r15,r0,@nmr_addr_ret
 RET
@@ -109,6 +111,8 @@ RET
 nmr_addr_ret:
 .word 0
 nmr_addr_tmp_ptr:
+.word 0
+nmr_addr_tmp_key_ptr:
 .word 0
 .org 18000
 nmr_addr_prefix:
