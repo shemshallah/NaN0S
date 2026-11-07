@@ -172,6 +172,7 @@ ST r2,r0,@nmr_expr_exec_dim
 ST r3,r0,@nmr_expr_exec_out
 LD r1,r0,@nmr_expr_input
 CALL @nmr_expr_resolve
+ST r8,r0,@nmr_expr_status
 CMP r8,r0
 JMP[NE] @nmr_expr_execute_error
 ST r4,r0,@nmr_expr_out_kind
@@ -185,6 +186,7 @@ LD r4,r0,@nmr_expr_exec_dim
 LD r5,r0,@nmr_expr_exec_out
 CALL @nmr_execute
 ST r1,r0,@nmr_expr_result_ptr
+ST r3,r0,@nmr_expr_status
 CMP r3,r0
 JMP[NE] @nmr_expr_execute_error
 LD r1,r0,@nmr_expr_out_kind
@@ -196,10 +198,7 @@ RET
 nmr_expr_execute_error:
 MOVI r1,0
 MOVI r2,0
-CMP r3,r0
-JMP[NE] @nmr_expr_exec_keep_status
 LD r3,r0,@nmr_expr_status
-nmr_expr_exec_keep_status:
 MOVI r4,0
 LD r15,r0,@nmr_expr_execute_ret
 RET
