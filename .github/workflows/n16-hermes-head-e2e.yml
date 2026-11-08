@@ -38,12 +38,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: shemshallah/NaNROUTER
-          ref: c45d46f05fcd8db3c35b119fe01cb7cdaee468ae
+          ref: 738d715ff2f4001ec6702af22277802b83b1ccce
           path: router
       - uses: actions/checkout@v4
         with:
           repository: shemshallah/NaNLMind_HERMES
-          ref: fb0bb48e3431a4936805df913fbceb312efe9d80
+          ref: e7b2edadefa27146067493157ae3053bcd7e4082
           path: hermes
       - uses: actions/setup-python@v5
         with:
@@ -63,7 +63,7 @@ jobs:
             src/nannet/n16_head_worker.nas > "$GITHUB_WORKSPACE/nan0s/head.nan"
           test -s head.nan
           test -s head.labels
-      - name: Execute signed lease, double native revision, durable chart and pack
+      - name: Execute real signed multi-head revisions, CAS races, durable chart and pack
         working-directory: router
         env:
           PYTHONPATH: ${{ github.workspace }}/router:${{ github.workspace }}/hermes
