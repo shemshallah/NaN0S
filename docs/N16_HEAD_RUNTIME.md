@@ -1,0 +1,9 @@
+# Native head runtime attachment / counter learning
+
+This implements a **guest-native scratch learning primitive**, not a general language model. `n16_head_runtime.nas` attaches an already formatted `NH_WORDS=67838` word bank to one NaN16 process, then exposes `nhr_read` and `nhr_observe`. `nhr_observe` performs the bounded native read/modify/commit through the two-slot guest bank; **head 0 is reserved for NANNET0**. The 128 feature counts per head are empirical learning signals only; no approval, proof, MTH dispatch, native neural weight update, or global NANNET merge is inferred from their increase.
+
+There is no destructive auto-initialize on attach. The VM caller must allocate **542,704 bytes** of nonoverlapping RAM plus a 1 KiB staging buffer, explicitly call `nh_format` for a new bank, and subsequently `nhr_attach`. Existing banks always use `nh_open`, preserving previous valid generations and rejecting malformed headers. A valid prior generation survives a torn newest publish, and the next update is based on that recovered prior generation. The guest is non-reentrant.
+
+The 8 MiB HERMES chart can store this bank as **raw bytes** in an independent extension region. Byte layout and outer SHA-256 persistence are responsibilities of the chart transport, not an alternate implementation of the NaN16 selection/checksum logic. No host-side counter manipulation is permitted. Native execution needs a real guest attached to its reserved bank; calling a host metadata inspector is not an attachment.
+
+Run `sh tools/n16_head_runtime_gate.sh`. The fixture executes the native guest in nan_cli, exercises head 1 and 255, class nibble preservation, detach/reattach, invalid requests, and corrupt newest-slot recovery. The storage-only test remains independently runnable with `sh tools/n16_head_store_gate.sh`.
