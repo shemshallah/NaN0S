@@ -74,6 +74,22 @@ fill:
   CMP r6,r7
   JMP[NE] @fail
 
+  ; Unsafe source/destination pointers inside the head bank are denied.
+  MOVI r1,16384
+  MOVI r2,1
+  MOVI r3,16397
+  CALL @nh_put
+  MOVI r6,1
+  CMP r5,r6
+  JMP[NE] @fail
+  MOVI r1,16384
+  MOVI r2,1
+  MOVI r3,16397
+  CALL @nh_get
+  MOVI r6,1
+  CMP r5,r6
+  JMP[NE] @fail
+
   ; Head 255 must be independent, including upper index boundary.
   LA r6,0xFEED
   MOVI r7,4096
