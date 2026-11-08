@@ -56,20 +56,30 @@ main:
   MOVI r1,1
   MOVI r2,8192
   CALL @nhr_read
+  MOVI r10,97
+  ST r10,r0,@diag
   CMP r5,r0
   JMP[NE] @fail
   MOVI r7,2
+  MOVI r10,98
+  ST r10,r0,@diag
   CMP r6,r7
   JMP[NE] @fail
   LD r7,r0,8204
   MOVI r8,5
+  MOVI r10,99
+  ST r10,r0,@diag
   CMP r7,r8
   JMP[NE] @fail
   LDN r7,r0,8204
   MOVI r8,6
+  MOVI r10,100
+  ST r10,r0,@diag
   CMP r7,r8
   JMP[NE] @fail
   LD r7,r0,8205
+  MOVI r10,101
+  ST r10,r0,@diag
   CMP r7,r0
   JMP[NE] @fail
 
