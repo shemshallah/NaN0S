@@ -100,7 +100,8 @@ fill:
 
   ; Head 1 second generation, without changing head 255.
   LA r6,0xDEAD
-  STW r6,r0,4096
+  MOVI r7,4096
+  STW r6,r7,r11
   MOVI r1,16384
   MOVI r2,1
   MOVI r3,4096
