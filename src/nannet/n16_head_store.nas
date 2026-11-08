@@ -104,6 +104,12 @@ nh_buffer_bad:
   RET
 
 nh_open:
+  MOVI r6,4096
+  CMP r1,r6
+  JMP[LT] @nh_open_bad
+  LA r6,0x00300000
+  CMP r1,r6
+  JMP[GT] @nh_open_bad
   LA r4,#NH_MAGIC
   LD r5,r1,0
   CMP r5,r4
