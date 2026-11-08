@@ -76,7 +76,8 @@ fill:
 
   ; Head 255 must be independent, including upper index boundary.
   LA r6,0xFEED
-  STW r6,r0,4096
+  MOVI r7,4096
+  STW r6,r7,r11
   MOVI r1,16384
   MOVI r2,255
   MOVI r3,4096
@@ -125,7 +126,8 @@ fill:
 
   ; Corrupt generation 2 raw payload: guest checksum must fall back to gen1.
   LA r6,0xBAD
-  STW r6,r0,16530
+  MOVI r7,16530
+  STW r6,r7,r11
   MOVI r1,16384
   MOVI r2,1
   MOVI r3,8192
