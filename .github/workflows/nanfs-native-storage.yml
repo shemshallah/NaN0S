@@ -1,0 +1,24 @@
+name: native-nanfs-storage
+on:
+  pull_request:
+    paths:
+      - 'src/lib/nanfs.nas'
+      - 'src/tests/nanfs*'
+      - 'tools/nanfs_storage_gate.sh'
+      - '.github/workflows/nanfs-native-storage.yml'
+  push:
+    paths:
+      - 'src/lib/nanfs.nas'
+      - 'src/tests/nanfs*'
+      - 'tools/nanfs_storage_gate.sh'
+      - '.github/workflows/nanfs-native-storage.yml'
+  workflow_dispatch:
+
+jobs:
+  native-store:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and run genuine NaN16 NaNFS guests
+        run: sh tools/nanfs_storage_gate.sh
