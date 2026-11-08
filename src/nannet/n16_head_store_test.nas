@@ -225,6 +225,13 @@ fill:
   CMP r5,r6
   JMP[NE] @fail
 
+  ; Memory-mask aliasing must not reopen the same bank at another base.
+  LA r1,0x00404000
+  CALL @nh_open
+  MOVI r6,1
+  CMP r5,r6
+  JMP[NE] @fail
+
   MOVI r1,@passed
   CALL @puts
   HALT
