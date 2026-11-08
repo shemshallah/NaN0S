@@ -260,6 +260,11 @@ MOVI r12,8448
 ST r5,r12,0
 ST r6,r12,1
 ST r8,r12,2
+; Preserve the END byte address before schedule_index overwrites r4 with
+; the permutation result. The prior scrub compared against a sample index
+; (0..record_count) and silently skipped clearing the corpus region.
+; r14 is free after strict UTF-8 completion and untouched by the scheduler.
+ADDI r14,r4,0
 ; The count-based byte model is order-independent. Record the exact guest
 ; epoch-1 sample permutation as candidate metadata so runner and Android
 ; can verify the same schedule before a future order-sensitive trainer uses it.
@@ -283,6 +288,8 @@ JMP @schedule_audit_loop
 schedule_audit_done:
 MOVI r12,8456
 ST r8,r12,0
+; Restore the original scan terminator byte pointer, not the final draw index.
+ADDI r4,r14,0
 ; Clear the original corpus bytes before any candidate checkpoint is exported.
 MOVI r2,49152
 clear_corpus:
