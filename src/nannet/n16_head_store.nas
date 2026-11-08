@@ -20,7 +20,9 @@
 ;   nh_get:    r1=base,r2=head,r3=destination (128 NaN16 words)
 ;              -> r4=generation, r5=0 success,1 invalid,2 not committed
 ; No failed get copies ANY destination bytes; prior slot survives torn publish.
-; Destination/source cannot alias bank storage. No concurrent guest callers.
+; Source/destination spans cannot alias bank storage. Generation is capped
+; at 0x7fffffff so guest signed CMP preserves chronological ordering.
+; No concurrent guest callers.
 .equ NH_MAGIC 0x4E485331
 .equ NH_SLOT_MAGIC 0x4E484431
 .equ NH_COMMIT 0x434D5431
@@ -71,6 +73,35 @@ nh_format_bad:
   RET
 nh_format_ret:
   .word 0
+
+; Validate a 128-word staging span against the reserved head bank.
+; r1=base, r3=span pointer -> r5=0 safe or 1 invalid.
+nh_buffer_safe:
+  MOVI r6,4096
+  CMP r3,r6
+  JMP[LT] @nh_buffer_bad
+  LA r6,#NH_WORDS
+  ADD r7,r1,r6
+  CMP r3,r1
+  JMP[LT] @nh_buffer_before
+  CMP r3,r7
+  JMP[LT] @nh_buffer_bad
+  ; Destination follows the bank; stay within canonical VM guest memory.
+  ADDI r8,r3,128
+  LA r9,0x00400000
+  CMP r8,r9
+  JMP[GT] @nh_buffer_bad
+  JMP @nh_buffer_ok
+nh_buffer_before:
+  ADDI r8,r3,128
+  CMP r8,r1
+  JMP[GT] @nh_buffer_bad
+nh_buffer_ok:
+  MOVI r5,0
+  RET
+nh_buffer_bad:
+  MOVI r5,1
+  RET
 
 nh_open:
   LA r4,#NH_MAGIC
@@ -134,7 +165,7 @@ nh_valid:
   JMP[NE] @nh_valid_bad
   LD r7,r1,2
   CMP r7,r0
-  JMP[EQ] @nh_valid_bad
+  JMP[LE] @nh_valid_bad
   LA r6,#NH_COMMIT
   LD r7,r1,4
   CMP r7,r6
@@ -238,6 +269,9 @@ nh_epoch:
 nh_put:
   ST r15,r0,@nh_put_ret
   ST r3,r0,@nh_put_source
+  CALL @nh_buffer_safe
+  CMP r5,r0
+  JMP[NE] @nh_put_bad
   CALL @nh_choose
   CMP r5,r0
   JMP[NE] @nh_put_bad
@@ -245,7 +279,7 @@ nh_put:
   CMP r3,r6
   JMP[EQ] @nh_put_first
   ; Reject exhausted version counter; never reuse generation zero.
-  LA r6,0xFFFFFFFF
+  LA r6,0x7FFFFFFF
   CMP r4,r6
   JMP[EQ] @nh_put_exhausted
   LD r6,r0,@nh_slot0
@@ -307,6 +341,9 @@ nh_put_epoch:
 nh_get:
   ST r15,r0,@nh_get_ret
   ST r3,r0,@nh_get_target
+  CALL @nh_buffer_safe
+  CMP r5,r0
+  JMP[NE] @nh_get_bad
   CALL @nh_choose
   CMP r5,r0
   JMP[NE] @nh_get_bad
