@@ -14,8 +14,8 @@ The five decimal coordinates are each 0..255:
 - GM: global mesh
 - SC: supercluster
 - MC: macrocluster
-- BS: bootstrap universe
-- HW: hardware endpoint within that bootstrap universe
+- BS: shared bootstrap routing/control domain (BS0:0 is its runner-ring NANNET port)
+- HW: hardware node within that bootstrap; never a runner ID or a local computational head
 
 Initial assignments in GM0/SC0/MC0/BS0:
 
@@ -25,6 +25,10 @@ Initial assignments in GM0/SC0/MC0/BS0:
 | 1 | Android / NaNLMind_android | 2 |
 | 2 | Hermes | 3 |
 | 3 | Clocked | 4 |
+| 4 | **WordNet universe — reserved** | 5 |
+| 5–255 | Available for NANNET registration, later NaNROUTER allocation | 6–256 |
+
+BS0:0 is the shared NANNET network port for the one BS0 runner ring. HW0:0 is its separate root hardware-node coordinate. R0–R5 / BSR0–BSR5 are internal workers under BS0:0, **not** HW4–HW8 reservations. Each of BS1–BS255 has its own separate hardware-node addressing domain.
 
 HWn maps to local overbootstrap node point n+1. This preserves the existing
 NaN16 `ob_point_to_page` interface, which accepts local points 1..256.
@@ -35,7 +39,8 @@ Clocked remains HW3 for now. It may later participate in a macrocluster or
 cooperative corpus process with Android and Hermes without changing its
 historical endpoint identity.
 
-## Transport and authority
+HW4 must never be handed to a generic device: it is the fixed WordNet universe. Only HW5–HW255 are open for registration in BS0.
+\n## Transport and authority
 
 The Koyeb NANNET HTTPS origin is a replaceable transport ingress. It is not the
 NaN address and must not be encoded as a fixed IPv4 address. A bearer token is
