@@ -5,16 +5,12 @@ JMP @main
 .include "n16_head_runtime.nas"
 main:
   MOVI r13,1
-  MOVI r10,65
-  ST r10,r0,@diag
   ; Unformatted banks may never be attached.
   MOVI r1,16384
   CALL @nhr_attach
   MOVI r7,1
   CMP r5,r7
   JMP[NE] @fail
-  MOVI r10,66
-  ST r10,r0,@diag
   MOVI r1,16384
   CALL @nh_format
   CMP r5,r0
@@ -24,8 +20,6 @@ main:
   CMP r5,r0
   JMP[NE] @fail
 
-  MOVI r10,67
-  ST r10,r0,@diag
   ; Virgin head 1, feature 12 -> 3; no host-side score calculation.
   MOVI r1,1
   MOVI r2,12
@@ -38,8 +32,6 @@ main:
   CMP r6,r7
   JMP[NE] @fail
 
-  MOVI r10,68
-  ST r10,r0,@diag
   ; Second generation -> 5; distinct feature remains zero.
   MOVI r1,1
   MOVI r2,12
@@ -51,40 +43,26 @@ main:
   MOVI r7,2
   CMP r6,r7
   JMP[NE] @fail
-  MOVI r10,69
-  ST r10,r0,@diag
   MOVI r1,1
   MOVI r2,8192
   CALL @nhr_read
-  MOVI r10,97
-  ST r10,r0,@diag
   CMP r5,r0
   JMP[NE] @fail
   MOVI r7,2
-  MOVI r10,98
-  ST r10,r0,@diag
   CMP r6,r7
   JMP[NE] @fail
   LD r7,r0,8204
   MOVI r8,5
-  MOVI r10,99
-  ST r10,r0,@diag
   CMP r7,r8
   JMP[NE] @fail
   LDN r7,r0,8204
   MOVI r8,6
-  MOVI r10,100
-  ST r10,r0,@diag
   CMP r7,r8
   JMP[NE] @fail
   LD r7,r0,8205
-  MOVI r10,101
-  ST r10,r0,@diag
   CMP r7,r0
   JMP[NE] @fail
 
-  MOVI r10,70
-  ST r10,r0,@diag
   ; Head 255 is independent of head 1.
   MOVI r1,255
   MOVI r2,12
@@ -103,8 +81,6 @@ main:
   CMP r7,r8
   JMP[NE] @fail
 
-  MOVI r10,71
-  ST r10,r0,@diag
   ; Native stale-slot recovery: corrupt head 1's newest commit marker.
   ST r0,r0,16529
   MOVI r1,1
@@ -120,8 +96,6 @@ main:
   CMP r7,r8
   JMP[NE] @fail
 
-  MOVI r10,72
-  ST r10,r0,@diag
   ; Recovery resumes from generation 1, then republishes generation 2.
   MOVI r1,1
   MOVI r2,12
@@ -143,8 +117,6 @@ main:
   CMP r7,r8
   JMP[NE] @fail
 
-  MOVI r10,73
-  ST r10,r0,@diag
   ; A reserved point, invalid feature and bank alias cannot mutate a head.
   MOVI r1,0
   MOVI r2,12
@@ -171,8 +143,6 @@ main:
   CMP r5,r7
   JMP[NE] @fail
 
-  MOVI r10,74
-  ST r10,r0,@diag
   CALL @nhr_detach
   MOVI r1,1
   MOVI r2,8192
@@ -180,8 +150,6 @@ main:
   MOVI r7,1
   CMP r5,r7
   JMP[NE] @fail
-  MOVI r10,75
-  ST r10,r0,@diag
   ; Reattachment is non-destructive.
   MOVI r1,16384
   CALL @nhr_attach
@@ -201,10 +169,6 @@ main:
   CALL @puts
   HALT
 fail:
-  LD r1,r0,@diag
-  PUTC r1
-  MOVI r1,10
-  PUTC r1
   MOVI r1,@failed
   CALL @puts
   HALT
@@ -228,5 +192,3 @@ passed:
 failed:
   .str "N16 HEAD RUNTIME FAIL\n"
 
-diag:
-  .word 0
