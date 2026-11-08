@@ -120,8 +120,10 @@ nhr_obs_loaded:
   SUB r10,r10,r7
   CMP r9,r10
   JMP[GT] @nhr_obs_exhausted
+  ; Preserve the input word's four-class NaN face during counter updates.
+  LDN r11,r8,0
   ADD r9,r9,r7
-  ST r9,r8,0
+  STW r9,r8,r11
   LD r1,r0,@nhr_attached_base
   LD r2,r0,@nhr_head
   LD r3,r0,@nhr_stage
