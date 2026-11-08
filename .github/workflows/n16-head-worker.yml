@@ -1,0 +1,27 @@
+name: native-nan16-head-worker-image
+on:
+  push:
+    paths:
+      - 'src/nannet/n16_head_worker.nas'
+      - 'src/nannet/n16_head_runtime.nas'
+      - 'src/nannet/n16_head_store.nas'
+      - 'tools/n16_head_worker_gate.sh'
+      - '.github/workflows/n16-head-worker.yml'
+  pull_request:
+    paths:
+      - 'src/nannet/n16_head_worker.nas'
+      - 'src/nannet/n16_head_runtime.nas'
+      - 'src/nannet/n16_head_store.nas'
+      - 'tools/n16_head_worker_gate.sh'
+      - '.github/workflows/n16-head-worker.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  guest-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble guest, verify labels and execute no-request HALT
+        run: sh tools/n16_head_worker_gate.sh
