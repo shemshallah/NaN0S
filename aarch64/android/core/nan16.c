@@ -87,6 +87,62 @@ uint32_t nan_reg(const nan_vm *v, int i) { return v->r[i & 15]; }
 uint32_t nan_pc(const nan_vm *v) { return v->pc; }
 uint64_t nan_word(const nan_vm *v, uint32_t i) { return v->mem[i & M]; }
 void nan_set_word(nan_vm *v, uint32_t i, uint64_t raw) { v->mem[i & M] = raw; }
+/* Host boundary: pack external bytes into NaN16 data words for guest LDB.
+   Corpus interpretation and all training decisions remain in the guest. */
+int nan_write_bytes(nan_vm *v, uint32_t byte_address, const uint8_t *data, size_t len) {
+  if (!v || (!data && len)) return -1;
+  const uint64_t cap = (uint64_t)NAN_WORDS * 4u;
+  if ((uint64_t)byte_address > cap || (uint64_t)len > cap - byte_address) return -1;
+  for (size_t i = 0; i < len; ++i) {
+    uint64_t at = (uint64_t)byte_address + i;
+    uint32_t wi = (uint32_t)(at >> 2);
+    uint32_t shift = (uint32_t)(at & 3u) * 8u;
+    uint32_t payload = (uint32_t)(v->mem[wi] >> 16);
+    payload = (payload & ~(0xFFu << shift)) | ((uint32_t)data[i] << shift);
+    v->mem[wi] = nan_mkword(payload, 10);
+  }
+  return 0;
+}
+int nan_read_bytes(const nan_vm *v, uint32_t byte_address, uint8_t *out, size_t len) {
+  if (!v || (!out && len)) return -1;
+  const uint64_t cap = (uint64_t)NAN_WORDS * 4u;
+  if ((uint64_t)byte_address > cap || (uint64_t)len > cap - byte_address) return -1;
+  for (size_t i = 0; i < len; ++i) {
+    uint64_t at = (uint64_t)byte_address + i;
+    uint32_t wi = (uint32_t)(at >> 2);
+    uint32_t shift = (uint32_t)(at & 3u) * 8u;
+    out[i] = (uint8_t)(((uint32_t)(v->mem[wi] >> 16) >> shift) & 0xFFu);
+  }
+  return 0;
+}
+
+/* Raw class-bearing NaN16 guest-memory transport, NOT corpus-byte injection.
+   Each 8-byte word is copied unchanged (both NaN faces, payload, endianness).
+   This API does not interpret words or decide a head's validity/generation:
+   the native nh_open/nh_get/nh_put guest code remains the sole authority.
+   Reject entire out-of-range spans before writing any byte; no wraparound. */
+static int nan_raw_words_bounds(const nan_vm *v, uint32_t first_word,
+                                size_t word_count, const void *buffer) {
+  if (!v || (!buffer && word_count)) return -1;
+  if (first_word > NAN_WORDS || word_count > NAN_WORDS - (size_t)first_word) return -1;
+  /* Canonical NaN16 raw words are little-endian, supported by ARM/x86. */
+  const uint16_t one = 1;
+  if (*(const uint8_t *)&one != 1) return -1;
+  return 0;
+}
+int nan_write_words_raw(nan_vm *v, uint32_t first_word,
+                        const uint8_t *raw_words, size_t word_count) {
+  if (nan_raw_words_bounds(v, first_word, word_count, raw_words)) return -1;
+  if (word_count) memcpy(v->mem + first_word, raw_words, word_count * 8u);
+  return 0;
+}
+int nan_read_words_raw(const nan_vm *v, uint32_t first_word,
+                       uint8_t *out, size_t word_count) {
+  if (nan_raw_words_bounds(v, first_word, word_count, out)) return -1;
+  if (word_count) memcpy(out, v->mem + first_word, word_count * 8u);
+  return 0;
+}
+
 void nan_set_reg(nan_vm *v, int i, uint32_t x) { v->r[i & 15] = x; }
 void nan_set_pc(nan_vm *v, uint32_t pc) { v->pc = pc; v->halted = 0; }
 int nan_flags(const nan_vm *v) { return v->k; }

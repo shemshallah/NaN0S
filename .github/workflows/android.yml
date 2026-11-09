@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Build the current NaN16 system image and APK assets
+        working-directory: .
+        run: sh tools/build.sh
       - run: make test
       - run: make seals
       - run: make asan
@@ -23,6 +26,22 @@ jobs:
           sh tools/ngate_boot.sh || exit 1
           sh tools/settings_gate.sh || exit 1
           sh tools/nannet_service_gate.sh || exit 1
+          sh tools/n16_train_gate.sh || exit 1
+          sh tools/mirror_pair_gate.sh || exit 1
+          sh tools/math_registry_gate.sh || exit 1
+          sh tools/boolean_bootstrap_gate.sh || exit 1
+          sh tools/runner_task_gate.sh || exit 1
+          sh tools/runner_ring_integration_gate.sh || exit 1
+          sh tools/route_address_gate.sh || exit 1
+          sh tools/object_key_decode_gate.sh || exit 1
+          sh tools/route_object_resolve_gate.sh || exit 1
+          sh tools/mc0db_scratch_gate.sh || exit 1
+          sh tools/mc0_feedback_gate.sh || exit 1
+          sh tools/math_dispatch_gate.sh || exit 1
+          sh tools/math_execute_gate.sh || exit 1
+          sh tools/math_expression_gate.sh || exit 1
+          sh tools/overbootstrap_route_gate.sh || exit 1
+          sh tools/train_protocol_gate.sh || exit 1
           sh tools/cart_page_gate.sh || exit 1
           sh tools/browser_gate.sh || exit 1
           rc=0; sh tools/nic_gate.sh || rc=$?; if [ "$rc" -ne 0 ] && [ "$rc" -ne 77 ]; then exit "$rc"; fi

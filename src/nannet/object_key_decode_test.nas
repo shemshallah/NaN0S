@@ -1,0 +1,112 @@
+; Object-key decoder tests; key bytes are supplied directly.
+main:
+MOVI r1,@key_vector
+SHL r1,r1,2
+MOVI r2,10
+CALL @nmr_key_decode
+CMP r3,r0
+JMP[NE] @key_fail
+MOVI r5,4
+CMP r1,r5
+JMP[NE] @key_fail
+MOVI r5,1337
+CMP r2,r5
+JMP[NE] @key_fail
+MOVI r1,@key_hyper
+SHL r1,r1,2
+MOVI r2,12
+CALL @nmr_key_decode
+CMP r3,r0
+JMP[NE] @key_fail
+MOVI r5,8
+CMP r1,r5
+JMP[NE] @key_fail
+MOVI r5,42
+CMP r2,r5
+JMP[NE] @key_fail
+MOVI r1,@key_zero
+SHL r1,r1,2
+MOVI r2,7
+CALL @nmr_key_decode
+MOVI r5,2
+CMP r3,r5
+JMP[NE] @key_fail
+MOVI r1,@key_unknown
+SHL r1,r1,2
+MOVI r2,8
+CALL @nmr_key_decode
+MOVI r5,1
+CMP r3,r5
+JMP[NE] @key_fail
+MOVI r1,@key_overflow
+SHL r1,r1,2
+MOVI r2,11
+CALL @nmr_key_decode
+MOVI r5,2
+CMP r3,r5
+JMP[NE] @key_fail
+MOVI r1,75
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,89
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,67
+PUTC r1
+MOVI r1,79
+PUTC r1
+MOVI r1,68
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,80
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,83
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+key_fail:
+MOVI r1,75
+PUTC r1
+MOVI r1,69
+PUTC r1
+MOVI r1,89
+PUTC r1
+MOVI r1,32
+PUTC r1
+MOVI r1,70
+PUTC r1
+MOVI r1,65
+PUTC r1
+MOVI r1,73
+PUTC r1
+MOVI r1,76
+PUTC r1
+MOVI r1,10
+PUTC r1
+HALT
+.include "object_key_decode.nas"
+.org 18400
+key_vector:
+.str "vector1337"
+key_hyper:
+.str "hypergraph42"
+key_zero:
+.str "vector0"
+key_unknown:
+.str "matrix42"
+key_overflow:
+.str "vector10000"

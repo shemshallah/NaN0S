@@ -1,0 +1,23 @@
+name: native-nan16-head-scratch
+on:
+  push:
+    paths:
+      - 'src/nannet/n16_head_store*.nas'
+      - 'tools/n16_head_store_gate.sh'
+      - '.github/workflows/n16-head-scratch.yml'
+  pull_request:
+    paths:
+      - 'src/nannet/n16_head_store*.nas'
+      - 'tools/n16_head_store_gate.sh'
+      - '.github/workflows/n16-head-scratch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-head-bank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble and execute native NaN16 head scratch guest
+        run: sh tools/n16_head_store_gate.sh

@@ -16,6 +16,13 @@ class NanVm : AutoCloseable {
     /** returns the detected kind ("floppy", "nan-text", "words", "state") or null if the data is not a NaN16 program */
     fun load(data: ByteArray): String? = synchronized(lock) { if (h == 0L) null else NanNative.load(h, data) }
     fun reset() = synchronized(lock) { if (h != 0L) NanNative.reset(h) }
+    fun writeBytes(address: Int, data: ByteArray): Boolean = synchronized(lock) { h != 0L && NanNative.writeBytes(h, address, data) }
+    fun readBytes(address: Int, length: Int): ByteArray? = synchronized(lock) { if (h == 0L) null else NanNative.readBytes(h, address, length) }
+    fun register(index: Int): Int = synchronized(lock) { if (h == 0L) 0 else NanNative.getReg(h, index) }
+    fun setRegister(index: Int, value: Int) = synchronized(lock) { if (h != 0L) NanNative.setReg(h, index, value) }
+    fun setProgramCounter(pc: Int) = synchronized(lock) { if (h != 0L && pc >= 0) NanNative.setPc(h, pc) }
+    fun stageNetworkFrame(address: Int, frame: ByteArray): Boolean = synchronized(lock) { h != 0L && NanNative.stageNetworkFrame(h, address, frame) }
+    fun extractNetworkFrame(address: Int, length: Int): ByteArray? = synchronized(lock) { if (h == 0L) null else NanNative.extractNetworkFrame(h, address, length) }
     fun run(steps: Int): Int = synchronized(lock) { if (h == 0L) HALTED else NanNative.run(h, steps) }
     fun setTime(ms: Int) = synchronized(lock) { if (h != 0L) NanNative.setTime(h, ms) }
     fun keyChar(c: Int) = synchronized(lock) { if (h != 0L) NanNative.keyChar(h, c) }

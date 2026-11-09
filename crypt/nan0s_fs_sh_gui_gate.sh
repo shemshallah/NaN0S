@@ -1,6 +1,5 @@
 #!/bin/sh
-# GUI launch gate: desktop terminal command f hands off to the VGA nsh cart
-# (slot 10), which lists and writes the encrypted nan0s_fs volume.
+# GUI launch gate: desktop terminal's `f` command opens the VGA nsh cart.
 set -e; cd "$(dirname "$0")/.."; export LC_ALL=C
 T="${TMPDIR:-/tmp}/nan0sfsguigate.$$"; mkdir -p "$T"; trap 'rm -rf "$T"' EXIT
 IMG=build/nan0s.img
@@ -22,7 +21,7 @@ grep -q '^FILE hello.txt start=00000002 sectors=00000001 size=0000000F$' "$T/ls.
 grep -q '^LS OK files=00000001$' "$T/ls.out" || { echo "nan0s_fs GUI gate: FAIL (ls status)"; exit 1; }
 
 # Settings subprogram path: museum menu 9 -> Settings [4] STORAGE -> nsh.
-S='@3000000,ESC,@1500000,9,@700000,4,@5000000,l,s,ENTER'
+S='@3000000,f,ENTER,@5000000,l,s,ENTER'
 aarch64/android/nan_cli --img "$IMG" --disk "$T/fs.img" --steps 150000000 \
   --keys "$S" --dump-text > "$T/settings.out" 2>/dev/null
 grep -q '^nsh> ls$' "$T/settings.out" || { echo "nan0s_fs GUI gate: FAIL (settings storage)"; head -8 "$T/settings.out"; exit 1; }

@@ -992,8 +992,8 @@ MOVI r1,4
 CALL @gui_single
 JMP @tm_done
 tm_net:
-MOVI r1,5
-CALL @gui_single
+MOVI r1,7
+CALL @gui_open_new
 JMP @tm_done
 tm_utl:
 MOVI r1,6
@@ -1020,7 +1020,7 @@ RET
 tm_id:
 .word 0
 s_help:
-.str "h c v w b l m x t s n u f q\nb browser l lattice m monitor x hex\nt term w count c clear v ver\ns settings n nannet u utils\nf files (nsh) q quit gui\n"
+.str "h c v w b l m x t s n u f q\nb browser l lattice m monitor x hex\nt term w count c clear v ver\ns settings n browser u utils\nf files (nsh) q quit gui\n"
 s_ver:
 .str "NaN/0S GUI r26\npure NaN16 wm\n"
 s_wins:

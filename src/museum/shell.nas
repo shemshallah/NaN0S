@@ -276,9 +276,6 @@ BOOL.8 r1,r1,r4
 MOVI r4,115
 CMP r1,r4
 JMP[EQ] @sh_sys
-MOVI r4,0x7E
-CMP r1,r4
-JMP[EQ] @sh_curator
 MOVI r4,27
 CMP r1,r4
 JMP[EQ] @sh_redraw
@@ -524,7 +521,7 @@ cu_foot:
 
 ; ---- Data ----
 sh_banner:
-.str " NaN/0S  MUSEUM OF COMPUTING  (exhibit cartridges)  v40          "
+.str " NaN/0S  SYSTEM  -  NaN16                                           "
 sh_more:
 .str " PAGE "
 sh_btab:
@@ -588,15 +585,6 @@ sm_key:
   MOVI r4,50
   CMP r1,r4
   JMP[EQ] @sm_net
-  MOVI r4,51
-  CMP r1,r4
-  JMP[EQ] @sm_disk
-  MOVI r4,52
-  CMP r1,r4
-  JMP[EQ] @sm_mem
-  MOVI r4,53
-  CMP r1,r4
-  JMP[EQ] @sm_cpu
   JMP @sm_key
 sm_settings:
   MOVI r1,@st_title
@@ -698,9 +686,9 @@ sh_visidx:
 sm_title:
 .str " NaN/0S  SYSTEM"
 sm_body:
-.str " [1] SETTINGS\n [2] NANNET SERVICE\n [3] DISK UTILITY\n [4] MEMORY UTILITY\n [5] CPU / ARCHITECTURE\n\n ESC returns to the museum."
+.str " [1] SETTINGS\n [2] NANNET / BROWSER\n\n ESC returns to the main menu."
 sm_foot:
-.str "NaN/0S SYSTEM  1-5 open  ESC shell"
+.str "NaN/0S SYSTEM  1-2 open  ESC main menu"
 sys_foot:
 .str "NaN/0S  any key returns to the system menu"
 st_title:

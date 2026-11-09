@@ -1,0 +1,65 @@
+name: NaN16 Android transport tests
+
+on:
+  push:
+    paths:
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/N16HttpsTransport.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/N16GuestProtocol.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/N16RemoteSession.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/MainActivity.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/NanNative.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/NanVm.kt"
+      - "aarch64/android/app/src/main/cpp/**"
+      - "aarch64/android/jni/**"
+      - "src/nannet/n16t_android_*.nas"
+      - "src/nannet/train_protocol.nas"
+      - "src/nannet/train_protocol_test.nas"
+      - "src/nannet/n16t_server_test.nas"
+      - "aarch64/android/app/src/test/**"
+      - "aarch64/android/app/build.gradle.kts"
+      - ".github/workflows/n16-android-transport-tests.yml"
+  pull_request:
+    paths:
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/N16HttpsTransport.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/N16GuestProtocol.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/N16RemoteSession.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/MainActivity.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/NanNative.kt"
+      - "aarch64/android/app/src/main/java/org/nan0s/vm/NanVm.kt"
+      - "aarch64/android/app/src/main/cpp/**"
+      - "aarch64/android/jni/**"
+      - "src/nannet/n16t_android_*.nas"
+      - "src/nannet/train_protocol.nas"
+      - "src/nannet/train_protocol_test.nas"
+      - "src/nannet/n16t_server_test.nas"
+      - "aarch64/android/app/src/test/**"
+      - "aarch64/android/app/build.gradle.kts"
+      - ".github/workflows/n16-android-transport-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  transport-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "8.9"
+      - name: Build native NaN16 guest runner
+        run: make -C aarch64/android nan_cli
+      - name: Assemble and execute the N16T server handshake guest
+        shell: bash
+        run: |
+          set -euo pipefail
+          awk -f tools/nmk.awk -v CMD=emit src/nannet/n16t_server_test.nas > /tmp/n16t-server-test.nan
+          aarch64/android/nan_cli --img /tmp/n16t-server-test.nan --steps 3000000 --serial | tee /tmp/n16t-server-test.out
+          grep -q '^N16 SERVER PASS' /tmp/n16t-server-test.out
+      - name: Run N16 HTTPS transport unit tests and package APK
+        run: gradle --no-daemon -p aarch64/android :app:testDebugUnitTest :app:assembleDebug

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "../core/nan16.h"
+#include "../core/nan_net_driver.h"
 
 #define VM(h) ((nan_vm *)(intptr_t)(h))
 #define FN(n) Java_org_nan0s_vm_NanNative_##n
@@ -19,6 +20,50 @@ JNIEXPORT jstring JNICALL FN(load)(JNIEnv *e, jclass c, jlong h, jbyteArray data
   const char *kind = ""; int rc = nan_load_auto(VM(h), (const uint8_t *)p, (size_t)n, &kind);
   (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
   return rc == 0 ? (*e)->NewStringUTF(e, kind) : NULL;
+}
+JNIEXPORT jbyteArray JNICALL FN(readBytes)(JNIEnv *e, jclass c, jlong h, jint address, jint length) {
+  (void)c; if (address < 0 || length < 0 || length > 1048576) return NULL;
+  jbyteArray out = (*e)->NewByteArray(e, length); if (!out) return NULL;
+  if (length == 0) return out;
+  jbyte *buf = (jbyte *)malloc((size_t)length);
+  if (!buf) return NULL;
+  int rc = nan_read_bytes(VM(h), (uint32_t)address, (uint8_t *)buf, (size_t)length);
+  if (rc == 0) (*e)->SetByteArrayRegion(e, out, 0, length, buf);
+  free(buf);
+  return rc == 0 ? out : NULL;
+}
+JNIEXPORT jboolean JNICALL FN(stageNetworkFrame)(JNIEnv *e, jclass c, jlong h, jint address, jbyteArray data) {
+  (void)c; if (!data || address < 0) return JNI_FALSE;
+  jsize n = (*e)->GetArrayLength(e, data);
+  jbyte *p = (*e)->GetByteArrayElements(e, data, NULL); if (!p) return JNI_FALSE;
+  int rc = nan_net_stage_frame(VM(h), (uint32_t)address, (const uint8_t *)p, (size_t)n);
+  (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
+  return rc == 0 ? JNI_TRUE : JNI_FALSE;
+}
+JNIEXPORT jbyteArray JNICALL FN(extractNetworkFrame)(JNIEnv *e, jclass c, jlong h, jint address, jint length) {
+  (void)c; if (address < 0 || length < 36 || length > (jint)NAN_NET_MAX_FRAME) return NULL;
+  uint8_t *buf = (uint8_t *)malloc((size_t)length); if (!buf) return NULL;
+  int rc = nan_net_extract_frame(VM(h), (uint32_t)address, buf, (size_t)length, (size_t)length);
+  jbyteArray out = NULL;
+  if (rc == 0) { out = (*e)->NewByteArray(e, length); if (out) (*e)->SetByteArrayRegion(e, out, 0, length, (const jbyte *)buf); }
+  free(buf); return out;
+}
+JNIEXPORT jboolean JNICALL FN(writeBytes)(JNIEnv *e, jclass c, jlong h, jint address, jbyteArray data) {
+  (void)c; if (!data || address < 0) return JNI_FALSE;
+  jsize n = (*e)->GetArrayLength(e, data);
+  jbyte *p = (*e)->GetByteArrayElements(e, data, NULL); if (!p) return JNI_FALSE;
+  int rc = nan_write_bytes(VM(h), (uint32_t)address, (const uint8_t *)p, (size_t)n);
+  (*e)->ReleaseByteArrayElements(e, data, p, JNI_ABORT);
+  return rc == 0 ? JNI_TRUE : JNI_FALSE;
+}
+JNIEXPORT jint JNICALL FN(getReg)(JNIEnv *e, jclass c, jlong h, jint index) {
+  (void)e; (void)c; return (jint)nan_reg(VM(h), index);
+}
+JNIEXPORT void JNICALL FN(setReg)(JNIEnv *e, jclass c, jlong h, jint index, jint value) {
+  (void)e; (void)c; nan_set_reg(VM(h), index, (uint32_t)value);
+}
+JNIEXPORT void JNICALL FN(setPc)(JNIEnv *e, jclass c, jlong h, jint pc) {
+  (void)e; (void)c; if (pc >= 0) nan_set_pc(VM(h), (uint32_t)pc);
 }
 JNIEXPORT jint JNICALL FN(run)(JNIEnv *e, jclass c, jlong h, jint steps) { (void)e; (void)c; return nan_run(VM(h), steps > 0 ? (uint32_t)steps : 0u); }
 JNIEXPORT void JNICALL FN(setTime)(JNIEnv *e, jclass c, jlong h, jint ms) { (void)e; (void)c; nan_set_time_ms(VM(h), (uint32_t)ms); }

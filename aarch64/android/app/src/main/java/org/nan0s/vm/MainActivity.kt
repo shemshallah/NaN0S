@@ -21,6 +21,10 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
 import java.io.File
+import java.net.URI
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 
 /** Thin shell: one NanVm, one run thread, the display view, a key row and a few buttons. Everything NaN16 lives in the C core. */
 class MainActivity : Activity(), NanLoop.Listener {
@@ -32,7 +36,15 @@ class MainActivity : Activity(), NanLoop.Listener {
     private val reqImage = 1
     private val reqDisk = 2
     private val reqWifi = 3
+    private val reqTrain = 4
+    private val reqCandidate = 5
+    @Volatile private var trainingActive = false
+    @Volatile private var remoteSession: N16RemoteSession? = null
+    @Volatile private var remoteConnectGeneration = 0
+    private var trainingState: ByteArray? = null
+    private val remotePrefs get() = getSharedPreferences("n16_remote", MODE_PRIVATE)
     private val autosave get() = File(filesDir, "autosave.nan1")
+    private val candidateFile get() = File(filesDir, "n16_candidate.nan1")
     private val diskFile get() = File(filesDir, "disk.nanfs")
     private val fsFile get() = File(filesDir, "nan0s_fs.img")
     private val fsKey get() = File(filesDir, "nan0s_fs.key")
@@ -154,7 +166,237 @@ class MainActivity : Activity(), NanLoop.Listener {
         row.addView(btn("Fit") { view.resetZoom() })
         row.addView(btn("Log") { showLog() })
         row.addView(btn("WiFi") { showWifi() })
+        row.addView(btn("NaNLMind Remote Training") { showTrainingSuite() })
+        row.addView(btn("N16T Gateway") { showRemoteGateway() })
         return HorizontalScrollView(this).apply { addView(row) }
+    }
+
+    private fun showRemoteGateway() {
+        val input = EditText(this).apply {
+            hint = "https://gateway.example/n16t"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+            setText(remotePrefs.getString("endpoint", "") ?: "")
+        }
+        val tokenInput = EditText(this).apply {
+            hint = "NANNET endpoint token (not a GitHub token)"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            isSaveEnabled = false
+            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
+        }
+        val fields = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 8, 24, 0)
+            addView(input)
+            addView(tokenInput)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("N16T HTTPS Gateway")
+            .setMessage(
+                "Connect the persistent NaN16 protocol guest. The endpoint token is scoped to this device and is held only for this connection. " +
+                    "No GitHub token is requested or stored."
+            )
+            .setView(fields)
+            .setPositiveButton("Connect") { _, _ ->
+                connectRemoteGateway(input.text.toString().trim(), tokenInput.text.toString().trim())
+            }
+            .setNeutralButton("Disconnect") { _, _ -> disconnectRemoteGateway() }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun connectRemoteGateway(raw: String, bearerToken: String) {
+        val endpoint = try { URI(raw) } catch (e: Exception) {
+            Toast.makeText(this, "Invalid gateway URL", Toast.LENGTH_LONG).show()
+            return
+        }
+        if (endpoint.scheme != "https" || endpoint.host.isNullOrBlank() ||
+            endpoint.userInfo != null || endpoint.fragment != null) {
+            Toast.makeText(this, "Use an HTTPS URL without embedded credentials or fragments", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        if (bearerToken.length !in 32..512) {
+            Toast.makeText(this, "A scoped NANNET endpoint token is required", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val generation = remoteConnectGeneration + 1
+        remoteConnectGeneration = generation
+        remoteSession?.close()
+        remoteSession = null
+        val session = try { N16RemoteSession(this, endpoint, bearerToken) } catch (e: Exception) {
+            Toast.makeText(this, "Could not initialize NaN16 protocol guest: ${e.message}", Toast.LENGTH_LONG).show()
+            return
+        }
+        remotePrefs.edit().putString("endpoint", endpoint.toString()).apply()
+        Toast.makeText(this, "Connecting to N16T gateway…", Toast.LENGTH_SHORT).show()
+
+        Thread {
+            try {
+                // HELLO's two-byte route prefix selects the Runner portal (point 1).
+                val result = session.exchange(1, byteArrayOf(1, 0))
+                runOnUiThread {
+                    if (generation != remoteConnectGeneration || isFinishing || isDestroyed) {
+                        session.close()
+                    } else {
+                        remoteSession = session
+                        Toast.makeText(
+                            this,
+                            "N16T HELLO/CAPABILITIES accepted; route ${result.route.gateway}/${result.route.interfaceId}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                session.close()
+                runOnUiThread {
+                    if (generation == remoteConnectGeneration) {
+                        Toast.makeText(this, "N16T gateway handshake failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    private fun disconnectRemoteGateway() {
+        remoteConnectGeneration++
+        val active = remoteSession
+        remoteSession = null
+        if (active == null) {
+            Toast.makeText(this, "No active N16T session", Toast.LENGTH_SHORT).show()
+            return
+        }
+        Thread {
+            try { active.closeRemote() } catch (_: Exception) { }
+            active.close()
+            runOnUiThread {
+                Toast.makeText(this, "N16T session disconnected", Toast.LENGTH_SHORT).show()
+            }
+        }.start()
+    }
+
+    private fun showTrainingSuite() {
+        AlertDialog.Builder(this)
+            .setTitle("NaNLMind Remote Training")
+            .setMessage("Run the NaN16 corpus trainer in an isolated VM snapshot. It builds a temporary byte-bigram candidate; merging into the active universe is not enabled yet. Use N16T Gateway for the HTTPS HELLO/CAPABILITIES check; remote corpus transfer is not enabled yet.")
+            .setPositiveButton("Choose TXT") { _, _ ->
+                if (prepareTraining()) {
+                    val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "text/plain"
+                    }
+                    startActivityForResult(i, reqTrain)
+                }
+            }
+            .setNeutralButton("Run sample") { _, _ ->
+                if (prepareTraining()) Thread { runTraining(null) }.start()
+            }
+            .setNegativeButton("Export candidate") { _, _ ->
+                if (!candidateFile.isFile) {
+                    Toast.makeText(this, "Run a successful corpus first", Toast.LENGTH_SHORT).show()
+                } else {
+                    val export = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/octet-stream"
+                        putExtra(Intent.EXTRA_TITLE, "n16_candidate.nan1")
+                    }
+                    startActivityForResult(export, reqCandidate)
+                }
+            }
+            .show()
+    }
+
+    private fun prepareTraining(): Boolean {
+        if (trainingActive) return false
+        loop.paused = true
+        val saved = vm.saveState()
+        if (saved == null) {
+            loop.paused = false
+            loop.rearm()
+            Toast.makeText(this, "Could not snapshot the active universe", Toast.LENGTH_LONG).show()
+            return false
+        }
+        trainingState = saved
+        // Never leave an older candidate exportable after a new run is started.
+        candidateFile.delete()
+        trainingActive = true
+        return true
+    }
+
+    private fun readCorpus(uri: android.net.Uri): ByteArray {
+        val out = ByteArrayOutputStream()
+        contentResolver.openInputStream(uri)!!.use { input ->
+            val buffer = ByteArray(8192)
+            while (true) {
+                val n = input.read(buffer)
+                if (n < 0) break
+                if (out.size() + n > 1_048_576) throw IllegalArgumentException("TXT corpus exceeds 1 MiB")
+                out.write(buffer, 0, n)
+            }
+        }
+        val raw = out.toByteArray()
+        if (raw.any { it.toInt() == 0 }) throw IllegalArgumentException("TXT corpus contains a NUL byte")
+        Charsets.UTF_8.newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(raw))
+        return raw
+    }
+
+    private fun runTraining(raw: ByteArray?) {
+        var result = "Training failed"
+        try {
+            val guest = assets.open("n16_train.nan").use { it.readBytes() }
+            if (vm.load(guest) == null) throw IllegalStateException("NaN16 training guest did not load")
+            val sample = "NaN16 owns the corpus codec.\nRunner and Android share one trainer.\nA temporary candidate is built and the active universe is restored afterward.\n".toByteArray(Charsets.UTF_8)
+            val corpus = raw ?: sample
+            val header = "N16TXT/1\n".toByteArray(Charsets.US_ASCII)
+            val crlfHeader = "N16TXT/1\r\n".toByteArray(Charsets.US_ASCII)
+            val hasLfHeader = corpus.size >= header.size && corpus.copyOfRange(0, header.size).contentEquals(header)
+            val hasCrlfHeader = corpus.size >= crlfHeader.size && corpus.copyOfRange(0, crlfHeader.size).contentEquals(crlfHeader)
+            val bodyOffset = if (hasCrlfHeader) crlfHeader.size else if (hasLfHeader) header.size else 0
+            val framed = header + corpus.copyOfRange(bodyOffset, corpus.size)
+            if (!vm.writeBytes(49152, framed + byteArrayOf(0))) {
+                throw IllegalStateException("Could not transfer corpus into NaN16 memory")
+            }
+            var rc = NanVm.BUDGET
+            var rounds = 0
+            while (rc == NanVm.BUDGET && rounds < 5000) {
+                rc = vm.run(100_000)
+                rounds++
+            }
+            val transcript = String(vm.serial(), Charsets.UTF_8).trim()
+            if (rc == NanVm.HALTED && transcript.contains("N16 TRAIN PASS")) {
+                val candidate = vm.saveState()
+                    ?: throw IllegalStateException("Could not snapshot NaN16 candidate")
+                candidateFile.writeBytes(candidate)
+            }
+            result = when {
+                rc != NanVm.HALTED -> "Training stopped before completion (VM result $rc)"
+                transcript.contains("N16 TRAIN PASS") -> "$transcript\nTemporary byte-bigram candidate saved locally; active universe restored."
+                transcript.contains("N16 TRAIN REJECT") -> "$transcript\nCorpus rejected; active universe restored unchanged."
+                else -> "Training guest halted without a success marker: $transcript"
+            }
+        } catch (e: Exception) {
+            result = "Training failed: ${e.message}"
+        }
+        finishTraining(result)
+    }
+
+    private fun finishTraining(message: String) {
+        val saved = trainingState
+        trainingState = null
+        trainingActive = false
+        val restored = saved != null && vm.restoreState(saved)
+        loop.paused = false
+        loop.rearm()
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("NaNLMind Remote Training")
+                .setMessage(if (restored) message else "$message\nWarning: the previous VM snapshot could not be restored.")
+                .setPositiveButton("Close", null)
+            dialog.show()
+        }
     }
 
     // ---- real WiFi: status, scan, connect request ----
@@ -234,6 +476,34 @@ class MainActivity : Activity(), NanLoop.Listener {
     @Deprecated("kept to avoid an androidx dependency")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == reqTrain) {
+            val uri = data?.data
+            if (resultCode != RESULT_OK || uri == null) {
+                finishTraining("Training cancelled")
+                return
+            }
+            Thread {
+                try { runTraining(readCorpus(uri)) }
+                catch (e: Exception) { finishTraining("Training failed: ${e.message}") }
+            }.start()
+            return
+        }
+        if (requestCode == reqCandidate) {
+            val uri = data?.data ?: return
+            if (resultCode != RESULT_OK) return
+            Thread {
+                val copied = try {
+                    val output = contentResolver.openOutputStream(uri)
+                        ?: throw IllegalStateException("Could not open export destination")
+                    output.use { candidateFile.inputStream().use { input -> input.copyTo(it) } }
+                    true
+                } catch (_: Exception) { false }
+                runOnUiThread {
+                    Toast.makeText(this, if (copied) "Candidate exported" else "Candidate export failed", Toast.LENGTH_LONG).show()
+                }
+            }.start()
+            return
+        }
         val uri = data?.data ?: return
         if (resultCode != RESULT_OK) return
         Thread {
@@ -276,14 +546,17 @@ class MainActivity : Activity(), NanLoop.Listener {
     override fun onPause() {
         super.onPause()
         loop.paused = true; beeper.muted = true
-        vm.saveState()?.let { try { autosave.writeBytes(it) } catch (e: Exception) { } }
+        if (!trainingActive) vm.saveState()?.let { try { autosave.writeBytes(it) } catch (e: Exception) { } }
     }
     override fun onResume() {
         super.onResume()
-        loop.paused = false; beeper.muted = false; loop.poke(); view.invalidate()
+        loop.paused = trainingActive; beeper.muted = false; loop.poke(); view.invalidate()
     }
     override fun onDestroy() {
         super.onDestroy()
+        remoteConnectGeneration++
+        remoteSession?.close()
+        remoteSession = null
         loop.shutdown(); beeper.shutdown()
         try { loop.join(1000) } catch (e: InterruptedException) { }
         vm.detachDisk()

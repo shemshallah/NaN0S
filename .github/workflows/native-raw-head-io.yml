@@ -1,0 +1,27 @@
+name: native-class-preserving-raw-head-io
+on:
+  push:
+    paths:
+      - 'aarch64/android/core/nan16.c'
+      - 'aarch64/android/core/nan16.h'
+      - 'aarch64/android/tests/test_core.c'
+      - 'tools/n16_raw_head_gate.sh'
+      - '.github/workflows/native-raw-head-io.yml'
+  pull_request:
+    paths:
+      - 'aarch64/android/core/nan16.c'
+      - 'aarch64/android/core/nan16.h'
+      - 'aarch64/android/tests/test_core.c'
+      - 'tools/n16_raw_head_gate.sh'
+      - '.github/workflows/native-raw-head-io.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  raw-words:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build portable VM and run the class-face raw transport regression
+        run: sh tools/n16_raw_head_gate.sh

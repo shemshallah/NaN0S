@@ -17,3 +17,8 @@ host.jar
 # local work areas
 staging/
 INCORPORATEANDDELETE/
+
+# private local suite
+**/nannetsuite/
+
+aarch64/android/app/src/main/assets/n16_train.nan
