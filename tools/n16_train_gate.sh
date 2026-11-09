@@ -42,7 +42,7 @@ test "$(sed -n '15p' "$tmp/out")" = '00000003' || {
 # with status sequence 0,1,0,1. Requesting nine steps must fail without
 # overwriting the fixed eight-word output buffer. -1 must be rejected too.
 printf 'N16TXT/1\nAB\nAB\nAB\n' > "$tmp/chain-corpus.txt"
-if ! aarch64/android/nan_cli --nannet-train "$tmp/chain-corpus.txt" --serial \\
+if ! aarch64/android/nan_cli --nannet-train "$tmp/chain-corpus.txt" --serial \
     --peek 8463:6,8470:4,8478:4,81920:3 > "$tmp/chain.out"; then
   cat "$tmp/chain.out"
   echo "native bounded completion invocation failed"
