@@ -37,6 +37,37 @@ test "$(sed -n '13p' "$tmp/out")" = '00000001' || {
 test "$(sed -n '15p' "$tmp/out")" = '00000003' || {
   echo "out-of-range completion context was accepted"; cat "$tmp/out"; exit 1;
 }
+# Real guest multi-step completion: A->B uses the bigram, then B->A
+# backs off to the tied (lowest-byte) unigram. Repeating AB must yield BABA
+# with status sequence 0,1,0,1. Requesting nine steps must fail without
+# overwriting the fixed eight-word output buffer. -1 must be rejected too.
+printf 'N16TXT/1\\nAB\\nAB\\nAB\\n' > "$tmp/chain-corpus.txt"
+if ! aarch64/android/nan_cli --nannet-train "$tmp/chain-corpus.txt" --serial \\
+    --peek 8463:6,8470:4,8478:4,81920:3 > "$tmp/chain.out"; then
+  cat "$tmp/chain.out"
+  echo "native bounded completion invocation failed"
+  exit 1
+fi
+if ! awk '
+  BEGIN {
+    expected[1]="N16 TRAIN PASS";
+    expected[2]="00000004"; expected[3]="00000000";
+    expected[4]="00000000"; expected[5]="00000001";
+    expected[6]="00000000"; expected[7]="00000003";
+    expected[8]="00000042"; expected[9]="00000041";
+    expected[10]="00000042"; expected[11]="00000041";
+    expected[12]="00000000"; expected[13]="00000001";
+    expected[14]="00000000"; expected[15]="00000001";
+    expected[16]="00000000"; expected[17]="00000000";
+    expected[18]="00000000";
+  }
+  { if ($0 != expected[NR]) bad=1 }
+  END { if (bad || NR != 18) exit 1 }
+' "$tmp/chain.out"; then
+  echo "native BABA completion, fallback, bounds, or scrub regression"
+  cat "$tmp/chain.out"
+  exit 1
+fi
 # Prove the model/data layout under an input bigger than the old 16 KiB
 # overlap boundary. All 700 records must survive and every native AB bigram
 # must accumulate; neither buffer writes nor corpus scrubbing may erase them.
