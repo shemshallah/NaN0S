@@ -299,6 +299,19 @@ STB r0,r2,0
 ADDI r2,r2,1
 JMP @clear_corpus
 corpus_cleared:
+; Exercise the same callable NaN16 inference ABI that a later guest
+; completion interface can use. This stores evidence, not a generated text.
+MOVI r1,65
+CALL @predict_next
+MOVI r12,8457
+ST r4,r12,0
+ST r5,r12,1
+; Byte 255 is unseen in this bounded ASCII sample: require real backoff.
+MOVI r1,255
+CALL @predict_next
+MOVI r12,8459
+ST r4,r12,0
+ST r5,r12,1
 ; report success on COM1
 MOVI r1,78
 PUTC r1
@@ -383,6 +396,72 @@ schedule_invalid:
 MOVI r5,1
 MOVI r4,0
 RET
+; Native count-based next-byte completion, callable from a persisted trainer
+; image without creating another model or relying on a host opcode handler.
+; ABI: r1=previous byte (0..255).
+;      r4=best next byte; r5=0 bigram,1 unigram fallback,
+;         2 no learned counts,3 invalid previous byte.
+; Deterministic lowest-byte tie break, no record-crossing bigrams.
+; All counts and choices remain inside the NaN16 guest.
+predict_next:
+MOVI r6,256
+CMP r1,r6
+JMP[GE] @predict_invalid
+SHL r6,r1,8
+MOVI r7,16384
+ADD r6,r6,r7
+MOVI r7,0
+MOVI r8,0
+MOVI r4,0
+predict_bigram:
+LD r9,r6,0
+CMP r9,r8
+JMP[GT] @predict_bigram_best
+predict_bigram_advance:
+ADDI r6,r6,1
+ADDI r7,r7,1
+MOVI r10,256
+CMP r7,r10
+JMP[LT] @predict_bigram
+CMP r8,r0
+JMP[EQ] @predict_fallback
+MOVI r5,0
+RET
+predict_bigram_best:
+ADDI r8,r9,0
+ADDI r4,r7,0
+JMP @predict_bigram_advance
+predict_fallback:
+MOVI r6,8192
+MOVI r7,0
+MOVI r8,0
+MOVI r4,0
+predict_unigram:
+LD r9,r6,0
+CMP r9,r8
+JMP[GT] @predict_unigram_best
+predict_unigram_advance:
+ADDI r6,r6,1
+ADDI r7,r7,1
+MOVI r10,256
+CMP r7,r10
+JMP[LT] @predict_unigram
+CMP r8,r0
+JMP[EQ] @predict_empty
+MOVI r5,1
+RET
+predict_unigram_best:
+ADDI r8,r9,0
+ADDI r4,r7,0
+JMP @predict_unigram_advance
+predict_empty:
+MOVI r5,2
+RET
+predict_invalid:
+MOVI r4,0
+MOVI r5,3
+RET
+
 .org 8192
 freq:
 .word 0
@@ -393,6 +472,11 @@ prev_byte:
 .word 0
 prev_valid:
 .word 0
+.org 8456
+; Schedule digest, next byte for 'A', prediction status, unseen-context
+; backoff byte and status. These are observable candidate diagnostics.
+prediction_probe:
+.word 0,0,0,0,0
 .org 12288
 corpus:
 .str "N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n"
