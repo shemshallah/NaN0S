@@ -6,7 +6,7 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir -p "$tmp"
 printf 'N16TXT/1\nAB N16_GATE_UNIQUE_CORPUS_MARKER_7F31.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n' > "$tmp/corpus.txt"
 make -s -C aarch64/android nan_cli
-if ! aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --candidate-out "$tmp/candidate.nan1" --peek 8448:3,33090:1,12288:3,8456:1 > "$tmp/out"; then cat "$tmp/out"; echo "trainer invocation failed"; exit 1; fi
+if ! aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --candidate-out "$tmp/candidate.nan1" --peek 8448:3,33090:1,12288:3,8456:1,8457:6 > "$tmp/out"; then cat "$tmp/out"; echo "trainer invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/out" || { cat "$tmp/out"; exit 1; }
 test -s "$tmp/candidate.nan1" || { echo "candidate checkpoint was not written"; exit 1; }
 if grep -a -q 'N16_GATE_UNIQUE_CORPUS_MARKER_7F31' "$tmp/candidate.nan1"; then echo "candidate checkpoint retained raw corpus text"; exit 1; fi
@@ -22,6 +22,21 @@ if ! awk 'NR >= 6 && NR <= 8 { if ($0 != "00000000") bad=1; seen++ }
   cat "$tmp/out"
   exit 1
 fi
+# NaN16 predictor: "AB" is the deterministic lowest-byte tied A-context
+# completion in this corpus; unseen byte 255 must back off to the unigram,
+# while previous byte 256 must fail before reading any table entry.
+test "$(sed -n '10p' "$tmp/out")" = '00000042' || {
+  echo "native A -> B completion failed"; cat "$tmp/out"; exit 1;
+}
+test "$(sed -n '11p' "$tmp/out")" = '00000000' || {
+  echo "seen-context completion did not use the bigram"; cat "$tmp/out"; exit 1;
+}
+test "$(sed -n '13p' "$tmp/out")" = '00000001' || {
+  echo "unseen-context unigram backoff failed"; cat "$tmp/out"; exit 1;
+}
+test "$(sed -n '15p' "$tmp/out")" = '00000003' || {
+  echo "out-of-range completion context was accepted"; cat "$tmp/out"; exit 1;
+}
 if ! aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"; then cat "$tmp/sample.out"; echo "sample invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/sample.out" || { cat "$tmp/sample.out"; exit 1; }
 sh tools/nannet-train.sh > "$tmp/launcher.out"
