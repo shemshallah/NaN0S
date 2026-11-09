@@ -12,6 +12,16 @@ test -s "$tmp/candidate.nan1" || { echo "candidate checkpoint was not written"; 
 if grep -a -q 'N16_GATE_UNIQUE_CORPUS_MARKER_7F31' "$tmp/candidate.nan1"; then echo "candidate checkpoint retained raw corpus text"; exit 1; fi
 grep -qx '00000001' "$tmp/out" || { echo "candidate bigram count missing"; cat "$tmp/out"; exit 1; }
 grep -qx '0B86B768' "$tmp/out" || { echo "deterministic trainer schedule digest mismatch"; cat "$tmp/out"; exit 1; }
+# --peek emits: PASS line, three stats, one bigram count, then the first
+# three corpus words (12288:3), then the schedule audit digest. The candidate
+# exporter may omit the input region entirely, so its marker-absence test is
+# NOT evidence that NaN16 scrubbed the source bytes from live guest memory.
+if ! awk 'NR >= 6 && NR <= 8 { if ($0 != "00000000") bad=1; seen++ }
+          END { if (bad || seen != 3) exit 1 }' "$tmp/out"; then
+  echo "native NaN16 corpus input remained in guest memory after training"
+  cat "$tmp/out"
+  exit 1
+fi
 if ! aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"; then cat "$tmp/sample.out"; echo "sample invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/sample.out" || { cat "$tmp/sample.out"; exit 1; }
 sh tools/nannet-train.sh > "$tmp/launcher.out"
