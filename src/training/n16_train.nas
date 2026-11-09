@@ -312,6 +312,12 @@ CALL @predict_next
 MOVI r12,8459
 ST r4,r12,0
 ST r5,r12,1
+; An out-of-range context must refuse inference instead of indexing RAM.
+MOVI r1,256
+CALL @predict_next
+MOVI r12,8461
+ST r4,r12,0
+ST r5,r12,1
 ; report success on COM1
 MOVI r1,78
 PUTC r1
@@ -476,7 +482,7 @@ prev_valid:
 ; Schedule digest, next byte for 'A', prediction status, unseen-context
 ; backoff byte and status. These are observable candidate diagnostics.
 prediction_probe:
-.word 0,0,0,0,0
+.word 0,0,0,0,0,0,0
 .org 12288
 corpus:
 .str "N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n"
