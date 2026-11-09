@@ -6,14 +6,14 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir -p "$tmp"
 printf 'N16TXT/1\nAB N16_GATE_UNIQUE_CORPUS_MARKER_7F31.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n' > "$tmp/corpus.txt"
 make -s -C aarch64/android nan_cli
-if ! aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --candidate-out "$tmp/candidate.nan1" --peek 8448:3,33090:1,12288:3,8456:1,8457:6 > "$tmp/out"; then cat "$tmp/out"; echo "trainer invocation failed"; exit 1; fi
+if ! aarch64/android/nan_cli --nannet-train "$tmp/corpus.txt" --serial --candidate-out "$tmp/candidate.nan1" --peek 8448:3,33090:1,81920:3,8456:1,8457:6 > "$tmp/out"; then cat "$tmp/out"; echo "trainer invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/out" || { cat "$tmp/out"; exit 1; }
 test -s "$tmp/candidate.nan1" || { echo "candidate checkpoint was not written"; exit 1; }
 if grep -a -q 'N16_GATE_UNIQUE_CORPUS_MARKER_7F31' "$tmp/candidate.nan1"; then echo "candidate checkpoint retained raw corpus text"; exit 1; fi
 grep -qx '00000001' "$tmp/out" || { echo "candidate bigram count missing"; cat "$tmp/out"; exit 1; }
 grep -qx '0B86B768' "$tmp/out" || { echo "deterministic trainer schedule digest mismatch"; cat "$tmp/out"; exit 1; }
 # --peek emits: PASS line, three stats, one bigram count, then the first
-# three corpus words (12288:3), then the schedule audit digest. The candidate
+# three corpus words (81920:3), then the schedule audit digest. The candidate
 # exporter may omit the input region entirely, so its marker-absence test is
 # NOT evidence that NaN16 scrubbed the source bytes from live guest memory.
 if ! awk 'NR >= 6 && NR <= 8 { if ($0 != "00000000") bad=1; seen++ }
@@ -37,6 +37,34 @@ test "$(sed -n '13p' "$tmp/out")" = '00000001' || {
 test "$(sed -n '15p' "$tmp/out")" = '00000003' || {
   echo "out-of-range completion context was accepted"; cat "$tmp/out"; exit 1;
 }
+# Prove the model/data layout under an input bigger than the old 16 KiB
+# overlap boundary. All 700 records must survive and every native AB bigram
+# must accumulate; neither buffer writes nor corpus scrubbing may erase them.
+printf 'N16TXT/1\\n' > "$tmp/long-corpus.txt"
+i=0
+while [ "$i" -lt 700 ]; do
+  printf 'AB repeated context data 0123456789.\\n' >> "$tmp/long-corpus.txt"
+  i=$((i + 1))
+done
+if ! aarch64/android/nan_cli --nannet-train "$tmp/long-corpus.txt" --serial \\
+    --peek 8449:1,33090:1,81920:3 > "$tmp/long.out"; then
+  cat "$tmp/long.out"
+  echo "large native trainer corpus invocation failed"
+  exit 1
+fi
+grep -qx 'N16 TRAIN PASS' "$tmp/long.out" || { cat "$tmp/long.out"; exit 1; }
+test "$(sed -n '2p' "$tmp/long.out")" = '000002BC' || {
+  echo "record accounting failed above former 16 KiB overlap"; cat "$tmp/long.out"; exit 1;
+}
+test "$(sed -n '3p' "$tmp/long.out")" = '000002BC' || {
+  echo "native bigram counts were corrupted by corpus input"; cat "$tmp/long.out"; exit 1;
+}
+if ! awk 'NR >= 4 && NR <= 6 { if ($0 != "00000000") bad=1; seen++ }
+          END { if (bad || seen != 3) exit 1 }' "$tmp/long.out"; then
+  echo "large corpus source was retained in the NaN16 guest"
+  cat "$tmp/long.out"
+  exit 1
+fi
 if ! aarch64/android/nan_cli --nannet-train --serial > "$tmp/sample.out"; then cat "$tmp/sample.out"; echo "sample invocation failed"; exit 1; fi
 grep -qx 'N16 TRAIN PASS' "$tmp/sample.out" || { cat "$tmp/sample.out"; exit 1; }
 sh tools/nannet-train.sh > "$tmp/launcher.out"
