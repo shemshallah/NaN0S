@@ -1,0 +1,31 @@
+name: Native HERMES NaN16DE lease gate
+
+on:
+  push:
+    paths:
+      - "src/nannet/hermes_lease.nas"
+      - "src/nannet/hermes_lease_test.nas"
+      - ".github/workflows/hermes-lease-native.yml"
+  pull_request:
+    paths:
+      - "src/nannet/hermes_lease.nas"
+      - "src/nannet/hermes_lease_test.nas"
+      - ".github/workflows/hermes-lease-native.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  nan16de-lease:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build existing native NaN16 guest interpreter
+        run: make -C aarch64/android nan_cli
+      - name: Assemble and execute per-lease universe regression in native NaN16
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh tools/nrun.sh src/nannet/hermes_lease_test.nas 1000000 | tee /tmp/hermes_lease.out
+          grep -q '^HERMES LEASE PASS' /tmp/hermes_lease.out
