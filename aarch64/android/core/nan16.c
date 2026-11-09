@@ -38,6 +38,19 @@ static uint32_t fp_cvtfi(uint32_t A) {
   if (f <= -2147483648.0f) return 0x80000000u;
   return (uint32_t)(int32_t)f;
 }
+static uint32_t fp_unary(uint32_t A, int op) {
+  if (is_nan32(A)) return A | 0x00400000u;
+  volatile float a = f32(A), r;
+  if (op == 0x46) r = expf(a);
+  else if (op == 0x47) r = tanhf(a);
+  else {
+    if ((A & 0x7FFFFFFFu) == 0) return 0xFF800000u;  /* log(+-0) = -inf */
+    if (A & 0x80000000u) return 0x7FC00000u;         /* log(negative) */
+    r = logf(a);
+  }
+  uint32_t x = u32(r);
+  return is_nan32(x) ? 0x7FC00000u : x;
+}
 
 nan_vm *nan_create(void) {
   nan_vm *v = (nan_vm *)calloc(1, sizeof *v);
@@ -151,7 +164,7 @@ int nan_run(nan_vm *v, uint32_t max_steps) {
     uint32_t p = (uint32_t)(w >> 16), op = p >> 24;
     int n = (int)((nan_hcls(nh) << 2) | nan_hcls(fh));
     if (op == 0xFF) { v->halted = 1; LEAVE(NAN_HALTED); }
-    if (op > 0x45) { trap(v, 'O', pc); pc = v->pc; LEAVE(NAN_HALTED); }
+    if (op > 0x48) { trap(v, 'O', pc); pc = v->pc; LEAVE(NAN_HALTED); }
     if (op != 0 && !((n >> v->k) & 1)) continue;
     if (v->trace) v->trace(v->trace_ctx, at, p, n, v->k);
     uint32_t d = (p >> 20) & 15, a = (p >> 16) & 15, imm = p & 0xFFFF;
@@ -229,6 +242,9 @@ int nan_run(nan_vm *v, uint32_t max_steps) {
     case 0x35: if (is_nan32(A) || is_nan32(B)) v->k = 3; else SETK(f32(A) == f32(B), f32(A) < f32(B)); break;
     case 0x36: { volatile float f = (float)(int32_t)A; r[d] = u32(f); v->k = 0; break; }
     case 0x37: { uint32_t res = fp_cvtfi(A); r[d] = res; SETK(res == 0, 0); break; }
+    case 0x46: r[d] = fp_unary(A, 0x46); v->k = 0; break;  /* FEXP */
+    case 0x47: r[d] = fp_unary(A, 0x47); v->k = 0; break;  /* FTANH */
+    case 0x48: r[d] = fp_unary(A, 0x48); v->k = 0; break;  /* FLOG */
     case 0x38: pc = p & 0xFFFFFF; break;
     case 0x39: r[15] = pc; pc = p & 0xFFFFFF; break;
     case 0x3A: r[d] = (v->fbw << 16) | v->fbh; break;

@@ -59,12 +59,16 @@ Payload `[31:24]=op, d, a, b=imm[3:0] or imm16`; predication as before.
     2F reserved
     30 FADD 31 FSUB 32 FMUL 33 FDIV 34 FSQRT d,a 35 FCMP a,b
     36 CVTIF d,a 37 CVTFI d,a
+    46 FEXP d,a 47 FTANH d,a 48 FLOG d,a
+      expf/tanhf/logf in the payload. NaN propagates as in the other FP ops;
+      FLOG(+-0) = -inf, FLOG(negative) = qNaN. These are the softmax,
+      activation and BPTT primitives; no separate VM revision is created.
       IEEE-754 binary32 in the payload, round to nearest even. FCMP sets
       Z=eq L=lt; unordered (NaN) sets (Z,L)=(1,1), the state the integer
       ops can never reach, so EQ/NE/LT/GT/LE/GE all skip. CVTFI truncates,
       saturates, NaN -> 0. Negate/abs = BOOL with 0x80000000 / 0x7FFFFFFF.
 
-Deliberately NOT yet: FSIN/FCOS/FATAN2 (tables or NaN polynomials first),
+Deliberately NOT yet: FSIN/FCOS/FATAN2 (the Q16 CORDIC path covers turns),
 FMA, SIMD lanes, FB ops.
 
 ## 3. NaNVM1 — memory and pc
@@ -369,10 +373,10 @@ existing op/ABI or its op is added here with a version.
 | NaNFS read, ATA PIO read | DONE |
 | DISPQ/DISPSET text boundary | DONE |
 | sealed-image verify (L4) | DONE (`spec/INTEGRITY_PLAN.md`) |
-| NaNVM1 op set 0x20-0x37 (32-bit mul/div, bytes, BCOPY, float32) | DONE in the C core (`aarch64/android/core/nan16.c`, `tests/test_core.c`); native implementation PLAN (§4) |
+| NaNVM1 op set 0x20-0x48 (32-bit mul/div, bytes, BCOPY, float32, FEXP/FTANH/FLOG) | DONE in the C core (`aarch64/android/core/nan16.c`, `tests/test_core.c`); native implementation PLAN (§4) |
 | 64-bit effective addresses (ADDRH, 0x40) | PLAN (§4.1) |
 | SMP cores, atomics, fences (0x41-0x44) | PLAN (§9.2, §9.3) |
-| AI packed math: FMA, DP2H, DP4B, CVTPK (0x45-0x48) | PLAN (§11) |
+| AI packed math: FMA, DP2H, DP4B, CVTPK (0x49-0x4C) | PLAN (§11) |
 | 16 GB RAM configuration (NAN_WORDS, 64-bit indices, demand-mapped host memory) | PLAN — C core revision |
 | nalloc64 (heaps > 2^31 words, 64-bit pointers/sizes) | PLAN (§11) |
 | NaNVM1 native flat memory + 32-bit pc | PLAN (§4.1-4.2) |
@@ -403,8 +407,8 @@ AI-specific second machine.
   DEV windows with 64-bit cell addresses; first use is a linear framebuffer,
   later virtio-gpu command rings.
 - **Compute.** f32 scalar math already exists (0x30-0x37). The AI family
-  adds FMA (0x45), packed f16 dot (0x46), packed i8 dot (0x47) and packed
-  conversions (0x48) so matrix work is bandwidth-bound instead of
+  adds FMA (0x49), packed f16 dot (0x4A), packed i8 dot (0x4B) and packed
+  conversions (0x4C) so matrix work is bandwidth-bound instead of
   instruction-bound. Packing f16/bf16 pairs and i8 quads inside the 32-bit
   payload is deliberate: the word stays 8 bytes, the gated class stays
   intact, and no raw side-regions appear.

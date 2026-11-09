@@ -1,5 +1,6 @@
 /* test_core.c - Gate C: unit tests for the portable NaN16 core. `make test`. Semantics source: core/OPS.md. */
 #include "../core/nan16_int.h"
+#include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -103,7 +104,7 @@ static void t_predication_and_traps(void) {
   /* HALT is silent and unconditional */
   begin(); emit(0xFF, 0, 0, 0, 0); go(10); ser(b, sizeof b); EQ(go(10), NAN_HALTED); CHECK(b[0] == 0); CHECK(!*nan_trap_text(V));
   /* bad op >0x45: trap text !O + pc after fetch, min 4 hex digits */
-  begin(); I(0x01, 3, 0, 1); I(0x46, 0, 0, 0); EQ(go(10), NAN_HALTED); ser(b, sizeof b); CHECK(!strcmp(b, "!O0002")); CHECK(!strcmp(nan_trap_text(V), "!O0002"));
+  begin(); I(0x01, 3, 0, 1); I(0x49, 0, 0, 0); EQ(go(10), NAN_HALTED); ser(b, sizeof b); CHECK(!strcmp(b, "!O0002")); CHECK(!strcmp(nan_trap_text(V), "!O0002"));
   EQ(go(10), NAN_HALTED);                                                   /* stays halted */
   begin(); I(0x0E, 0, 0, 0); go(10); ser(b, sizeof b); CHECK(!strcmp(b, "!O0001"));      /* table entry 0x0E is a bad op */
   begin(); I(0x1C, 0, 0, 0); go(10); ser(b, sizeof b); CHECK(!strcmp(b, "!O0001"));
@@ -116,13 +117,14 @@ static void t_predication_and_traps(void) {
   /* one bad head only is still a gate trap */
   begin(); nan_set_word(V, 0, (nan_mkword(0x01000000u, 15) & ~((uint64_t)0xFFFF << 48)) | ((uint64_t)0x7FF2 << 48)); go(10); ser(b, sizeof b); CHECK(!strcmp(b, "!G0001"));
   /* large pc prints more digits */
-  begin(); I(0x38, 0, 0, 0); nan_set_word(V, 0, nan_mkword(0x38ABCDEFu, 15)); nan_set_word(V, 0xABCDEF, nan_mkword(0x46000000u, 15)); go(10); ser(b, sizeof b); CHECK(!strcmp(b, "!OABCDF0"));
+  begin(); I(0x38, 0, 0, 0); nan_set_word(V, 0, nan_mkword(0x38ABCDEFu, 15)); nan_set_word(V, 0xABCDEF, nan_mkword(0x49000000u, 15)); go(10); ser(b, sizeof b); CHECK(!strcmp(b, "!OABCDF0"));
   /* JMP/CALL/RET/JMPR/CALLR */
   begin(); I(0x0B, 0, 0, 4); I(0x01, 4, 0, 7); halt(); I(0x0F, 0, 0, 0); I(0x01, 3, 0, 5); I(0x0C, 0, 0, 0); go(100); EQ(R(3), 5); EQ(R(4), 7); EQ(R(15), 1);
   begin(); I(0x01, 1, 0, 3); I(0x2C, 0, 1, 0); halt(); I(0x01, 5, 0, 1); I(0x0D, 0, 15, 0); go(100); EQ(R(5), 1); EQ(R(15), 2);
 }
 
 static uint32_t f2u(float f) { uint32_t x; memcpy(&x, &f, 4); return x; }
+static float f32(uint32_t x) { float f; memcpy(&f, &x, 4); return f; }
 static uint32_t un(int op, uint32_t A, int *k) { begin(); nan_set_reg(V, 1, A); I(op, 3, 1, 0); halt(); go(100); if (k) *k = nan_flags(V); return R(3); }
 static void t_fp(void) {
   int k; const uint32_t SNAN = 0x7F800001u, QNAN = 0x7FC00000u, INF = 0x7F800000u, NINF = 0xFF800000u, DEF = 0xFFC00000u;
@@ -149,6 +151,13 @@ static void t_fp(void) {
   EQ(un(0x37, f2u(3e10f), &k), 0x7FFFFFFFu); EQ(un(0x37, f2u(-3e10f), &k), 0x80000000u);
   EQ(un(0x37, f2u(-2147483648.f), &k), 0x80000000u); EQ(un(0x37, f2u(2147483648.f), &k), 0x7FFFFFFFu);
   EQ(un(0x37, f2u(0.5f), &k), 0); EQ(k, 2); EQ(un(0x37, f2u(2147483520.f), &k), 2147483520u);
+  /* FEXP / FTANH / FLOG: needed by softmax, MLP and BPTT, no new VM */
+  EQ(un(0x46, f2u(0.f), &k), f2u(1.f)); EQ(k, 0);
+  CHECK(fabs(f32(un(0x46, f2u(1.f), &k)) - expf(1.f)) < 1e-6f);
+  EQ(un(0x47, f2u(0.f), &k), 0); EQ(un(0x47, 0x80000000u, &k), 0x80000000u);
+  CHECK(fabs(f32(un(0x47, f2u(1.f), &k)) - tanhf(1.f)) < 1e-6f);
+  EQ(un(0x48, f2u(1.f), &k), 0); EQ(k, 0); EQ(un(0x48, 0, &k), 0xFF800000u);
+  EQ(un(0x48, f2u(-1.f), &k), 0x7FC00000u); EQ(un(0x46, SNAN, &k), SNAN | 0x400000u);
 }
 
 static void t_memory_ops(void) {

@@ -18,7 +18,7 @@ this round. Items marked [FIX] correct the first draft of this file.
 ## Fetch / decode
 loop: steps++ (kernel stops at MAXS=0x7FFFFFFF silently; the C core uses a per-call budget instead).
 gate: BOTH heads valid else trap "!G" . pc++ . op==0xFF HALT (silent, unconditional, before predication).
-op>0x45 -> trap "!O" (also unconditional). Then: op!=0 requires (n>>k)&1 else the op is skipped silently - this applies
+op>0x48 -> trap "!O" (also unconditional). Then: op!=0 requires (n>>k)&1 else the op is skipped silently - this applies
 to ALL ops incl. the bad ones in the table (0x0E, 0x1C-0x1F), so a predicated-off bad op does not trap. BOOL (0x00) ignores n for
 the predicate (n is its truth table). Payload p: op=p>>24 d=(p>>20)&15 a=(p>>16)&15 imm=p&0xFFFF A=r[a] B=r[imm&15].
 pc is a full 32-bit counter (JMPF/CALLF 24-bit); the word fetched is (pc & MASK). JMP/CALL load imm (16-bit).
@@ -46,13 +46,15 @@ Trap text: "!" + 'G'|'O' + uppercase hex of (pc after the fetch increment), min 
 3A FBINFO r[d]=FBW<<16|FBH  3B VSYNC  3C FBCOPY(count r[d], dst A, src B)  3D FBFILL(count r[d], start A, colour B&255)
 3E OUTB(port A&0xFFFF, val r[d])  3F INB  40 INW  41 OUTW  42 OUTSW(port A, src word index B, count r[d]; low16 of each payload, B not masked in x86)  43 OUTL (no INL exists)
 44 CPUID(leaf A, subleaf 0; r[d] = reg B&3 of EAX,EBX,ECX,EDX)  45 RDTSC (r[d] = A==0 ? low32 : high32)
+46 FEXP d,a = expf(A)  47 FTANH d,a = tanhf(A)  48 FLOG d,a = logf(A)
 Plain ops leave flags alone: MOVI MOVHI LD ST LDN STW KEY KEYQ TICK VPEEK VPOKE BSWAPM PUTC DISPQ FBINFO INB... BOOL/ADD/SUB/shifts/CMP*/MUL*/DIV*/ADDI set flags.
 [FIX] VPEEK with an out-of-range index leaves r[d] UNCHANGED (kernel jumps to loop without storing). VPOKE out of range is ignored.
 
 ## Floating point (x86 SSE single, MXCSR default: no FTZ/DAZ, round-to-nearest-even)
 FADD/FSUB/FMUL: if A is NaN -> A|0x00400000; else if B is NaN -> B|0x00400000; else IEEE op; if the result is NaN (inf-inf, 0*inf) -> 0xFFC00000.
 FDIV: if B is +-0: A is +-0 or NaN -> 0x7FC00000; otherwise +-inf (sign xor) as IEEE. Else the same NaN rules as FADD (inf/inf -> 0xFFC00000).
-FSQRT: A NaN or A<0 (strict; -0 -> -0) -> 0x7FC00000. FCMP: unordered -> k=3, else Z=eq, L=A<B. CVTIF = (float)(int32) RNE.
+FSQRT: A NaN or A<0 (strict; -0 -> -0) -> 0x7FC00000.
+FEXP/FTANH/FLOG: A NaN -> A|0x00400000; result NaN -> 0x7FC00000; FLOG(+-0) -> -inf, FLOG(negative) -> qNaN; all set k=0. FCMP: unordered -> k=3, else Z=eq, L=A<B. CVTIF = (float)(int32) RNE.
 CVTFI: NaN -> 0; trunc toward zero; >=2^31 -> 0x7FFFFFFF; <=-2^31 -> 0x80000000; flags: Z from result, L=0.
 ARM note: AArch64/ARMv7 produce 0x7FC00000 for invalid ops and propagate NaNs differently, so the C core implements the rules in software
 (bit tests) and never trusts the host FPU for NaN results. Build with -ffp-contract=off -fno-fast-math.
