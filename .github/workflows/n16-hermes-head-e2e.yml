@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: shemshallah/NaNROUTER
-          ref: 2f13095050eb086be8ac5e7a3fe40eac28f26a77
+          ref: 63f6f51cbd14557c70d959d70f5d8f8e21797fa1
           path: router
       - uses: actions/checkout@v4
         with:
