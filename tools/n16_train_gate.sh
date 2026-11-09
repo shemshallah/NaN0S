@@ -40,13 +40,13 @@ test "$(sed -n '15p' "$tmp/out")" = '00000003' || {
 # Prove the model/data layout under an input bigger than the old 16 KiB
 # overlap boundary. All 700 records must survive and every native AB bigram
 # must accumulate; neither buffer writes nor corpus scrubbing may erase them.
-printf 'N16TXT/1\\n' > "$tmp/long-corpus.txt"
+printf 'N16TXT/1\n' > "$tmp/long-corpus.txt"
 i=0
 while [ "$i" -lt 700 ]; do
-  printf 'AB repeated context data 0123456789.\\n' >> "$tmp/long-corpus.txt"
+  printf 'AB repeated context data 0123456789.\n' >> "$tmp/long-corpus.txt"
   i=$((i + 1))
 done
-if ! aarch64/android/nan_cli --nannet-train "$tmp/long-corpus.txt" --serial \\
+if ! aarch64/android/nan_cli --nannet-train "$tmp/long-corpus.txt" --serial \
     --peek 8449:1,33090:1,81920:3 > "$tmp/long.out"; then
   cat "$tmp/long.out"
   echo "large native trainer corpus invocation failed"
