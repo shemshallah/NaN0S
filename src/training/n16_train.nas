@@ -1,12 +1,14 @@
 ; NaN16 corpus trainer v1.
 ; Input: N16TXT/1 LF header followed by newline-delimited UTF-8 records.
-; Host boundary writes bytes at byte address 49152 and appends NUL.
+; Host boundary writes bytes at byte address 327680 (word 81920) and appends NUL.
+; This starts AFTER the dense bigram model (words 16384..81919); the
+; earlier 49152-byte address overlapped its cells on corpora over 16 KiB.
 ; All parsing, bounds, record accounting, frequency updates and digest work run here.
 ; Candidate model: unigram[256] at 8192; bigram[256x256] at 16384.
 ; Output statistics: words 8448..8450 = content bytes, records, rolling digest.
 main:
 MOVI r13,1
-MOVI r4,49152
+LA r4,0x00050000
 ; exact 9-byte header: N16TXT/1 + LF
 LDB r1,r4,0
 MOVI r2,78
@@ -291,7 +293,7 @@ ST r8,r12,0
 ; Restore the original scan terminator byte pointer, not the final draw index.
 ADDI r4,r14,0
 ; Clear the original corpus bytes before any candidate checkpoint is exported.
-MOVI r2,49152
+LA r2,0x00050000
 clear_corpus:
 CMP r2,r4
 JMP[GT] @corpus_cleared
@@ -483,6 +485,6 @@ prev_valid:
 ; backoff byte and status. These are observable candidate diagnostics.
 prediction_probe:
 .word 0,0,0,0,0,0,0
-.org 12288
+.org 81920
 corpus:
 .str "N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n"
