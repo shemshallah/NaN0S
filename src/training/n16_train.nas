@@ -320,6 +320,29 @@ CALL @predict_next
 MOVI r12,8461
 ST r4,r12,0
 ST r5,r12,1
+; Bounded native multi-byte completion probe. The guest, not the host,
+; follows its predicted byte back into the next prediction. Four steps fit
+; the dedicated guest-owned diagnostic words; no corpus bytes are retained.
+MOVI r1,65
+MOVI r2,4
+CALL @predict_chain
+MOVI r12,8463
+ST r4,r12,0
+ST r5,r12,1
+; Refuse unbounded requests without writing the completion buffer.
+MOVI r1,65
+MOVI r2,9
+CALL @predict_chain
+MOVI r12,8465
+ST r4,r12,0
+ST r5,r12,1
+; Signed negative contexts must also fail closed, not wrap into tables.
+MOVI r1,1
+SUB r1,r0,r1
+CALL @predict_next
+MOVI r12,8467
+ST r4,r12,0
+ST r5,r12,1
 ; report success on COM1
 MOVI r1,78
 PUTC r1
@@ -412,6 +435,8 @@ RET
 ; Deterministic lowest-byte tie break, no record-crossing bigrams.
 ; All counts and choices remain inside the NaN16 guest.
 predict_next:
+CMP r1,r0
+JMP[LT] @predict_invalid
 MOVI r6,256
 CMP r1,r6
 JMP[GE] @predict_invalid
@@ -470,6 +495,53 @@ MOVI r4,0
 MOVI r5,3
 RET
 
+; Bounded greedy generation composed entirely of native NaN16 CALLs.
+; ABI: r1=start byte (0..255); r2=length (1..8).
+;      On success r4=number generated and r5=0; r5=1 invalid length,
+;      r5=2 untrained model, r5=3 invalid context. Failed validation never
+;      writes results. Guest words 8470..8477 hold bytes and 8478..8485
+;      hold per-step backoff codes (0 bigram, 1 unigram).
+; IMPORTANT: NaN16 CALL stores its return PC in a SINGLE r15 link register.
+; The nested CALL to predict_next must save/restore r15 explicitly.
+predict_chain:
+MOVI r4,0
+MOVI r5,1
+CMP r2,r0
+JMP[LE] @predict_chain_return
+MOVI r10,8
+CMP r2,r10
+JMP[GT] @predict_chain_return
+CMP r1,r0
+JMP[LT] @predict_chain_invalid
+MOVI r10,256
+CMP r1,r10
+JMP[GE] @predict_chain_invalid
+ADDI r14,r15,0
+MOVI r11,0
+MOVI r12,8470
+predict_chain_step:
+CALL @predict_next
+MOVI r10,2
+CMP r5,r10
+JMP[GE] @predict_chain_failure
+ST r4,r12,0
+ST r5,r12,8
+ADDI r1,r4,0
+ADDI r12,r12,1
+ADDI r11,r11,1
+CMP r11,r2
+JMP[LT] @predict_chain_step
+MOVI r5,0
+predict_chain_failure:
+ADDI r4,r11,0
+ADDI r15,r14,0
+RET
+predict_chain_invalid:
+MOVI r5,3
+predict_chain_return:
+MOVI r4,0
+RET
+
 .org 8192
 freq:
 .word 0
@@ -485,6 +557,15 @@ prev_valid:
 ; backoff byte and status. These are observable candidate diagnostics.
 prediction_probe:
 .word 0,0,0,0,0,0,0
+.org 8463
+; chain length/status, invalid-length length/status, negative-context result/status
+chain_metadata:
+.word 0,0,0,0,0,0
+.org 8470
+chain_bytes:
+.word 0,0,0,0,0,0,0,0
+chain_statuses:
+.word 0,0,0,0,0,0,0,0
 .org 81920
 corpus:
 .str "N16TXT/1\nNaN16 owns the corpus codec.\nRunner and Android share one trainer.\nThe intake stages updates before merge.\n"
