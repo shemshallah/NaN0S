@@ -57,8 +57,10 @@ run_one disasm src/tests/disasm_test.nas
 grep -q "DISASM DONE" "$T/disasm.ref" || { echo "s1 a64 gate: FAIL (disasm reference)"; exit 1; }
 run_one n16i src/tests/n16i_test.nas
 grep -q "N16I GUEST DONE" "$T/n16i.ref" || { echo "s1 a64 gate: FAIL (n16i reference)"; exit 1; }
+run_one tm src/tests/tm_test.nas
+grep -q "TM ALL PASS" "$T/tm.ref" || { echo "s1 a64 gate: FAIL (TM reference)"; exit 1; }
 for t in n16de_test a2_boot_test nan16dump_test; do
   run_one "$t" "src/tests/$t.nas"
   grep -q "PASS" "$T/$t.ref" || { echo "s1 a64 gate: FAIL ($t reference)"; exit 1; }
 done
-echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + ring + keytest + disasm + n16i + n16de + a2_boot + nan16dump + work image)"
+echo "s1 a64 gate: PASS (differential vs nan_cli: s1_test + carry_probe + nalloc_test + a64_test + fp_test + dev_test + ring + keytest + disasm + n16i + tm + n16de + a2_boot + nan16dump + work image)"

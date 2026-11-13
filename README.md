@@ -252,6 +252,7 @@ flowchart LR
 | `sh x86/tools/qgate.sh` | the bare-metal boot prints the COM1 banner |
 | `sh tools/ngate_nfix.sh` | `nasm0` is a fixed point: gen0 = gen1 = gen2 |
 | `sh tools/ngate_n16i.sh` | native and interpreted runs are indistinguishable |
+| `sh tools/tm_gate.sh` | table-driven NaN16 Turing machine: native == n16i, exact tapes |
 | `make seals` · `make test` (in `aarch64/android`) | exhibits can be run in any order without corrupting one another's seals · the C core's 866 checks |
 
 The long form, with the diverse-double-compilation argument and the dual-face seal, is the [**Trust paper**](spec/TRUST_PAPER.md).
@@ -410,6 +411,7 @@ You need `sh`, `awk`, `xxd` and `qemu-system-i386`. That is the whole list.
 sh x86/tools/qgate.sh      # boot gate
 sh tools/ngate_nfix.sh     # nasm0 fixed point  → F1 PASS · F2 PASS · FIX PASS
 sh tools/ngate_n16i.sh     # native == interpreted
+sh tools/tm_gate.sh        # table-driven TM native == n16i
 ```
 
 **Without QEMU.** The portable core runs the same image from a terminal:
@@ -446,7 +448,7 @@ Living TODO: [`TODO.md`](TODO.md)
 
 What is solid, and what is in flight. Nothing here is rounded up.
 
-- **Solid:** the word model, the both-face gate, the nine exhibits, the sealed cartridge store, the `nasm0` fixed point, `n16i` and its differential gate, NaNFS, the portable C core, the browser player.
+- **Solid:** the word model, the both-face gate, the nine exhibits, the sealed cartridge store, the `nasm0` fixed point, `n16i` and its differential gate, the table-driven TM native/n16i gate, NaNFS, the portable C core, the browser player.
 - **In flight:** retiring the last Python scaffolds from `tools/` (replacements are NaN16, assembled by `nasm0`, run by the gates above); the Android app's first on-device fixes (portrait scaling, pinch-zoom, a GUI that fits any screen); a launcher so the desktop can open any cartridge; one canonical Sierpinski instead of two.
 - **Ahead:** Hall 1 — the Apollo guidance computer; the failure exhibits; the networking museum (modern and historical, from scratch, universal across all three bodies); a 16 GB bank window; RISC-V made real.
 
